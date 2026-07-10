@@ -1,17 +1,59 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Ticket, X } from 'lucide-react'
 import ProductImage from '../components/ProductImage'
+import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
-import { formatPrice, calcShipping, STORE } from '../config'
+import { formatPrice, STORE } from '../config'
+import { findCoupon, evaluateCoupon, computeTotals, couponLabel } from '../lib/coupons'
 
 export default function Cart() {
-  const { items, subtotal, setQuantity, removeItem } = useCart()
-  const shipping = calcShipping(subtotal)
-  const total = subtotal + shipping
+  const {
+    items,
+    subtotal,
+    setQuantity,
+    removeItem,
+    appliedCoupon,
+    applyCoupon,
+    removeCoupon,
+  } = useCart()
+
+  const [couponInput, setCouponInput] = useState('')
+  const [couponError, setCouponError] = useState('')
+  const [checking, setChecking] = useState(false)
+
+  const { discount, freeShipping, shipping, total } = computeTotals(subtotal, appliedCoupon)
+  const couponStillValid = appliedCoupon ? evaluateCoupon(appliedCoupon, subtotal).valid : true
   const missingForFree =
-    STORE.freeShippingFrom && subtotal > 0 && subtotal < STORE.freeShippingFrom
+    !freeShipping && STORE.freeShippingFrom && subtotal > 0 && subtotal < STORE.freeShippingFrom
       ? STORE.freeShippingFrom - subtotal
       : 0
+
+  async function handleApplyCoupon(e) {
+    e.preventDefault()
+    const code = couponInput.trim()
+    if (!code) return
+    setChecking(true)
+    setCouponError('')
+    try {
+      const coupon = await findCoupon(code)
+      if (!coupon) {
+        setCouponError('Cupón no válido.')
+        return
+      }
+      const ev = evaluateCoupon(coupon, subtotal)
+      if (!ev.valid) {
+        setCouponError(ev.reason)
+        return
+      }
+      applyCoupon(coupon)
+      setCouponInput('')
+    } catch {
+      setCouponError('No se pudo validar el cupón.')
+    } finally {
+      setChecking(false)
+    }
+  }
 
   if (items.length === 0) {
     return (
@@ -105,11 +147,63 @@ export default function Cart() {
         <aside className="lg:sticky lg:top-32 lg:self-start">
           <div className="rounded-2xl border border-line bg-surface p-5">
             <h2 className="font-display text-lg font-bold text-fg">Resumen</h2>
-            <dl className="mt-4 space-y-2.5 text-sm">
+
+            {/* Cupón */}
+            <div className="mt-4">
+              {appliedCoupon && couponStillValid ? (
+                <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
+                  <Ticket className="h-4 w-4 text-emerald-400" />
+                  <div className="flex-1 text-sm">
+                    <span className="font-semibold text-fg">{appliedCoupon.code}</span>
+                    <span className="text-fg-muted"> · {couponLabel(appliedCoupon)}</span>
+                  </div>
+                  <button
+                    onClick={removeCoupon}
+                    className="grid h-6 w-6 place-items-center rounded text-fg-subtle hover:text-fg"
+                    aria-label="Quitar cupón"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleApplyCoupon} className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Ticket className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
+                    <input
+                      value={couponInput}
+                      onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                      placeholder="Código de cupón"
+                      className="field pl-9 uppercase"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={checking || !couponInput.trim()}
+                    className="shrink-0 rounded-xl bg-surface-3 px-4 text-sm font-semibold text-fg transition hover:bg-surface-2 disabled:opacity-50"
+                  >
+                    {checking ? <Spinner size={4} /> : 'Aplicar'}
+                  </button>
+                </form>
+              )}
+              {couponError && <p className="mt-2 text-xs text-brand-400">{couponError}</p>}
+              {appliedCoupon && !couponStillValid && (
+                <p className="mt-2 text-xs text-amber-400">
+                  El cupón no aplica al subtotal actual.
+                </p>
+              )}
+            </div>
+
+            <dl className="mt-4 space-y-2.5 border-t border-line pt-4 text-sm">
               <div className="flex justify-between">
                 <dt className="text-fg-muted">Subtotal</dt>
                 <dd className="font-medium text-fg">{formatPrice(subtotal)}</dd>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between">
+                  <dt className="text-fg-muted">Descuento</dt>
+                  <dd className="font-medium text-emerald-400">−{formatPrice(discount)}</dd>
+                </div>
+              )}
               <div className="flex justify-between">
                 <dt className="text-fg-muted">Envío</dt>
                 <dd className="font-medium text-fg">

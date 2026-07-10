@@ -36,16 +36,26 @@ Deno.serve(async (req) => {
       return json({ error: 'Falta configurar MERCADOPAGO_ACCESS_TOKEN.' }, 500)
     }
 
-    const { order_id, items, shipping, payer, back_url_base } = await req.json()
+    const { order_id, items, shipping, discount, payer, back_url_base } = await req.json()
 
     if (!order_id || !Array.isArray(items) || items.length === 0) {
       return json({ error: 'Pedido inválido.' }, 400)
     }
 
+    // Reparte el descuento proporcionalmente en los precios (MercadoPago no
+    // admite importes negativos), para que la suma cuadre con el total cobrado.
+    const productsSubtotal = items.reduce(
+      (s: number, i: any) => s + Number(i.unit_price) * Number(i.quantity),
+      0
+    )
+    const disc = Number(discount) || 0
+    const factor =
+      disc > 0 && productsSubtotal > 0 ? Math.max(0, (productsSubtotal - disc) / productsSubtotal) : 1
+
     const prefItems = items.map((i: any) => ({
       title: String(i.title).slice(0, 250),
       quantity: Number(i.quantity),
-      unit_price: Number(i.unit_price),
+      unit_price: Math.round(Number(i.unit_price) * factor * 100) / 100,
       currency_id: 'MXN',
     }))
 

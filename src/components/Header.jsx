@@ -1,14 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { ShoppingCart, Search, MapPin, Truck } from 'lucide-react'
+import { ShoppingCart, Search, MapPin, Truck, Heart } from 'lucide-react'
 import Logo from './Logo'
 import UserMenu from './UserMenu'
 import { useCart } from '../context/CartContext'
+import { useFavorites } from '../context/FavoritesContext'
 import { getCategories } from '../lib/api'
 import { STORE, formatPrice } from '../config'
 
 export default function Header() {
   const { count } = useCart()
+  const { count: favCount } = useFavorites()
   const navigate = useNavigate()
   const [categories, setCategories] = useState([])
   const [search, setSearch] = useState('')
@@ -64,6 +66,18 @@ export default function Header() {
           </form>
 
           <div className="ml-auto flex items-center gap-1">
+            <Link
+              to="/favoritos"
+              className="relative grid h-10 w-10 place-items-center rounded-lg text-fg-muted transition hover:bg-surface-2 hover:text-fg"
+              aria-label="Favoritos"
+            >
+              <Heart className="h-5.5 w-5.5" />
+              {favCount > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
+                  {favCount}
+                </span>
+              )}
+            </Link>
             <UserMenu />
             <Link
               to="/carrito"

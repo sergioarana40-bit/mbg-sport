@@ -59,6 +59,24 @@ export async function getProducts({ categorySlug, featured, search } = {}) {
   return list
 }
 
+export async function getProductsByIds(ids) {
+  const list = Array.isArray(ids) ? ids : []
+  if (list.length === 0) return []
+  if (!isSupabaseConfigured) {
+    return withCategoryNames(
+      DEMO_PRODUCTS.filter((p) => list.includes(p.id)),
+      DEMO_CATEGORIES
+    )
+  }
+  const { data, error } = await supabase
+    .from('products')
+    .select('*, categories(name, slug)')
+    .in('id', list)
+    .eq('active', true)
+  if (error) throw error
+  return data.map(normalize)
+}
+
 export async function getProductById(id) {
   if (!isSupabaseConfigured) {
     const p = DEMO_PRODUCTS.find((x) => x.id === id)
@@ -77,7 +95,18 @@ export async function getProductById(id) {
 /* ------------------------- Pedidos ------------------------- */
 
 // Crea un pedido con sus items. Devuelve el pedido creado.
-export async function createOrder({ customer, items, subtotal, shipping, total, notes, userId }) {
+export async function createOrder({
+  customer,
+  items,
+  subtotal,
+  shipping,
+  total,
+  notes,
+  userId,
+  deliveryMethod,
+  discount,
+  couponCode,
+}) {
   if (!isSupabaseConfigured) {
     throw new Error('Configura Supabase para poder registrar pedidos.')
   }
@@ -97,6 +126,9 @@ export async function createOrder({ customer, items, subtotal, shipping, total, 
     notes: notes || null,
     subtotal,
     shipping,
+    discount: discount || 0,
+    coupon_code: couponCode || null,
+    delivery_method: deliveryMethod || 'shipping',
     total,
     status: 'pending',
     payment_status: 'pending',

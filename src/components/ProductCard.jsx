@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Plus, Check } from 'lucide-react'
 import ProductImage from './ProductImage'
+import FavoriteButton from './FavoriteButton'
 import { formatPrice } from '../config'
 import { useCart } from '../context/CartContext'
 
@@ -32,7 +33,12 @@ export default function ProductCard({ product }) {
         {product.featured && (
           <span className="badge-featured absolute left-2 top-2">Destacado</span>
         )}
-        {outOfStock && <span className="badge-out absolute right-2 top-2">Agotado</span>}
+        {outOfStock && <span className="badge-out absolute bottom-2 left-2">Agotado</span>}
+        <FavoriteButton
+          productId={product.id}
+          size={4.5}
+          className="absolute right-2 top-2 h-8 w-8 bg-ink/50 text-white backdrop-blur hover:bg-ink/70"
+        />
       </div>
 
       <div className="flex flex-1 flex-col p-3.5">

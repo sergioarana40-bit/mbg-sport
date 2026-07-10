@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { Minus, Plus, ShoppingCart, Check, ChevronRight, Package } from 'lucide-react'
 import ProductImage from '../components/ProductImage'
+import FavoriteButton from '../components/FavoriteButton'
+import ProductReviews from '../components/ProductReviews'
 import Spinner from '../components/Spinner'
 import { getProductById } from '../lib/api'
 import { formatPrice, STORE } from '../config'
@@ -74,11 +76,17 @@ export default function ProductDetail() {
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
-        <ProductImage
-          src={product.image_url}
-          alt={product.name}
-          className="aspect-square rounded-2xl border border-line"
-        />
+        <div className="relative">
+          <ProductImage
+            src={product.image_url}
+            alt={product.name}
+            className="aspect-square rounded-2xl border border-line"
+          />
+          <FavoriteButton
+            productId={product.id}
+            className="absolute right-3 top-3 h-10 w-10 bg-ink/50 text-white backdrop-blur hover:bg-ink/70"
+          />
+        </div>
 
         <div>
           {product.category_name && (
@@ -162,6 +170,8 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+
+      <ProductReviews productId={product.id} />
     </div>
   )
 }

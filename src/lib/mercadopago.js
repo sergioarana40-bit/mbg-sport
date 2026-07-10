@@ -13,6 +13,7 @@ export async function createMercadoPagoPreference({ order, items }) {
         unit_price: Number(i.price),
       })),
       shipping: order.shipping,
+      discount: order.discount || 0,
       payer: {
         name: order.customer_name,
         email: order.customer_email,

@@ -8,6 +8,7 @@ import Checkout from './pages/Checkout'
 import OrderConfirmation from './pages/OrderConfirmation'
 import NotFound from './pages/NotFound'
 
+import Favorites from './pages/Favorites'
 import Account from './pages/account/Account'
 import CustomerLogin from './pages/account/CustomerLogin'
 import Register from './pages/account/Register'
@@ -18,6 +19,7 @@ import AdminLogin from './pages/admin/Login'
 import Dashboard from './pages/admin/Dashboard'
 import AdminProducts from './pages/admin/AdminProducts'
 import AdminCategories from './pages/admin/AdminCategories'
+import AdminCoupons from './pages/admin/AdminCoupons'
 import AdminOrders from './pages/admin/AdminOrders'
 
 export default function App() {
@@ -29,6 +31,7 @@ export default function App() {
         <Route path="/catalogo" element={<Catalog />} />
         <Route path="/catalogo/:slug" element={<Catalog />} />
         <Route path="/producto/:id" element={<ProductDetail />} />
+        <Route path="/favoritos" element={<Favorites />} />
         <Route path="/carrito" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/pedido/:id" element={<OrderConfirmation />} />
@@ -50,6 +53,7 @@ export default function App() {
         <Route index element={<Dashboard />} />
         <Route path="productos" element={<AdminProducts />} />
         <Route path="categorias" element={<AdminCategories />} />
+        <Route path="cupones" element={<AdminCoupons />} />
         <Route path="pedidos" element={<AdminOrders />} />
       </Route>
 

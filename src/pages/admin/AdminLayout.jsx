@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Package,
   Tags,
+  Ticket,
   ShoppingBag,
   LogOut,
   Store,
@@ -18,6 +19,7 @@ const NAV = [
   { to: '/admin/pedidos', label: 'Pedidos', icon: ShoppingBag },
   { to: '/admin/productos', label: 'Productos', icon: Package },
   { to: '/admin/categorias', label: 'Categorías', icon: Tags },
+  { to: '/admin/cupones', label: 'Cupones', icon: Ticket },
 ]
 
 export default function AdminLayout() {

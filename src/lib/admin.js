@@ -133,6 +133,43 @@ export async function updateOrderStatus(id, status) {
   if (error) throw error
 }
 
+/* ------------------------- Cupones ------------------------- */
+
+export async function getAllCoupons() {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('coupons')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+export async function saveCoupon(coupon) {
+  if (!isSupabaseConfigured) return needBackend()
+  const payload = {
+    code: coupon.code.trim().toUpperCase(),
+    type: coupon.type,
+    value: Number(coupon.value) || 0,
+    min_subtotal: Number(coupon.min_subtotal) || 0,
+    active: coupon.active !== false,
+    expires_at: coupon.expires_at || null,
+  }
+  if (coupon.id) {
+    const { error } = await supabase.from('coupons').update(payload).eq('id', coupon.id)
+    if (error) throw error
+  } else {
+    const { error } = await supabase.from('coupons').insert(payload)
+    if (error) throw error
+  }
+}
+
+export async function deleteCoupon(id) {
+  if (!isSupabaseConfigured) return needBackend()
+  const { error } = await supabase.from('coupons').delete().eq('id', id)
+  if (error) throw error
+}
+
 /* ------------------------- Estadísticas ------------------------- */
 
 const PAID_STATES = ['paid', 'processing', 'shipped', 'delivered']

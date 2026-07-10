@@ -200,10 +200,20 @@ export default function AdminOrders() {
                 <dt className="text-fg-muted">Subtotal</dt>
                 <dd className="text-fg">{formatPrice(selected.subtotal)}</dd>
               </div>
+              {Number(selected.discount) > 0 && (
+                <div className="flex justify-between">
+                  <dt className="text-fg-muted">
+                    Descuento{selected.coupon_code ? ` (${selected.coupon_code})` : ''}
+                  </dt>
+                  <dd className="text-emerald-400">−{formatPrice(selected.discount)}</dd>
+                </div>
+              )}
               <div className="flex justify-between">
-                <dt className="text-fg-muted">Envío</dt>
+                <dt className="text-fg-muted">
+                  {selected.delivery_method === 'pickup' ? 'Recogida en tienda' : 'Envío'}
+                </dt>
                 <dd className="text-fg">
-                  {selected.shipping === 0 ? 'Gratis' : formatPrice(selected.shipping)}
+                  {Number(selected.shipping) === 0 ? 'Gratis' : formatPrice(selected.shipping)}
                 </dd>
               </div>
               <div className="flex justify-between border-t border-line pt-2 text-base font-semibold">
