@@ -43,19 +43,19 @@ export default function Catalog() {
   }, [products, sort])
 
   const linkClass = ({ isActive }) =>
-    `block rounded-lg px-3 py-2 text-sm transition ${
+    `block whitespace-nowrap rounded-lg px-3 py-2 text-sm transition ${
       isActive
-        ? 'bg-brand-50 font-semibold text-brand-700'
-        : 'text-neutral-600 hover:bg-neutral-100'
+        ? 'bg-brand-600 font-semibold text-white'
+        : 'text-fg-muted hover:bg-surface-2 hover:text-fg'
     }`
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
       <div className="mb-6">
-        <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-neutral-900 sm:text-3xl">
+        <h1 className="font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl">
           {title}
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm text-fg-muted">
           {loading ? 'Cargando…' : `${sorted.length} producto${sorted.length === 1 ? '' : 's'}`}
         </p>
       </div>
@@ -63,7 +63,7 @@ export default function Catalog() {
       <div className="grid gap-8 lg:grid-cols-[220px_1fr]">
         {/* Filtro de categorías */}
         <aside className="lg:sticky lg:top-32 lg:self-start">
-          <h2 className="mb-2 hidden text-xs font-bold uppercase tracking-wide text-neutral-400 lg:block">
+          <h2 className="mb-2 hidden text-xs font-bold uppercase tracking-wide text-fg-subtle lg:block">
             Categorías
           </h2>
           <nav className="no-scrollbar flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:gap-0.5 lg:overflow-visible">
@@ -81,12 +81,12 @@ export default function Catalog() {
         {/* Resultados */}
         <div>
           <div className="mb-4 flex items-center justify-end">
-            <label className="flex items-center gap-2 text-sm text-neutral-500">
+            <label className="flex items-center gap-2 text-sm text-fg-muted">
               <SlidersHorizontal className="h-4 w-4" />
               <select
                 value={sort}
                 onChange={(e) => setSort(e.target.value)}
-                className="rounded-lg border border-neutral-300 bg-white px-2.5 py-1.5 text-sm text-neutral-800 outline-none focus:border-brand-500"
+                className="field w-auto py-1.5"
               >
                 <option value="recent">Más recientes</option>
                 <option value="price-asc">Precio: menor a mayor</option>
@@ -101,9 +101,9 @@ export default function Catalog() {
               <Spinner />
             </div>
           ) : sorted.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-neutral-300 py-20 text-center">
-              <p className="font-semibold text-neutral-700">Sin resultados</p>
-              <p className="mt-1 text-sm text-neutral-500">
+            <div className="rounded-2xl border border-dashed border-line py-20 text-center">
+              <p className="font-semibold text-fg">Sin resultados</p>
+              <p className="mt-1 text-sm text-fg-muted">
                 Prueba con otra categoría o término de búsqueda.
               </p>
             </div>

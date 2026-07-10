@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
+import BottomNav from './BottomNav'
+import InstallPrompt from './InstallPrompt'
 
 export default function Layout() {
   const { pathname } = useLocation()
@@ -12,12 +14,15 @@ export default function Layout() {
   }, [pathname])
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-ink text-fg">
       <Header />
-      <main className="flex-1">
+      {/* pb en móvil para dejar espacio a la barra inferior */}
+      <main className="flex-1 pb-20 md:pb-0">
         <Outlet />
       </main>
       <Footer />
+      <BottomNav />
+      <InstallPrompt />
     </div>
   )
 }

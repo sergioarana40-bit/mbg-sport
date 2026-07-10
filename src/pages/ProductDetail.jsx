@@ -36,8 +36,8 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="font-display text-2xl font-bold">Producto no encontrado</h1>
-        <Link to="/catalogo" className="mt-4 inline-block text-brand-600 hover:underline">
+        <h1 className="font-display text-2xl font-bold text-fg">Producto no encontrado</h1>
+        <Link to="/catalogo" className="mt-4 inline-block text-brand-400 hover:underline">
           Volver al catálogo
         </Link>
       </div>
@@ -61,70 +61,68 @@ export default function ProductDetail() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-1.5 text-sm text-neutral-500">
-        <Link to="/" className="hover:text-brand-600">
+      <nav className="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">
+        <Link to="/" className="hover:text-brand-400">
           Inicio
         </Link>
         <ChevronRight className="h-4 w-4" />
-        <Link to="/catalogo" className="hover:text-brand-600">
+        <Link to="/catalogo" className="hover:text-brand-400">
           Catálogo
         </Link>
         <ChevronRight className="h-4 w-4" />
-        <span className="truncate text-neutral-700">{product.name}</span>
+        <span className="truncate text-fg">{product.name}</span>
       </nav>
 
       <div className="grid gap-8 md:grid-cols-2">
         <ProductImage
           src={product.image_url}
           alt={product.name}
-          className="aspect-square rounded-2xl border border-neutral-200"
+          className="aspect-square rounded-2xl border border-line"
         />
 
         <div>
           {product.category_name && (
-            <span className="text-sm font-medium uppercase tracking-wide text-brand-600">
+            <span className="text-sm font-medium uppercase tracking-wide text-brand-400">
               {product.category_name}
             </span>
           )}
-          <h1 className="mt-1 font-display text-3xl font-bold leading-tight text-neutral-900">
+          <h1 className="mt-1 font-display text-3xl font-bold leading-tight text-fg">
             {product.name}
           </h1>
 
-          <p className="mt-4 font-display text-3xl font-bold text-neutral-900">
+          <p className="mt-4 font-display text-3xl font-bold text-fg">
             {formatPrice(product.price)}
           </p>
 
           <div className="mt-2 flex items-center gap-2 text-sm">
-            <Package className="h-4 w-4 text-neutral-400" />
+            <Package className="h-4 w-4 text-fg-subtle" />
             {outOfStock ? (
-              <span className="font-medium text-brand-600">Agotado</span>
+              <span className="font-medium text-brand-500">Agotado</span>
             ) : (
-              <span className="text-emerald-600">
-                {product.stock} disponibles
-              </span>
+              <span className="text-emerald-400">{product.stock} disponibles</span>
             )}
           </div>
 
           {product.description && (
-            <p className="mt-5 leading-relaxed text-neutral-600">{product.description}</p>
+            <p className="mt-5 leading-relaxed text-fg-muted">{product.description}</p>
           )}
 
           {/* Cantidad + acciones */}
           {!outOfStock && (
             <div className="mt-7 flex flex-wrap items-center gap-3">
-              <div className="flex items-center rounded-lg border border-neutral-300">
+              <div className="flex items-center rounded-xl border border-line">
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="grid h-11 w-11 place-items-center text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                  className="grid h-11 w-11 place-items-center text-fg-muted hover:bg-surface-2 disabled:opacity-40"
                   disabled={qty <= 1}
                   aria-label="Quitar uno"
                 >
                   <Minus className="h-4 w-4" />
                 </button>
-                <span className="w-10 text-center font-semibold">{qty}</span>
+                <span className="w-10 text-center font-semibold text-fg">{qty}</span>
                 <button
                   onClick={() => setQty((q) => Math.min(maxQty, q + 1))}
-                  className="grid h-11 w-11 place-items-center text-neutral-600 hover:bg-neutral-100 disabled:opacity-40"
+                  className="grid h-11 w-11 place-items-center text-fg-muted hover:bg-surface-2 disabled:opacity-40"
                   disabled={qty >= maxQty}
                   aria-label="Agregar uno"
                 >
@@ -134,8 +132,8 @@ export default function ProductDetail() {
 
               <button
                 onClick={handleAdd}
-                className={`inline-flex h-11 items-center gap-2 rounded-lg px-5 font-semibold text-white transition ${
-                  added ? 'bg-emerald-600' : 'bg-neutral-900 hover:bg-neutral-800'
+                className={`inline-flex h-11 items-center gap-2 rounded-xl px-5 font-semibold transition ${
+                  added ? 'bg-emerald-600 text-white' : 'bg-surface-3 text-fg hover:bg-surface-2'
                 }`}
               >
                 {added ? (
@@ -151,15 +149,15 @@ export default function ProductDetail() {
 
               <button
                 onClick={buyNow}
-                className="inline-flex h-11 items-center gap-2 rounded-lg bg-brand-600 px-6 font-semibold text-white transition hover:bg-brand-700"
+                className="inline-flex h-11 items-center gap-2 rounded-xl bg-brand-600 px-6 font-semibold text-white transition hover:bg-brand-700"
               >
                 Comprar ahora
               </button>
             </div>
           )}
 
-          <div className="mt-8 rounded-xl bg-neutral-100 p-4 text-sm text-neutral-600">
-            <p className="font-semibold text-neutral-800">Recoge en tienda o recíbelo en casa</p>
+          <div className="mt-8 rounded-2xl bg-surface-2 p-4 text-sm text-fg-muted">
+            <p className="font-semibold text-fg">Recoge en tienda o recíbelo en casa</p>
             <p className="mt-1">{STORE.address}</p>
           </div>
         </div>

@@ -8,7 +8,7 @@ export default function ProductImage({ src, alt, className = '' }) {
 
   return (
     <div
-      className={`relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-neutral-100 to-neutral-200 ${className}`}
+      className={`relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-surface-2 to-surface ${className}`}
     >
       {showImage ? (
         <img
@@ -19,7 +19,7 @@ export default function ProductImage({ src, alt, className = '' }) {
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex flex-col items-center gap-2 text-neutral-400">
+        <div className="flex flex-col items-center gap-2 text-fg-subtle">
           <Dumbbell className="h-10 w-10" strokeWidth={1.5} />
           <span className="px-3 text-center text-xs font-medium uppercase tracking-wide">
             MBG Sport

@@ -25,11 +25,11 @@ function InstagramIcon({ className = 'h-5 w-5' }) {
 
 export default function Footer() {
   return (
-    <footer className="mt-16 bg-neutral-900 text-neutral-300">
+    <footer className="mt-16 hidden border-t border-line bg-ink text-fg-muted md:block">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <Logo light />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-400">
+          <p className="mt-4 max-w-xs text-sm leading-relaxed text-fg-subtle">
             {STORE.description}
           </p>
           <div className="mt-4 flex gap-3">
@@ -37,7 +37,7 @@ export default function Footer() {
               href={STORE.instagram}
               target="_blank"
               rel="noreferrer"
-              className="grid h-9 w-9 place-items-center rounded-lg bg-neutral-800 transition hover:bg-brand-600"
+              className="grid h-9 w-9 place-items-center rounded-lg bg-surface-2 transition hover:bg-brand-600 hover:text-white"
               aria-label="Instagram"
             >
               <InstagramIcon className="h-4.5 w-4.5" />
@@ -46,22 +46,22 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-white">
+          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-fg">
             Tienda
           </h4>
           <ul className="mt-4 space-y-2 text-sm">
             <li>
-              <Link to="/catalogo" className="transition hover:text-white">
+              <Link to="/catalogo" className="transition hover:text-fg">
                 Todo el catálogo
               </Link>
             </li>
             <li>
-              <Link to="/carrito" className="transition hover:text-white">
+              <Link to="/carrito" className="transition hover:text-fg">
                 Mi carrito
               </Link>
             </li>
             <li>
-              <Link to="/admin/login" className="transition hover:text-white">
+              <Link to="/admin/login" className="transition hover:text-fg">
                 Acceso administrador
               </Link>
             </li>
@@ -69,7 +69,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-white">
+          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-fg">
             Contacto
           </h4>
           <ul className="mt-4 space-y-3 text-sm">
@@ -89,7 +89,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-white">
+          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-fg">
             Horario
           </h4>
           <ul className="mt-4 space-y-3 text-sm">
@@ -101,8 +101,8 @@ export default function Footer() {
         </div>
       </div>
 
-      <div className="border-t border-neutral-800">
-        <div className="mx-auto max-w-7xl px-4 py-5 text-center text-xs text-neutral-500">
+      <div className="border-t border-line">
+        <div className="mx-auto max-w-7xl px-4 py-5 text-center text-xs text-fg-subtle">
           © {new Date().getFullYear()} {STORE.name}. Todos los derechos reservados.
         </div>
       </div>

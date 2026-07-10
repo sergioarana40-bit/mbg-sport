@@ -4,11 +4,7 @@ import Modal from '../../components/Modal'
 import Spinner from '../../components/Spinner'
 import CategoryIcon from '../../components/CategoryIcon'
 import { isSupabaseConfigured } from '../../lib/supabase'
-import {
-  getAllCategories,
-  saveCategory,
-  deleteCategory,
-} from '../../lib/admin'
+import { getAllCategories, saveCategory, deleteCategory } from '../../lib/admin'
 
 const EMPTY = { name: '', sort_order: 0 }
 
@@ -79,29 +75,21 @@ export default function AdminCategories() {
     }
   }
 
-  const inputClass =
-    'w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
-
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold uppercase tracking-tight text-neutral-900">
-            Categorías
-          </h1>
-          <p className="text-sm text-neutral-500">{categories.length} categorías</p>
+          <h1 className="font-display text-2xl font-bold tracking-tight text-fg">Categorías</h1>
+          <p className="text-sm text-fg-muted">{categories.length} categorías</p>
         </div>
-        <button
-          onClick={openNew}
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700"
-        >
+        <button onClick={openNew} className="btn-primary px-4 py-2.5 text-sm">
           <Plus className="h-4.5 w-4.5" />
           Nueva categoría
         </button>
       </div>
 
       {!isSupabaseConfigured && (
-        <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-300">
           <AlertCircle className="h-5 w-5 shrink-0" />
           Modo demostración: conecta Supabase para crear o editar categorías.
         </div>
@@ -112,29 +100,29 @@ export default function AdminCategories() {
           <Spinner />
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-          <ul className="divide-y divide-neutral-100">
+        <div className="overflow-hidden rounded-2xl border border-line bg-surface">
+          <ul className="divide-y divide-line">
             {categories.map((c) => (
-              <li key={c.id} className="flex items-center gap-3 px-4 py-3 hover:bg-neutral-50">
-                <GripVertical className="h-4 w-4 text-neutral-300" />
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-neutral-100 text-neutral-600">
+              <li key={c.id} className="flex items-center gap-3 px-4 py-3 transition hover:bg-surface-2">
+                <GripVertical className="h-4 w-4 text-fg-subtle" />
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-surface-2 text-fg-muted">
                   <CategoryIcon category={c} className="h-5 w-5" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-neutral-900">{c.name}</p>
-                  <p className="truncate text-xs text-neutral-400">/{c.slug}</p>
+                  <p className="font-medium text-fg">{c.name}</p>
+                  <p className="truncate text-xs text-fg-subtle">/{c.slug}</p>
                 </div>
                 <div className="flex gap-1">
                   <button
                     onClick={() => openEdit(c)}
-                    className="grid h-8 w-8 place-items-center rounded-lg text-neutral-500 hover:bg-neutral-100 hover:text-brand-600"
+                    className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-surface-3 hover:text-brand-400"
                     aria-label="Editar"
                   >
                     <Pencil className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => setConfirmDelete(c)}
-                    className="grid h-8 w-8 place-items-center rounded-lg text-neutral-500 hover:bg-red-50 hover:text-brand-600"
+                    className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-brand-600/15 hover:text-brand-400"
                     aria-label="Eliminar"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -143,9 +131,7 @@ export default function AdminCategories() {
               </li>
             ))}
             {categories.length === 0 && (
-              <li className="px-4 py-12 text-center text-neutral-400">
-                Aún no hay categorías.
-              </li>
+              <li className="px-4 py-12 text-center text-fg-subtle">Aún no hay categorías.</li>
             )}
           </ul>
         </div>
@@ -160,29 +146,29 @@ export default function AdminCategories() {
       >
         <form onSubmit={handleSave} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">Nombre</label>
+            <label className="mb-1 block text-sm font-medium text-fg-muted">Nombre</label>
             <input
-              className={inputClass}
+              className="field"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="Pesas y Mancuernas"
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-neutral-700">
+            <label className="mb-1 block text-sm font-medium text-fg-muted">
               Orden de aparición
             </label>
             <input
               type="number"
               min="0"
-              className={inputClass}
+              className="field"
               value={form.sort_order}
               onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
             />
           </div>
 
           {error && (
-            <p className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-brand-700">
+            <p className="flex items-center gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
               <AlertCircle className="h-4 w-4 shrink-0" />
               {error}
             </p>
@@ -192,15 +178,11 @@ export default function AdminCategories() {
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="rounded-lg px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+              className="rounded-lg px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-2"
             >
               Cancelar
             </button>
-            <button
-              type="submit"
-              disabled={saving}
-              className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-70"
-            >
+            <button type="submit" disabled={saving} className="btn-primary px-5 py-2 text-sm">
               {saving && <Spinner size={4} className="border-white/40 border-t-white" />}
               Guardar
             </button>
@@ -215,21 +197,18 @@ export default function AdminCategories() {
         title="Eliminar categoría"
         maxWidth="max-w-sm"
       >
-        <p className="text-sm text-neutral-600">
-          ¿Eliminar <b>{confirmDelete?.name}</b>? Los productos de esta categoría quedarán sin
-          categoría.
+        <p className="text-sm text-fg-muted">
+          ¿Eliminar <b className="text-fg">{confirmDelete?.name}</b>? Los productos de esta
+          categoría quedarán sin categoría.
         </p>
         <div className="mt-5 flex justify-end gap-3">
           <button
             onClick={() => setConfirmDelete(null)}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-neutral-600 hover:bg-neutral-100"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-2"
           >
             Cancelar
           </button>
-          <button
-            onClick={handleDelete}
-            className="rounded-lg bg-brand-600 px-5 py-2 text-sm font-semibold text-white hover:bg-brand-700"
-          >
+          <button onClick={handleDelete} className="btn-primary px-5 py-2 text-sm">
             Eliminar
           </button>
         </div>

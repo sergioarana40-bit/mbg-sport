@@ -21,7 +21,7 @@ export default function ProductCard({ product }) {
   return (
     <Link
       to={`/producto/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white transition hover:-translate-y-0.5 hover:shadow-lg"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface transition hover:-translate-y-0.5 hover:border-brand-500/40"
     >
       <div className="relative">
         <ProductImage
@@ -30,28 +30,22 @@ export default function ProductCard({ product }) {
           className="aspect-square"
         />
         {product.featured && (
-          <span className="absolute left-2 top-2 rounded-full bg-accent-400 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-neutral-900">
-            Destacado
-          </span>
+          <span className="badge-featured absolute left-2 top-2">Destacado</span>
         )}
-        {outOfStock && (
-          <span className="absolute right-2 top-2 rounded-full bg-neutral-900/80 px-2 py-0.5 text-[11px] font-semibold text-white">
-            Agotado
-          </span>
-        )}
+        {outOfStock && <span className="badge-out absolute right-2 top-2">Agotado</span>}
       </div>
 
       <div className="flex flex-1 flex-col p-3.5">
         {product.category_name && (
-          <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-brand-600">
+          <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-brand-400">
             {product.category_name}
           </span>
         )}
-        <h3 className="line-clamp-2 text-sm font-semibold text-neutral-900 group-hover:text-brand-700">
+        <h3 className="line-clamp-2 text-sm font-semibold text-fg transition group-hover:text-brand-400">
           {product.name}
         </h3>
         <div className="mt-auto flex items-end justify-between pt-3">
-          <span className="font-display text-lg font-bold text-neutral-900">
+          <span className="font-display text-lg font-bold text-fg">
             {formatPrice(product.price)}
           </span>
           <button
@@ -60,7 +54,7 @@ export default function ProductCard({ product }) {
             aria-label="Agregar al carrito"
             className={`grid h-9 w-9 place-items-center rounded-lg transition ${
               outOfStock
-                ? 'cursor-not-allowed bg-neutral-100 text-neutral-300'
+                ? 'cursor-not-allowed bg-surface-2 text-fg-subtle'
                 : added
                   ? 'bg-emerald-600 text-white'
                   : 'bg-brand-600 text-white hover:bg-brand-700 active:scale-95'

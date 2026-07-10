@@ -32,36 +32,30 @@ export default function Home() {
   return (
     <div>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-neutral-900 text-white">
+      <section className="relative overflow-hidden bg-ink text-fg">
         <div
-          className="absolute inset-0 opacity-70"
+          className="absolute inset-0"
           style={{
             background:
-              'radial-gradient(60% 100% at 85% 0%, rgba(220,38,38,0.55) 0%, rgba(220,38,38,0) 60%), radial-gradient(50% 80% at 0% 100%, rgba(234,179,8,0.18) 0%, rgba(234,179,8,0) 55%)',
+              'radial-gradient(60% 100% at 85% 0%, rgba(220,38,38,0.45) 0%, rgba(220,38,38,0) 60%), radial-gradient(50% 80% at 0% 100%, rgba(234,179,8,0.12) 0%, rgba(234,179,8,0) 55%)',
           }}
         />
         <div className="relative mx-auto max-w-7xl px-4 py-16 sm:py-24">
-          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-wide text-accent-400">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium uppercase tracking-wide text-accent-400">
             {STORE.city}
           </span>
-          <h1 className="mt-5 max-w-3xl font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight sm:text-6xl">
+          <h1 className="mt-5 max-w-3xl font-display text-4xl font-bold leading-[1.05] tracking-tight sm:text-6xl">
             Todo para tu <span className="text-brand-500">entrenamiento</span>
           </h1>
-          <p className="mt-4 max-w-xl text-base text-neutral-300 sm:text-lg">
+          <p className="mt-4 max-w-xl text-base text-fg-muted sm:text-lg">
             {STORE.description}
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              to="/catalogo"
-              className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white transition hover:bg-brand-700"
-            >
+            <Link to="/catalogo" className="btn-primary">
               Ver catálogo
               <ArrowRight className="h-4.5 w-4.5" />
             </Link>
-            <a
-              href="#categorias"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/25 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
-            >
+            <a href="#categorias" className="btn-ghost">
               Categorías
             </a>
           </div>
@@ -69,16 +63,16 @@ export default function Home() {
       </section>
 
       {/* Beneficios */}
-      <section className="border-b border-neutral-200 bg-white">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px overflow-hidden px-4 py-6 sm:grid-cols-4">
+      <section className="border-b border-line bg-surface">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-px px-4 py-6 sm:grid-cols-4">
           {BENEFITS.map((b) => (
             <div key={b.title} className="flex items-center gap-3 px-2 py-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-50 text-brand-600">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-brand-600/15 text-brand-400">
                 <b.icon className="h-5 w-5" />
               </span>
               <div>
-                <p className="text-sm font-semibold text-neutral-900">{b.title}</p>
-                <p className="text-xs text-neutral-500">{b.text}</p>
+                <p className="text-sm font-semibold text-fg">{b.title}</p>
+                <p className="text-xs text-fg-subtle">{b.text}</p>
               </div>
             </div>
           ))}
@@ -88,13 +82,10 @@ export default function Home() {
       {/* Categorías */}
       <section id="categorias" className="mx-auto max-w-7xl px-4 py-12">
         <div className="mb-6 flex items-end justify-between">
-          <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-neutral-900">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-fg">
             Categorías
           </h2>
-          <Link
-            to="/catalogo"
-            className="text-sm font-medium text-brand-600 hover:text-brand-700"
-          >
+          <Link to="/catalogo" className="text-sm font-medium text-brand-400 hover:text-brand-300">
             Ver todo
           </Link>
         </div>
@@ -103,12 +94,12 @@ export default function Home() {
             <Link
               key={c.id}
               to={`/catalogo/${c.slug}`}
-              className="group flex flex-col items-center gap-3 rounded-xl border border-neutral-200 bg-white p-5 text-center transition hover:-translate-y-0.5 hover:border-brand-300 hover:shadow-md"
+              className="group flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-5 text-center transition hover:-translate-y-0.5 hover:border-brand-500/40"
             >
-              <span className="grid h-14 w-14 place-items-center rounded-full bg-neutral-100 text-neutral-700 transition group-hover:bg-brand-600 group-hover:text-white">
+              <span className="grid h-14 w-14 place-items-center rounded-full bg-surface-2 text-fg-muted transition group-hover:bg-brand-600 group-hover:text-white">
                 <CategoryIcon category={c} className="h-7 w-7" />
               </span>
-              <span className="text-sm font-semibold text-neutral-800">{c.name}</span>
+              <span className="text-sm font-semibold text-fg">{c.name}</span>
             </Link>
           ))}
         </div>
@@ -117,13 +108,10 @@ export default function Home() {
       {/* Productos destacados */}
       <section className="mx-auto max-w-7xl px-4 pb-4">
         <div className="mb-6 flex items-end justify-between">
-          <h2 className="font-display text-2xl font-bold uppercase tracking-tight text-neutral-900">
+          <h2 className="font-display text-2xl font-bold tracking-tight text-fg">
             Destacados
           </h2>
-          <Link
-            to="/catalogo"
-            className="text-sm font-medium text-brand-600 hover:text-brand-700"
-          >
+          <Link to="/catalogo" className="text-sm font-medium text-brand-400 hover:text-brand-300">
             Ver todo
           </Link>
         </div>

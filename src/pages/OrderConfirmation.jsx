@@ -7,41 +7,40 @@ import { getOrderById } from '../lib/api'
 import { formatPrice, STORE } from '../config'
 import { isSupabaseConfigured } from '../lib/supabase'
 
-// Normaliza el estado que devuelve MercadoPago en la URL de retorno.
 function resolveStatus(raw) {
   if (raw === 'demo') return 'demo'
   if (['approved', 'success'].includes(raw)) return 'success'
   if (['pending', 'in_process'].includes(raw)) return 'pending'
   if (['failure', 'rejected', 'cancelled', 'null'].includes(raw)) return 'failure'
-  return 'success' // por defecto asumimos éxito si vuelve sin estado claro
+  return 'success'
 }
 
 const VIEWS = {
   success: {
     icon: CheckCircle2,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-500/15',
     title: '¡Gracias por tu compra!',
     text: 'Recibimos tu pago. Te contactaremos para coordinar la entrega.',
   },
   pending: {
     icon: Clock,
-    color: 'text-amber-600',
-    bg: 'bg-amber-50',
+    color: 'text-amber-400',
+    bg: 'bg-amber-500/15',
     title: 'Pago pendiente',
     text: 'Tu pago está en proceso. Te avisaremos cuando se confirme.',
   },
   failure: {
     icon: XCircle,
-    color: 'text-brand-600',
-    bg: 'bg-red-50',
+    color: 'text-brand-500',
+    bg: 'bg-brand-600/15',
     title: 'El pago no se completó',
     text: 'No se realizó ningún cargo. Puedes intentar de nuevo.',
   },
   demo: {
     icon: CheckCircle2,
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
+    color: 'text-emerald-400',
+    bg: 'bg-emerald-500/15',
     title: '¡Pedido simulado con éxito!',
     text: 'Esto es una demostración. Conecta Supabase y MercadoPago para pedidos reales.',
   },
@@ -56,7 +55,6 @@ export default function OrderConfirmation() {
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // Al confirmar (éxito/pendiente/demo) se vacía el carrito.
     if (status !== 'failure') clearCart()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status])
@@ -79,12 +77,13 @@ export default function OrderConfirmation() {
       <div className={`mx-auto grid h-20 w-20 place-items-center rounded-full ${view.bg}`}>
         <Icon className={`h-11 w-11 ${view.color}`} />
       </div>
-      <h1 className="mt-6 font-display text-3xl font-bold text-neutral-900">{view.title}</h1>
-      <p className="mt-3 text-neutral-600">{view.text}</p>
+      <h1 className="mt-6 font-display text-3xl font-bold text-fg">{view.title}</h1>
+      <p className="mt-3 text-fg-muted">{view.text}</p>
 
       {id && id !== 'demo' && (
-        <p className="mt-4 inline-block rounded-lg bg-neutral-100 px-4 py-2 text-sm text-neutral-600">
-          Pedido <span className="font-mono font-semibold text-neutral-900">
+        <p className="mt-4 inline-block rounded-lg bg-surface-2 px-4 py-2 text-sm text-fg-muted">
+          Pedido{' '}
+          <span className="font-mono font-semibold text-fg">
             #{id.slice(0, 8).toUpperCase()}
           </span>
         </p>
@@ -97,46 +96,40 @@ export default function OrderConfirmation() {
       )}
 
       {order && (
-        <div className="mt-6 rounded-xl border border-neutral-200 bg-white p-5 text-left">
-          <h2 className="flex items-center gap-2 font-semibold text-neutral-900">
-            <Package className="h-4.5 w-4.5 text-brand-600" />
+        <div className="mt-6 rounded-2xl border border-line bg-surface p-5 text-left">
+          <h2 className="flex items-center gap-2 font-semibold text-fg">
+            <Package className="h-4.5 w-4.5 text-brand-500" />
             Resumen del pedido
           </h2>
           <ul className="mt-3 space-y-1.5 text-sm">
             {order.order_items?.map((i) => (
-              <li key={i.id} className="flex justify-between gap-3 text-neutral-600">
+              <li key={i.id} className="flex justify-between gap-3 text-fg-muted">
                 <span>
                   {i.quantity}× {i.product_name}
                 </span>
-                <span className="font-medium">{formatPrice(i.price * i.quantity)}</span>
+                <span className="font-medium text-fg">{formatPrice(i.price * i.quantity)}</span>
               </li>
             ))}
           </ul>
-          <div className="mt-3 flex justify-between border-t border-neutral-200 pt-3 font-semibold">
+          <div className="mt-3 flex justify-between border-t border-line pt-3 font-semibold text-fg">
             <span>Total</span>
-            <span className="text-brand-600">{formatPrice(order.total)}</span>
+            <span className="text-brand-500">{formatPrice(order.total)}</span>
           </div>
         </div>
       )}
 
       <div className="mt-8 flex flex-col items-center gap-3">
         {status === 'failure' ? (
-          <Link
-            to="/checkout"
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white transition hover:bg-brand-700"
-          >
+          <Link to="/checkout" className="btn-primary">
             Intentar de nuevo
           </Link>
         ) : (
-          <Link
-            to="/catalogo"
-            className="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-6 py-3 font-semibold text-white transition hover:bg-brand-700"
-          >
+          <Link to="/catalogo" className="btn-primary">
             Seguir comprando
             <ArrowRight className="h-4.5 w-4.5" />
           </Link>
         )}
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-fg-muted">
           ¿Dudas? Visítanos en {STORE.city} o escríbenos.
         </p>
       </div>

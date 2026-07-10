@@ -33,16 +33,13 @@ export default function Login() {
     }
   }
 
-  const inputClass =
-    'w-full rounded-lg border border-neutral-300 bg-white py-2.5 pl-10 pr-3 text-sm outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100'
-
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-neutral-900 px-4">
+    <div className="relative flex min-h-screen items-center justify-center bg-ink px-4">
       <div
-        className="absolute inset-0 opacity-60"
+        className="absolute inset-0"
         style={{
           background:
-            'radial-gradient(50% 60% at 50% 0%, rgba(220,38,38,0.4) 0%, rgba(220,38,38,0) 70%)',
+            'radial-gradient(50% 60% at 50% 0%, rgba(220,38,38,0.35) 0%, rgba(220,38,38,0) 70%)',
         }}
       />
       <div className="relative w-full max-w-sm">
@@ -50,16 +47,12 @@ export default function Login() {
           <Logo light />
         </div>
 
-        <div className="rounded-2xl bg-white p-6 shadow-xl">
-          <h1 className="font-display text-xl font-bold text-neutral-900">
-            Acceso administrador
-          </h1>
-          <p className="mt-1 text-sm text-neutral-500">
-            Ingresa para gestionar tu tienda.
-          </p>
+        <div className="rounded-2xl border border-line bg-surface p-6 shadow-2xl">
+          <h1 className="font-display text-xl font-bold text-fg">Acceso administrador</h1>
+          <p className="mt-1 text-sm text-fg-muted">Ingresa para gestionar tu tienda.</p>
 
           {!isSupabaseConfigured && (
-            <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+            <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300">
               <AlertCircle className="h-4 w-4 shrink-0" />
               Backend no configurado. El acceso se habilita al conectar Supabase.
             </div>
@@ -67,40 +60,36 @@ export default function Login() {
 
           <form onSubmit={handleSubmit} className="mt-5 space-y-4">
             <div className="relative">
-              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="correo@mbgsport.com.mx"
-                className={inputClass}
+                className="field pl-10"
                 autoComplete="email"
               />
             </div>
             <div className="relative">
-              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
+              <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Contraseña"
-                className={inputClass}
+                className="field pl-10"
                 autoComplete="current-password"
               />
             </div>
 
             {error && (
-              <p className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-brand-700">
+              <p className="flex items-center gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {error}
               </p>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-lg bg-brand-600 py-2.5 font-semibold text-white transition hover:bg-brand-700 disabled:opacity-70"
-            >
+            <button type="submit" disabled={loading} className="btn-primary w-full">
               {loading ? (
                 <Spinner size={5} className="border-white/40 border-t-white" />
               ) : (
@@ -112,7 +101,7 @@ export default function Login() {
 
         <Link
           to="/"
-          className="mt-5 flex items-center justify-center gap-2 text-sm text-neutral-400 transition hover:text-white"
+          className="mt-5 flex items-center justify-center gap-2 text-sm text-fg-muted transition hover:text-fg"
         >
           <ArrowLeft className="h-4 w-4" />
           Volver a la tienda

@@ -8,7 +8,7 @@ export default function Logo({ to = '/', light = false, className = '' }) {
       </span>
       <span
         className={`font-display text-xl font-bold uppercase leading-none tracking-tight ${
-          light ? 'text-white' : 'text-neutral-900'
+          light ? 'text-white' : 'text-fg'
         }`}
       >
         Sport
