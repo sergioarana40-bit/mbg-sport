@@ -8,6 +8,10 @@ import Checkout from './pages/Checkout'
 import OrderConfirmation from './pages/OrderConfirmation'
 import NotFound from './pages/NotFound'
 
+import Account from './pages/account/Account'
+import CustomerLogin from './pages/account/CustomerLogin'
+import Register from './pages/account/Register'
+
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminLayout from './pages/admin/AdminLayout'
 import AdminLogin from './pages/admin/Login'
@@ -28,6 +32,9 @@ export default function App() {
         <Route path="/carrito" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/pedido/:id" element={<OrderConfirmation />} />
+        <Route path="/cuenta" element={<Account />} />
+        <Route path="/cuenta/login" element={<CustomerLogin />} />
+        <Route path="/cuenta/registro" element={<Register />} />
       </Route>
 
       {/* Panel de administración */}

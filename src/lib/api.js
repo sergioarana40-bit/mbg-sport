@@ -77,7 +77,7 @@ export async function getProductById(id) {
 /* ------------------------- Pedidos ------------------------- */
 
 // Crea un pedido con sus items. Devuelve el pedido creado.
-export async function createOrder({ customer, items, subtotal, shipping, total, notes }) {
+export async function createOrder({ customer, items, subtotal, shipping, total, notes, userId }) {
   if (!isSupabaseConfigured) {
     throw new Error('Configura Supabase para poder registrar pedidos.')
   }
@@ -89,6 +89,7 @@ export async function createOrder({ customer, items, subtotal, shipping, total, 
 
   const order = {
     id: orderId,
+    user_id: userId || null,
     customer_name: customer.name,
     customer_email: customer.email,
     customer_phone: customer.phone,

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { ShoppingCart, Search, MapPin, Truck } from 'lucide-react'
 import Logo from './Logo'
+import UserMenu from './UserMenu'
 import { useCart } from '../context/CartContext'
 import { getCategories } from '../lib/api'
 import { STORE, formatPrice } from '../config'
@@ -62,18 +63,21 @@ export default function Header() {
             />
           </form>
 
-          <Link
-            to="/carrito"
-            className="relative ml-auto grid h-10 w-10 place-items-center rounded-lg text-fg-muted transition hover:bg-surface-2 hover:text-fg"
-            aria-label="Carrito"
-          >
-            <ShoppingCart className="h-5.5 w-5.5" />
-            {count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
-                {count}
-              </span>
-            )}
-          </Link>
+          <div className="ml-auto flex items-center gap-1">
+            <UserMenu />
+            <Link
+              to="/carrito"
+              className="relative grid h-10 w-10 place-items-center rounded-lg text-fg-muted transition hover:bg-surface-2 hover:text-fg"
+              aria-label="Carrito"
+            >
+              <ShoppingCart className="h-5.5 w-5.5" />
+              {count > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
+                  {count}
+                </span>
+              )}
+            </Link>
+          </div>
         </div>
 
         {/* Navegación de categorías (desktop) */}

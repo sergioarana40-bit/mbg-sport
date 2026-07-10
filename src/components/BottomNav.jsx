@@ -53,7 +53,7 @@ export default function BottomNav() {
           </span>
           <span>Carrito</span>
         </NavLink>
-        <NavLink to="/admin/login" className={itemClass}>
+        <NavLink to="/cuenta" className={itemClass}>
           <User className="h-5.5 w-5.5" />
           <span>Cuenta</span>
         </NavLink>

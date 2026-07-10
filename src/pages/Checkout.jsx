@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate, Navigate } from 'react-router-dom'
 import { Lock, AlertCircle, CreditCard } from 'lucide-react'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../context/AuthContext'
 import { formatPrice, calcShipping } from '../config'
 import { createOrder } from '../lib/api'
 import { createMercadoPagoPreference } from '../lib/mercadopago'
@@ -13,12 +14,24 @@ const EMPTY = { name: '', email: '', phone: '', address: '', notes: '' }
 export default function Checkout() {
   const navigate = useNavigate()
   const { items, subtotal, clearCart } = useCart()
+  const { user, profile } = useAuth()
   const [form, setForm] = useState(EMPTY)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
   const shipping = calcShipping(subtotal)
   const total = subtotal + shipping
+
+  // Prellena los datos si el cliente tiene sesión iniciada.
+  useEffect(() => {
+    if (!user) return
+    setForm((f) => ({
+      ...f,
+      name: f.name || profile?.full_name || '',
+      email: f.email || user.email || '',
+      phone: f.phone || profile?.phone || '',
+    }))
+  }, [user, profile])
 
   if (items.length === 0) return <Navigate to="/carrito" replace />
 
@@ -64,6 +77,7 @@ export default function Checkout() {
         shipping,
         total,
         notes: form.notes.trim(),
+        userId: user?.id,
       })
       const { init_point } = await createMercadoPagoPreference({
         order: {
