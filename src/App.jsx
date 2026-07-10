@@ -1,0 +1,52 @@
+import { Routes, Route } from 'react-router-dom'
+import Layout from './components/Layout'
+import Home from './pages/Home'
+import Catalog from './pages/Catalog'
+import ProductDetail from './pages/ProductDetail'
+import Cart from './pages/Cart'
+import Checkout from './pages/Checkout'
+import OrderConfirmation from './pages/OrderConfirmation'
+import NotFound from './pages/NotFound'
+
+import ProtectedRoute from './components/ProtectedRoute'
+import AdminLayout from './pages/admin/AdminLayout'
+import AdminLogin from './pages/admin/Login'
+import Dashboard from './pages/admin/Dashboard'
+import AdminProducts from './pages/admin/AdminProducts'
+import AdminCategories from './pages/admin/AdminCategories'
+import AdminOrders from './pages/admin/AdminOrders'
+
+export default function App() {
+  return (
+    <Routes>
+      {/* Tienda (cliente) */}
+      <Route element={<Layout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/catalogo" element={<Catalog />} />
+        <Route path="/catalogo/:slug" element={<Catalog />} />
+        <Route path="/producto/:id" element={<ProductDetail />} />
+        <Route path="/carrito" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/pedido/:id" element={<OrderConfirmation />} />
+      </Route>
+
+      {/* Panel de administración */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute>
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="productos" element={<AdminProducts />} />
+        <Route path="categorias" element={<AdminCategories />} />
+        <Route path="pedidos" element={<AdminOrders />} />
+      </Route>
+
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  )
+}
