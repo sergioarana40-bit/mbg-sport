@@ -1,0 +1,10 @@
+# Configuración de despliegue en Netlify (proyecto Vite + React SPA).
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Todas las rutas se sirven desde index.html (React Router).
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
