@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Ticket, X } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Ticket, X, Truck, Check } from 'lucide-react'
 import ProductImage from '../components/ProductImage'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
@@ -77,9 +77,25 @@ export default function Cart() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <h1 className="mb-6 font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl">
-        Mi carrito
-      </h1>
+      <div className="mb-4 flex items-baseline gap-3">
+        <h1 className="font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl">
+          Mi carrito
+        </h1>
+        <span className="text-[12.5px] text-fg-subtle">
+          {items.reduce((n, i) => n + i.quantity, 0)} artículo
+          {items.reduce((n, i) => n + i.quantity, 0) === 1 ? '' : 's'}
+        </span>
+      </div>
+
+      {/* Banner de envío gratis (diseño 05) */}
+      {shipping === 0 && subtotal > 0 && (
+        <div className="mb-5 flex items-center gap-2.5 rounded-[11px] bg-emerald-400/10 px-3.5 py-3">
+          <Truck className="h-[17px] w-[17px] shrink-0 text-emerald-400" strokeWidth={1.8} />
+          <span className="text-[12.5px] font-medium text-emerald-200">
+            ¡Tienes envío gratis!
+          </span>
+        </div>
+      )}
 
       <div className="grid gap-8 lg:grid-cols-[1fr_340px]">
         {/* Lista de productos */}
@@ -151,15 +167,22 @@ export default function Cart() {
             {/* Cupón */}
             <div className="mt-4">
               {appliedCoupon && couponStillValid ? (
-                <div className="flex items-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2">
-                  <Ticket className="h-4 w-4 text-emerald-400" />
-                  <div className="flex-1 text-sm">
-                    <span className="font-semibold text-fg">{appliedCoupon.code}</span>
-                    <span className="text-fg-muted"> · {couponLabel(appliedCoupon)}</span>
+                /* Cupón aplicado (diseño 07) */
+                <div className="flex items-center gap-2.5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 px-3.5 py-3">
+                  <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-lg bg-emerald-400 text-ink">
+                    <Check className="h-[15px] w-[15px]" strokeWidth={3} />
+                  </span>
+                  <div className="flex-1">
+                    <p className="text-[13px] font-semibold text-emerald-100">
+                      Cupón <span className="font-mono">{appliedCoupon.code}</span> aplicado
+                    </p>
+                    <p className="text-[11px] text-emerald-300">
+                      {couponLabel(appliedCoupon)}
+                    </p>
                   </div>
                   <button
                     onClick={removeCoupon}
-                    className="grid h-6 w-6 place-items-center rounded text-fg-subtle hover:text-fg"
+                    className="grid h-6 w-6 place-items-center rounded text-emerald-300 transition hover:text-emerald-100"
                     aria-label="Quitar cupón"
                   >
                     <X className="h-4 w-4" />
@@ -200,8 +223,11 @@ export default function Cart() {
               </div>
               {discount > 0 && (
                 <div className="flex justify-between">
-                  <dt className="text-fg-muted">Descuento</dt>
-                  <dd className="font-medium text-emerald-400">−{formatPrice(discount)}</dd>
+                  <dt className="text-emerald-400">
+                    Cupón {appliedCoupon.code}
+                    {appliedCoupon.type === 'percent' && ` (−${Number(appliedCoupon.value)}%)`}
+                  </dt>
+                  <dd className="font-semibold text-emerald-400">−{formatPrice(discount)}</dd>
                 </div>
               )}
               <div className="flex justify-between">

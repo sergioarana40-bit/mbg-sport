@@ -27,9 +27,12 @@ export default function Header() {
     navigate(q ? `/catalogo?buscar=${encodeURIComponent(q)}` : '/catalogo')
   }
 
+  // Enlace de categoría: el activo lleva subrayado rojo (diseño 03).
   const linkClass = ({ isActive }) =>
-    `whitespace-nowrap text-sm font-medium transition hover:text-brand-400 ${
-      isActive ? 'text-brand-500' : 'text-fg-muted'
+    `whitespace-nowrap text-sm transition hover:text-brand-400 ${
+      isActive
+        ? 'font-semibold text-fg underline decoration-brand-600 decoration-2 underline-offset-[14px]'
+        : 'font-medium text-fg-muted'
     }`
 
   return (
@@ -37,11 +40,13 @@ export default function Header() {
       {/* Barra superior */}
       <div className="bg-black text-fg-muted">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs">
-          <span className="flex items-center gap-1.5">
-            <Truck className="h-3.5 w-3.5 text-accent-400" />
-            {STORE.freeShippingFrom
-              ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom)}`
-              : 'Envíos a todo México'}
+          <span className="flex min-w-0 items-center gap-1.5">
+            <Truck className="h-3.5 w-3.5 shrink-0 text-accent-400" />
+            <span className="truncate">
+              {STORE.freeShippingFrom
+                ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · Recoge hoy en tienda`
+                : 'Envíos a todo México'}
+            </span>
           </span>
           <span className="hidden items-center gap-1.5 sm:flex">
             <MapPin className="h-3.5 w-3.5 text-accent-400" />
@@ -105,6 +110,16 @@ export default function Header() {
                 {c.name}
               </NavLink>
             ))}
+            <NavLink
+              to="/promociones"
+              className={({ isActive }) =>
+                `ml-auto whitespace-nowrap text-sm font-semibold transition ${
+                  isActive ? 'text-accent-400' : 'text-accent-400/80 hover:text-accent-400'
+                }`
+              }
+            >
+              Promociones
+            </NavLink>
           </div>
         </nav>
       </div>

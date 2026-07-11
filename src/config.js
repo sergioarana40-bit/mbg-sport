@@ -5,7 +5,7 @@ export const STORE = {
   name: 'MBG Sport',
   tagline: 'Todo para tu entrenamiento',
   description:
-    'Artículos para gimnasio, ropa, pesas, barras y refacciones. Los mejores precios en Toluca.',
+    'Pesas, barras, cardio, ropa y refacciones. Los mejores precios en Toluca, con envío a todo México.',
   address: 'Av. Independencia Oriente 612, Col. Santa Clara, Toluca, México 50090',
   city: 'Toluca, Estado de México',
   // Rellena con el número real (formato internacional, sin +, ni espacios) para el contacto por WhatsApp.

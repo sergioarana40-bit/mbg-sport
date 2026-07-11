@@ -5,6 +5,7 @@ import Catalog from './pages/Catalog'
 import ProductDetail from './pages/ProductDetail'
 import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
+import Promotions from './pages/Promotions'
 import OrderConfirmation from './pages/OrderConfirmation'
 import NotFound from './pages/NotFound'
 
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/catalogo" element={<Catalog />} />
         <Route path="/catalogo/:slug" element={<Catalog />} />
         <Route path="/producto/:id" element={<ProductDetail />} />
+        <Route path="/promociones" element={<Promotions />} />
         <Route path="/favoritos" element={<Favorites />} />
         <Route path="/carrito" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

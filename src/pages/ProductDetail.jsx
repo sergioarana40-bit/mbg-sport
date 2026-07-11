@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Minus, Plus, ShoppingCart, Check, ChevronRight, Package } from 'lucide-react'
+import { Minus, Plus, ShoppingCart, Check, ChevronRight, Store, Truck } from 'lucide-react'
 import ProductImage from '../components/ProductImage'
 import FavoriteButton from '../components/FavoriteButton'
 import ProductReviews from '../components/ProductReviews'
+import StarRating from '../components/StarRating'
 import Spinner from '../components/Spinner'
 import { getProductById } from '../lib/api'
 import { formatPrice, STORE } from '../config'
@@ -17,6 +18,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true)
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
+  const [reviewSummary, setReviewSummary] = useState(null)
 
   useEffect(() => {
     setLoading(true)
@@ -98,16 +100,30 @@ export default function ProductDetail() {
             {product.name}
           </h1>
 
+          {/* Calificación (diseño 04): estrellas + "4.8 · 128 reseñas" */}
+          <a href="#resenas" className="mt-2.5 inline-flex items-center gap-2 hover:opacity-80">
+            <StarRating value={reviewSummary?.avg ?? 0} size={3.75} />
+            <span className="text-[13px] text-fg-muted">
+              {reviewSummary?.count
+                ? `${reviewSummary.avg.toFixed(1)} · ${reviewSummary.count} reseña${
+                    reviewSummary.count === 1 ? '' : 's'
+                  }`
+                : 'Sé el primero en reseñar'}
+            </span>
+          </a>
+
           <p className="mt-4 font-display text-3xl font-bold text-fg">
             {formatPrice(product.price)}
           </p>
 
-          <div className="mt-2 flex items-center gap-2 text-sm">
-            <Package className="h-4 w-4 text-fg-subtle" />
+          <div className="mt-1.5 flex items-center gap-1.5 text-[13px]">
             {outOfStock ? (
               <span className="font-medium text-brand-500">Agotado</span>
             ) : (
-              <span className="text-emerald-400">{product.stock} disponibles</span>
+              <>
+                <Check className="h-[15px] w-[15px] text-emerald-400" strokeWidth={2.5} />
+                <span className="text-emerald-400">{product.stock} disponibles</span>
+              </>
             )}
           </div>
 
@@ -164,14 +180,27 @@ export default function ProductDetail() {
             </div>
           )}
 
-          <div className="mt-8 rounded-2xl bg-surface-2 p-4 text-sm text-fg-muted">
-            <p className="font-semibold text-fg">Recoge en tienda o recíbelo en casa</p>
-            <p className="mt-1">{STORE.address}</p>
+          {/* Tarjetas de entrega (diseño 04) */}
+          <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
+            <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3">
+              <Store className="h-[18px] w-[18px] shrink-0 text-brand-500" strokeWidth={1.7} />
+              <span className="text-xs text-fg-muted">
+                Recoge hoy en tienda · {STORE.city.split(',')[0]}
+              </span>
+            </div>
+            <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3">
+              <Truck className="h-[18px] w-[18px] shrink-0 text-brand-500" strokeWidth={1.7} />
+              <span className="text-xs text-fg-muted">
+                {STORE.freeShippingFrom
+                  ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · 2–4 días`
+                  : 'Envío a todo México · 2–4 días'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
 
-      <ProductReviews productId={product.id} />
+      <ProductReviews productId={product.id} onSummary={setReviewSummary} />
     </div>
   )
 }

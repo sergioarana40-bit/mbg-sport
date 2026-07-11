@@ -177,27 +177,53 @@ const PAID_STATES = ['paid', 'processing', 'shipped', 'delivered']
 export async function getStats() {
   if (!isSupabaseConfigured) {
     return {
-      revenue: 0,
+      revenueMonth: 0,
+      monthDelta: null,
       orderCount: 0,
+      ordersToday: 0,
       pending: 0,
       productCount: DEMO_PRODUCTS.length,
+      lowStock: [],
+      clientCount: 0,
+      clientsThisWeek: 0,
       recentOrders: [],
       salesByDay: [],
       demo: true,
     }
   }
-  const [{ data: orders, error }, { count: productCount }] = await Promise.all([
-    supabase.from('orders').select('id, total, status, created_at, customer_name'),
-    supabase.from('products').select('id', { count: 'exact', head: true }).eq('active', true),
+  const [{ data: orders, error }, { data: products, error: prodError }] = await Promise.all([
+    supabase.from('orders').select('id, total, status, created_at, customer_name, customer_email'),
+    supabase.from('products').select('id, name, stock, active').eq('active', true),
   ])
   if (error) throw error
+  if (prodError) throw prodError
 
   const paid = orders.filter((o) => PAID_STATES.includes(o.status))
-  const revenue = paid.reduce((sum, o) => sum + Number(o.total), 0)
 
-  // Ventas por día (últimos 14 días).
+  // Ventas del mes actual vs. mes anterior (para el delta del dashboard).
+  const now = new Date()
+  const monthKey = (d) => `${d.getFullYear()}-${d.getMonth()}`
+  const thisMonth = monthKey(now)
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+  const prevMonth = monthKey(prev)
+  const sumMonth = (key) =>
+    paid
+      .filter((o) => o.created_at && monthKey(new Date(o.created_at)) === key)
+      .reduce((sum, o) => sum + Number(o.total), 0)
+  const revenueMonth = sumMonth(thisMonth)
+  const revenuePrevMonth = sumMonth(prevMonth)
+  const monthDelta =
+    revenuePrevMonth > 0
+      ? Math.round(((revenueMonth - revenuePrevMonth) / revenuePrevMonth) * 100)
+      : null
+
+  // Pedidos de hoy.
+  const todayKey = now.toISOString().slice(0, 10)
+  const ordersToday = orders.filter((o) => o.created_at?.slice(0, 10) === todayKey).length
+
+  // Ventas por día (últimos 7 días).
   const days = []
-  for (let i = 13; i >= 0; i--) {
+  for (let i = 6; i >= 0; i--) {
     const d = new Date()
     d.setHours(0, 0, 0, 0)
     d.setDate(d.getDate() - i)
@@ -205,18 +231,42 @@ export async function getStats() {
     const total = paid
       .filter((o) => o.created_at?.slice(0, 10) === key)
       .reduce((sum, o) => sum + Number(o.total), 0)
-    days.push({ date: key, total })
+    days.push({ date: key, day: d.getDay(), total })
   }
+
+  // Stock bajo (≤ 5 unidades).
+  const lowStock = products
+    .filter((p) => (p.stock ?? 0) <= 5)
+    .sort((a, b) => (a.stock ?? 0) - (b.stock ?? 0))
+    .slice(0, 5)
+
+  // Clientes únicos por correo; nuevos = primer pedido en los últimos 7 días.
+  const firstOrderByEmail = new Map()
+  for (const o of orders) {
+    const email = o.customer_email?.toLowerCase()
+    if (!email) continue
+    const t = new Date(o.created_at).getTime()
+    if (!firstOrderByEmail.has(email) || t < firstOrderByEmail.get(email)) {
+      firstOrderByEmail.set(email, t)
+    }
+  }
+  const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
+  const clientsThisWeek = [...firstOrderByEmail.values()].filter((t) => t >= weekAgo).length
 
   const recentOrders = [...orders]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
     .slice(0, 6)
 
   return {
-    revenue,
+    revenueMonth,
+    monthDelta,
     orderCount: orders.length,
+    ordersToday,
     pending: orders.filter((o) => o.status === 'pending').length,
-    productCount: productCount || 0,
+    productCount: products.length,
+    lowStock,
+    clientCount: firstOrderByEmail.size,
+    clientsThisWeek,
     recentOrders,
     salesByDay: days,
     demo: false,

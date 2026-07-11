@@ -24,7 +24,7 @@ function fmtDate(iso) {
   }).format(new Date(iso))
 }
 
-export default function ProductReviews({ productId }) {
+export default function ProductReviews({ productId, onSummary }) {
   const { user, profile } = useAuth()
   const [reviews, setReviews] = useState([])
   const [loading, setLoading] = useState(true)
@@ -50,6 +50,12 @@ export default function ProductReviews({ productId }) {
   }, [productId])
 
   const { count, avg, dist } = summarize(reviews)
+
+  // Informa el resumen al padre (para la fila de estrellas junto al título).
+  useEffect(() => {
+    if (!loading) onSummary?.({ avg, count })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, avg, count])
 
   async function submit(e) {
     e.preventDefault()
@@ -79,7 +85,7 @@ export default function ProductReviews({ productId }) {
   }
 
   return (
-    <section className="mt-12 border-t border-line pt-8">
+    <section id="resenas" className="mt-12 scroll-mt-32 border-t border-line pt-8">
       <h2 className="font-display text-2xl font-bold tracking-tight text-fg">Reseñas</h2>
 
       {loading ? (

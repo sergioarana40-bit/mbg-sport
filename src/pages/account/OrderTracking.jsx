@@ -101,17 +101,17 @@ export default function OrderTracking() {
         </span>
       </div>
 
-      {/* Entrega estimada */}
+      {/* Entrega estimada (diseño 09: icono azul de información) */}
       <div className="mt-5 flex items-center gap-3 rounded-2xl border border-line bg-surface p-4">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-600/15 text-brand-400">
+        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] bg-blue-400/15 text-blue-400">
           {order.delivery_method === 'pickup' ? (
-            <Home className="h-5.5 w-5.5" />
+            <Home className="h-[21px] w-[21px]" strokeWidth={1.7} />
           ) : (
-            <Truck className="h-5.5 w-5.5" />
+            <Truck className="h-[21px] w-[21px]" strokeWidth={1.7} />
           )}
         </span>
-        <div>
-          <p className="text-sm font-semibold text-fg">
+        <div className="flex-1">
+          <p className="text-[13.5px] font-semibold text-fg">
             {order.delivery_method === 'pickup' ? 'Recoge en tienda' : 'Entrega estimada'}
           </p>
           <p className="text-xs text-fg-muted">
@@ -128,39 +128,47 @@ export default function OrderTracking() {
           <p className="text-sm font-semibold text-fg">Este pedido fue cancelado.</p>
         </div>
       ) : (
-        <div className="mt-6">
+        <div className="mt-6 pl-1">
           {STEPS.map((step, i) => {
-            const done = i <= current
             const isCurrent = i === current && order.status !== 'delivered'
+            const done = i < current || (i === current && order.status === 'delivered')
             const last = i === STEPS.length - 1
-            const Icon = step.icon
             return (
-              <div key={step.label} className="flex gap-3">
+              <div key={step.label} className="flex gap-3.5">
                 <div className="flex flex-col items-center">
-                  <span
-                    className={`grid h-9 w-9 place-items-center rounded-full transition ${
-                      isCurrent
-                        ? 'bg-brand-600 text-white'
-                        : done
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : 'bg-surface-2 text-fg-subtle'
-                    }`}
-                  >
-                    {done ? <Check className="h-5 w-5" /> : <Icon className="h-4.5 w-4.5" />}
-                  </span>
+                  {/* Círculo del paso (diseño 09): verde=hecho, rojo con halo=actual, gris=pendiente */}
+                  {done ? (
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-400 text-ink">
+                      <Check className="h-[11px] w-[11px]" strokeWidth={3.2} />
+                    </span>
+                  ) : isCurrent ? (
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-600 text-white shadow-[0_0_0_4px_rgba(220,38,38,.2)]">
+                      <Check className="h-[11px] w-[11px]" strokeWidth={2.5} />
+                    </span>
+                  ) : (
+                    <span className="h-5 w-5 shrink-0 rounded-full border-2 border-[#3f3f46] bg-surface-2" />
+                  )}
                   {!last && (
                     <span
-                      className={`w-0.5 flex-1 ${i < current ? 'bg-emerald-500/40' : 'bg-surface-2'}`}
-                      style={{ minHeight: '28px' }}
+                      className={`w-0.5 flex-1 ${done ? 'bg-emerald-400' : 'bg-[#3f3f46]'}`}
+                      style={{ minHeight: '30px' }}
                     />
                   )}
                 </div>
-                <div className={`pb-6 ${done ? '' : 'opacity-60'}`}>
-                  <p className={`text-sm font-semibold ${isCurrent ? 'text-brand-400' : 'text-fg'}`}>
+                <div className="pb-5">
+                  <p
+                    className={`text-sm font-semibold leading-5 ${
+                      done || isCurrent ? 'text-fg' : 'text-fg-subtle'
+                    }`}
+                  >
                     {step.label}
                   </p>
-                  <p className="text-xs text-fg-muted">
-                    {isCurrent ? `Ahora · ${step.note}` : done ? step.note : 'Pendiente'}
+                  <p
+                    className={`text-[11.5px] ${
+                      isCurrent ? 'text-brand-400' : done ? 'text-fg-subtle' : 'text-[#52525b]'
+                    }`}
+                  >
+                    {isCurrent ? `Ahora · ${step.note.toLowerCase()}` : done ? step.note : 'Pendiente'}
                   </p>
                 </div>
               </div>
@@ -170,7 +178,7 @@ export default function OrderTracking() {
       )}
 
       {/* Resumen breve */}
-      <div className="rounded-2xl border border-line bg-surface p-4">
+      <div className="mt-2 rounded-2xl border border-line bg-surface p-4">
         <div className="flex items-center justify-between text-sm">
           <span className="text-fg-muted">
             {order.order_items?.reduce((n, i) => n + i.quantity, 0)} artículo(s) ·{' '}
@@ -182,14 +190,14 @@ export default function OrderTracking() {
         </div>
       </div>
 
-      {/* WhatsApp */}
+      {/* WhatsApp (diseño 09: botón oscuro) */}
       <a
         href={waLink}
         target="_blank"
         rel="noreferrer"
-        className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] py-3 font-semibold text-white transition hover:brightness-95"
+        className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-surface-3 text-sm font-semibold text-fg transition hover:bg-surface-2"
       >
-        <WhatsAppIcon className="h-5 w-5" />
+        <WhatsAppIcon className="h-[17px] w-[17px]" />
         Contactar por WhatsApp
       </a>
     </div>

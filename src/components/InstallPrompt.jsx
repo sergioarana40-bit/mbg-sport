@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Download, X } from 'lucide-react'
+import { Download } from 'lucide-react'
 
 const DISMISS_KEY = 'mbg_install_dismissed'
 
@@ -84,34 +84,54 @@ export default function InstallPrompt() {
   }
 
   return (
-    <div className="fixed inset-x-3 bottom-24 z-40 mx-auto max-w-md rounded-2xl border border-line bg-surface p-4 shadow-2xl md:inset-x-auto md:bottom-4 md:right-4 md:left-auto">
-      <div className="flex items-center gap-3">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-brand-600 font-display text-sm font-bold text-white">
+    <div className="fixed inset-x-3.5 bottom-24 z-40 mx-auto max-w-md rounded-[22px] border border-white/10 bg-[#18181c] p-5 shadow-[0_-10px_40px_rgba(0,0,0,.5)] md:inset-x-auto md:bottom-4 md:right-4 md:left-auto">
+      {/* Instalar app (diseño 10) */}
+      <div className="flex items-center gap-3.5">
+        <span className="grid h-[52px] w-[52px] shrink-0 place-items-center rounded-[14px] bg-brand-600 font-display text-[19px] font-bold text-white shadow-[0_8px_18px_rgba(220,38,38,.4)]">
           MBG
         </span>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-fg">Instala MBG Sport</p>
-          <p className="text-xs text-fg-muted">Acceso rápido y compra sin conexión.</p>
+          <p className="font-display text-lg font-bold uppercase leading-tight text-fg">
+            Instala MBG Sport
+          </p>
+          <p className="text-xs text-fg-muted">mbgsport.com.mx</p>
         </div>
-        <button
-          onClick={dismiss}
-          className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-fg-subtle hover:bg-surface-2"
-          aria-label="Cerrar"
-        >
-          <X className="h-4 w-4" />
-        </button>
       </div>
 
+      <p className="mt-3.5 text-[13px] leading-normal text-[#d4d4d8]">
+        Añádela a tu pantalla de inicio: compra más rápido, recibe avisos de tu pedido y
+        navega el catálogo sin conexión.
+      </p>
+
       {device.ios ? (
-        <p className="mt-3 flex items-center justify-center gap-1.5 rounded-xl bg-surface-2 px-3 py-2.5 text-center text-xs text-fg-muted">
-          Toca <ShareIcon className="inline h-4 w-4 text-brand-400" /> y luego
-          <b className="text-fg">“Añadir a inicio”</b>
-        </p>
+        <div className="mt-4 flex gap-2.5">
+          <button
+            onClick={dismiss}
+            className="flex h-[46px] flex-1 items-center justify-center rounded-xl border border-white/15 text-sm font-semibold text-[#d4d4d8] transition hover:bg-white/5"
+          >
+            Ahora no
+          </button>
+          <p className="flex h-[46px] flex-[1.4] items-center justify-center gap-1.5 rounded-xl bg-surface-2 px-3 text-center text-[11px] text-fg-muted">
+            Toca <ShareIcon className="inline h-4 w-4 shrink-0 text-brand-400" /> y{' '}
+            <b className="text-fg">“Añadir a inicio”</b>
+          </p>
+        </div>
       ) : (
-        <button onClick={install} className="btn-primary mt-3 w-full py-2.5 text-sm">
-          <Download className="h-4.5 w-4.5" />
-          Instalar app
-        </button>
+        <div className="mt-4 flex gap-2.5">
+          <button
+            onClick={dismiss}
+            className="flex h-[46px] flex-1 items-center justify-center rounded-xl border border-white/15 text-sm font-semibold text-[#d4d4d8] transition hover:bg-white/5"
+          >
+            Ahora no
+          </button>
+          <button
+            onClick={install}
+            className="flex h-[46px] flex-[1.4] items-center justify-center gap-2 rounded-xl bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700 active:scale-[.98]"
+          >
+            <Download className="h-[17px] w-[17px]" strokeWidth={1.9} />
+            Instalar
+          </button>
+        </div>
       )}
     </div>
   )

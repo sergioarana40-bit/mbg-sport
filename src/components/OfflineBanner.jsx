@@ -20,12 +20,13 @@ export default function OfflineBanner() {
   if (!offline) return null
 
   return (
-    <div className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-brand-700 px-4 py-1.5 text-center text-xs font-medium text-white">
-      <WifiOff className="h-3.5 w-3.5" />
+    /* Banner sin conexión (diseño 10: rojo oscuro #3f1414) */
+    <div className="sticky top-0 z-50 flex items-center justify-center gap-2 bg-[#3f1414] px-4 py-2.5 text-center text-xs font-medium text-[#fca5a5]">
+      <WifiOff className="h-[15px] w-[15px]" strokeWidth={2} />
       Sin conexión · estás viendo el catálogo guardado
       <button
         onClick={() => window.location.reload()}
-        className="ml-2 inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 font-semibold hover:bg-white/30"
+        className="ml-1.5 inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 font-semibold text-white transition hover:bg-white/20"
       >
         <RotateCw className="h-3 w-3" />
         Reintentar

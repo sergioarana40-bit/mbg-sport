@@ -1,6 +1,19 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 import { formatPrice, calcShipping } from '../config'
 
+// Cupones activos y vigentes (para la página de promociones).
+export async function getActiveCoupons() {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('coupons')
+    .select('*')
+    .eq('active', true)
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  const now = new Date()
+  return data.filter((c) => !c.expires_at || new Date(c.expires_at) >= now)
+}
+
 // Busca un cupón activo por código.
 export async function findCoupon(code) {
   if (!isSupabaseConfigured || !code) return null

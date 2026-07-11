@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, Navigate } from 'react-router-dom'
-import { Lock, AlertCircle, CreditCard, Truck, Store } from 'lucide-react'
+import { Lock, AlertCircle, CreditCard, Truck, Store, Check, MapPin } from 'lucide-react'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
@@ -104,40 +104,77 @@ export default function Checkout() {
     }
   }
 
-  const deliveryOption = (value, Icon, title, subtitle) => {
+  // Tarjeta de método de entrega (diseño 06): seleccionada = borde rojo + fondo rojizo.
+  const deliveryOption = (value, Icon, title, subtitle, note, noteColor) => {
     const active = delivery === value
     return (
       <button
         type="button"
         onClick={() => setDelivery(value)}
-        className={`flex items-center gap-3 rounded-xl border p-3.5 text-left transition ${
-          active ? 'border-brand-500 bg-brand-600/10' : 'border-line bg-surface-2 hover:bg-surface-3'
+        className={`flex items-center gap-3 rounded-[15px] p-4 text-left transition ${
+          active
+            ? 'border-[1.5px] border-brand-600 bg-[#1a1315]'
+            : 'border border-line bg-surface hover:bg-surface-2'
         }`}
       >
         <span
-          className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg ${
-            active ? 'bg-brand-600 text-white' : 'bg-surface-3 text-fg-muted'
+          className={`grid h-[42px] w-[42px] shrink-0 place-items-center rounded-[11px] ${
+            active ? 'bg-brand-600/15 text-brand-500' : 'bg-surface-2 text-fg-muted'
           }`}
         >
-          <Icon className="h-5 w-5" />
+          <Icon className="h-[21px] w-[21px]" strokeWidth={1.7} />
         </span>
-        <span className="flex-1">
+        <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold text-fg">{title}</span>
           <span className="block text-xs text-fg-muted">{subtitle}</span>
+          <span className={`block text-xs font-semibold ${noteColor}`}>{note}</span>
         </span>
-        <span
-          className={`grid h-5 w-5 place-items-center rounded-full border-2 ${
-            active ? 'border-brand-500' : 'border-surface-3'
-          }`}
-        >
-          {active && <span className="h-2.5 w-2.5 rounded-full bg-brand-500" />}
-        </span>
+        {active ? (
+          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-600">
+            <Check className="h-3 w-3 text-white" strokeWidth={3} />
+          </span>
+        ) : (
+          <span className="h-5 w-5 shrink-0 rounded-full border-2 border-[#3f3f46]" />
+        )}
       </button>
     )
   }
 
+  // Paso del stepper (diseño 06).
+  const step = (n, label, state) => (
+    <span
+      className={`flex items-center gap-2 ${
+        state === 'active' ? 'font-semibold text-fg' : 'text-fg-subtle'
+      }`}
+    >
+      <span
+        className={`grid h-[22px] w-[22px] place-items-center rounded-full text-[11px] ${
+          state === 'active'
+            ? 'bg-brand-600 text-white'
+            : state === 'done'
+              ? 'bg-emerald-400/20 text-emerald-400'
+              : 'bg-surface-3 text-fg-muted'
+        }`}
+      >
+        {state === 'done' ? <Check className="h-3 w-3" strokeWidth={3} /> : n}
+      </span>
+      {label}
+    </span>
+  )
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
+      {/* Stepper Carrito › Entrega › Pago (diseño 06) */}
+      <div className="mb-5 flex items-center gap-2.5 text-[12.5px] sm:gap-3">
+        <Link to="/carrito" className="transition hover:opacity-80">
+          {step(1, 'Carrito', 'done')}
+        </Link>
+        <span className="h-px w-5 bg-[#3f3f46] sm:w-[26px]" />
+        {step(2, 'Entrega', 'active')}
+        <span className="h-px w-5 bg-[#3f3f46] sm:w-[26px]" />
+        {step(3, 'Pago', 'pending')}
+      </div>
+
       <h1 className="mb-6 font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl">
         Finalizar compra
       </h1>
@@ -157,13 +194,43 @@ export default function Checkout() {
           <div className="rounded-2xl border border-line bg-surface p-5">
             <h2 className="font-display text-lg font-bold text-fg">¿Cómo quieres recibirlo?</h2>
             <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {deliveryOption('shipping', Truck, 'Envío a domicilio', '2–4 días · gratis desde $1,500')}
-              {deliveryOption('pickup', Store, 'Recogida en tienda', 'Toluca · gratis')}
+              {deliveryOption(
+                'shipping',
+                Truck,
+                'Envío a domicilio',
+                '2–4 días hábiles',
+                'Gratis · pedido +$1,500',
+                'text-emerald-400'
+              )}
+              {deliveryOption(
+                'pickup',
+                Store,
+                'Recoge en tienda',
+                'Listo hoy en tienda',
+                'Sin costo',
+                'text-accent-400'
+              )}
             </div>
+            {/* Tarjeta de la tienda (diseño 06) */}
             {delivery === 'pickup' && (
-              <p className="mt-3 rounded-lg bg-surface-2 p-3 text-xs text-fg-muted">
-                Recoge en: {STORE.address}
-              </p>
+              <div className="mt-4 overflow-hidden rounded-[15px] border border-line bg-surface-2">
+                <div
+                  className="grid h-[96px] place-items-center"
+                  style={{
+                    background:
+                      'repeating-linear-gradient(45deg,#1a1a1f,#1a1a1f 10px,#202027 10px,#202027 20px)',
+                  }}
+                >
+                  <MapPin className="h-7 w-7 text-brand-600" fill="currentColor" strokeWidth={1} />
+                </div>
+                <div className="p-4">
+                  <p className="text-[13.5px] font-semibold text-fg">
+                    {STORE.name} · Santa Clara
+                  </p>
+                  <p className="mt-1 text-xs leading-relaxed text-fg-muted">{STORE.address}</p>
+                  <p className="mt-1.5 text-[11.5px] text-fg-subtle">{STORE.hours}</p>
+                </div>
+              </div>
             )}
           </div>
 
