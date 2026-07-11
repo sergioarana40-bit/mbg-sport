@@ -148,7 +148,7 @@ export default function Catalog() {
         </aside>
 
         {/* Resultados */}
-        <div>
+        <div className="min-w-0">
           {/* Chips de categorías (móvil) */}
           <nav className="no-scrollbar mb-4 flex gap-2 overflow-x-auto lg:hidden">
             <NavLink to="/catalogo" end className={linkClass}>
