@@ -60,6 +60,14 @@
   /* Oculta scrollbars en carruseles horizontales (chips, categorías) */
   .no-scrollbar::-webkit-scrollbar { display: none; }
   .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* iOS Safari hace zoom automático al enfocar campos con fuente menor a 16px
+     (y la vista se queda ampliada). En pantallas táctiles forzamos 16px. */
+  @media (pointer: coarse) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
 }
 
 /* ==========================================================================
