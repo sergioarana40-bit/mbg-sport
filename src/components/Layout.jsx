@@ -4,6 +4,7 @@ import Header from './Header'
 import Footer from './Footer'
 import BottomNav from './BottomNav'
 import InstallPrompt from './InstallPrompt'
+import OfflineBanner from './OfflineBanner'
 
 export default function Layout() {
   const { pathname } = useLocation()
@@ -15,6 +16,7 @@ export default function Layout() {
 
   return (
     <div className="flex min-h-screen flex-col bg-ink text-fg">
+      <OfflineBanner />
       <Header />
       {/* pb en móvil para dejar espacio a la barra inferior */}
       <main className="flex-1 pb-20 md:pb-0">

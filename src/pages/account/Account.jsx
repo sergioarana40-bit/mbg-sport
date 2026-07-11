@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Navigate, Link, useNavigate } from 'react-router-dom'
-import { LogOut, Package, ShieldCheck, Check, ChevronRight } from 'lucide-react'
+import { LogOut, Package, ShieldCheck, Check, ChevronRight, Bell } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import Spinner from '../../components/Spinner'
 import StatusBadge from '../../components/StatusBadge'
+import AddressManager from '../../components/AddressManager'
 import { formatPrice } from '../../config'
-import { getMyOrders, updateProfile } from '../../lib/account'
+import { getMyOrders, updateProfile, setNotifications } from '../../lib/account'
 
 function fmtDate(iso) {
   if (!iso) return ''
@@ -24,6 +25,7 @@ export default function Account() {
   const [form, setForm] = useState({ full_name: '', phone: '' })
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [notifOn, setNotifOn] = useState(true)
 
   useEffect(() => {
     if (!user) return
@@ -35,8 +37,22 @@ export default function Account() {
   }, [user])
 
   useEffect(() => {
-    if (profile) setForm({ full_name: profile.full_name || '', phone: profile.phone || '' })
+    if (profile) {
+      setForm({ full_name: profile.full_name || '', phone: profile.phone || '' })
+      setNotifOn(profile.notifications_enabled !== false)
+    }
   }, [profile])
+
+  async function toggleNotif() {
+    const next = !notifOn
+    setNotifOn(next)
+    try {
+      await setNotifications(user.id, next)
+      await refreshProfile()
+    } catch {
+      setNotifOn(!next)
+    }
+  }
 
   if (loading) {
     return (
@@ -99,7 +115,9 @@ export default function Account() {
         </Link>
       )}
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-[320px_1fr]">
+      <div className="mt-6 grid gap-6 lg:grid-cols-[340px_1fr]">
+        {/* Columna izquierda: perfil, notificaciones y direcciones */}
+        <div className="space-y-6">
         {/* Perfil */}
         <form
           onSubmit={handleSave}
@@ -141,6 +159,36 @@ export default function Account() {
           </button>
         </form>
 
+        {/* Notificaciones */}
+        <div className="flex items-center gap-3 rounded-2xl border border-line bg-surface p-5">
+          <span className="grid h-10 w-10 place-items-center rounded-lg bg-surface-2 text-fg-muted">
+            <Bell className="h-5 w-5" />
+          </span>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-fg">Notificaciones</p>
+            <p className="text-xs text-fg-muted">Avisos del estado de tus pedidos</p>
+          </div>
+          <button
+            onClick={toggleNotif}
+            role="switch"
+            aria-checked={notifOn}
+            aria-label="Notificaciones"
+            className={`relative h-6 w-11 shrink-0 rounded-full transition ${
+              notifOn ? 'bg-brand-600' : 'bg-surface-3'
+            }`}
+          >
+            <span
+              className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${
+                notifOn ? 'left-[22px]' : 'left-0.5'
+              }`}
+            />
+          </button>
+        </div>
+
+        {/* Direcciones */}
+        <AddressManager userId={user.id} />
+        </div>
+
         {/* Historial de pedidos */}
         <div>
           <h2 className="mb-3 font-display text-lg font-bold text-fg">Mis pedidos</h2>
@@ -164,7 +212,11 @@ export default function Account() {
           ) : (
             <div className="space-y-3">
               {orders.map((o) => (
-                <div key={o.id} className="rounded-2xl border border-line bg-surface p-4">
+                <Link
+                  key={o.id}
+                  to={`/cuenta/pedidos/${o.id}`}
+                  className="block rounded-2xl border border-line bg-surface p-4 transition hover:border-brand-500/40"
+                >
                   <div className="flex items-center justify-between gap-3">
                     <div>
                       <p className="font-mono text-xs text-fg-subtle">
@@ -188,7 +240,7 @@ export default function Account() {
                     <span className="text-fg">Total</span>
                     <span className="text-brand-500">{formatPrice(o.total)}</span>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

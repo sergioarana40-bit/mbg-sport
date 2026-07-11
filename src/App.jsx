@@ -10,6 +10,7 @@ import NotFound from './pages/NotFound'
 
 import Favorites from './pages/Favorites'
 import Account from './pages/account/Account'
+import OrderTracking from './pages/account/OrderTracking'
 import CustomerLogin from './pages/account/CustomerLogin'
 import Register from './pages/account/Register'
 
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/pedido/:id" element={<OrderConfirmation />} />
         <Route path="/cuenta" element={<Account />} />
+        <Route path="/cuenta/pedidos/:id" element={<OrderTracking />} />
         <Route path="/cuenta/login" element={<CustomerLogin />} />
         <Route path="/cuenta/registro" element={<Register />} />
       </Route>
