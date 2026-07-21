@@ -61,6 +61,11 @@ export default function Footer() {
               </Link>
             </li>
             <li>
+              <Link to="/terminos" className="transition hover:text-fg">
+                Términos y condiciones
+              </Link>
+            </li>
+            <li>
               <Link to="/admin/login" className="transition hover:text-fg">
                 Acceso administrador
               </Link>

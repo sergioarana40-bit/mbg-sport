@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Plus, Pencil, Trash2, AlertCircle, Ticket } from 'lucide-react'
 import Modal from '../../components/Modal'
 import Spinner from '../../components/Spinner'
-import { formatPrice } from '../../config'
+import { formatPrice, STORE } from '../../config'
 import { couponLabel } from '../../lib/coupons'
 import { isSupabaseConfigured } from '../../lib/supabase'
 import { getAllCoupons, saveCoupon, deleteCoupon } from '../../lib/admin'
@@ -176,7 +176,8 @@ export default function AdminCoupons() {
               >
                 <option value="percent">Porcentaje (%)</option>
                 <option value="fixed">Monto fijo ($)</option>
-                <option value="free_shipping">Envío gratis</option>
+                {/* Sin envío a domicilio no tiene sentido ofrecer cupones de envío gratis. */}
+                {!STORE.pickupOnly && <option value="free_shipping">Envío gratis</option>}
               </select>
             </div>
             <div>

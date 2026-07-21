@@ -181,21 +181,25 @@ export default function ProductDetail() {
           )}
 
           {/* Tarjetas de entrega (diseño 04) */}
-          <div className="mt-6 grid gap-2.5 sm:grid-cols-2">
+          <div className={`mt-6 grid gap-2.5 ${STORE.pickupOnly ? '' : 'sm:grid-cols-2'}`}>
             <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3">
               <Store className="h-[18px] w-[18px] shrink-0 text-brand-500" strokeWidth={1.7} />
               <span className="text-xs text-fg-muted">
-                Recoge hoy en tienda · {STORE.city.split(',')[0]}
+                {STORE.pickupOnly
+                  ? `Recoge tu pedido en tienda · ${STORE.city.split(',')[0]}`
+                  : `Recoge hoy en tienda · ${STORE.city.split(',')[0]}`}
               </span>
             </div>
-            <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3">
-              <Truck className="h-[18px] w-[18px] shrink-0 text-brand-500" strokeWidth={1.7} />
-              <span className="text-xs text-fg-muted">
-                {STORE.freeShippingFrom
-                  ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · 2–4 días`
-                  : 'Envío a todo México · 2–4 días'}
-              </span>
-            </div>
+            {!STORE.pickupOnly && (
+              <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3">
+                <Truck className="h-[18px] w-[18px] shrink-0 text-brand-500" strokeWidth={1.7} />
+                <span className="text-xs text-fg-muted">
+                  {STORE.freeShippingFrom
+                    ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · 2–4 días`
+                    : 'Envío a todo México · 2–4 días'}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

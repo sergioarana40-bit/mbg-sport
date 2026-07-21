@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Ticket, X, Truck, Check } from 'lucide-react'
+import { Minus, Plus, Trash2, ShoppingBag, ArrowRight, Ticket, X, Truck, Store, Check } from 'lucide-react'
 import ProductImage from '../components/ProductImage'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
@@ -87,12 +87,18 @@ export default function Cart() {
         </span>
       </div>
 
-      {/* Banner de envío gratis (diseño 05) */}
-      {shipping === 0 && subtotal > 0 && (
+      {/* Banner de entrega (diseño 05) */}
+      {subtotal > 0 && (STORE.pickupOnly || shipping === 0) && (
         <div className="mb-5 flex items-center gap-2.5 rounded-[11px] bg-emerald-400/10 px-3.5 py-3">
-          <Truck className="h-[17px] w-[17px] shrink-0 text-emerald-400" strokeWidth={1.8} />
+          {STORE.pickupOnly ? (
+            <Store className="h-[17px] w-[17px] shrink-0 text-emerald-400" strokeWidth={1.8} />
+          ) : (
+            <Truck className="h-[17px] w-[17px] shrink-0 text-emerald-400" strokeWidth={1.8} />
+          )}
           <span className="text-[12.5px] font-medium text-emerald-200">
-            ¡Tienes envío gratis!
+            {STORE.pickupOnly
+              ? 'Recoge tu pedido en tienda · Sin costo de envío'
+              : '¡Tienes envío gratis!'}
           </span>
         </div>
       )}
@@ -231,9 +237,11 @@ export default function Cart() {
                 </div>
               )}
               <div className="flex justify-between">
-                <dt className="text-fg-muted">Envío</dt>
+                <dt className="text-fg-muted">{STORE.pickupOnly ? 'Entrega' : 'Envío'}</dt>
                 <dd className="font-medium text-fg">
-                  {shipping === 0 ? (
+                  {STORE.pickupOnly ? (
+                    <span className="text-emerald-400">Recoge en tienda</span>
+                  ) : shipping === 0 ? (
                     <span className="text-emerald-400">Gratis</span>
                   ) : (
                     formatPrice(shipping)

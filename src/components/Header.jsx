@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { ShoppingCart, Search, MapPin, Truck, Heart } from 'lucide-react'
+import { ShoppingCart, Search, MapPin, Truck, Store, Heart } from 'lucide-react'
 import Logo from './Logo'
 import UserMenu from './UserMenu'
 import { useCart } from '../context/CartContext'
@@ -41,11 +41,17 @@ export default function Header() {
       <div className="bg-black text-fg-muted">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs">
           <span className="flex min-w-0 items-center gap-1.5">
-            <Truck className="h-3.5 w-3.5 shrink-0 text-accent-400" />
+            {STORE.pickupOnly ? (
+              <Store className="h-3.5 w-3.5 shrink-0 text-accent-400" />
+            ) : (
+              <Truck className="h-3.5 w-3.5 shrink-0 text-accent-400" />
+            )}
             <span className="truncate">
-              {STORE.freeShippingFrom
-                ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · Recoge hoy en tienda`
-                : 'Envíos a todo México'}
+              {STORE.pickupOnly
+                ? 'Recoge tu pedido en tienda · Listo hoy'
+                : STORE.freeShippingFrom
+                  ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · Recoge hoy en tienda`
+                  : 'Envíos a todo México'}
             </span>
           </span>
           <span className="hidden items-center gap-1.5 sm:flex">

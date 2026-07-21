@@ -5,7 +5,7 @@ export const STORE = {
   name: 'MBG Sport',
   tagline: 'Todo para tu entrenamiento',
   description:
-    'Pesas, barras, cardio, ropa y refacciones. Los mejores precios en Toluca, con envío a todo México.',
+    'Pesas, barras, cardio, ropa y refacciones. Los mejores precios en Toluca.',
   address: 'Av. Independencia Oriente 612, Col. Santa Clara, Toluca, México 50090',
   city: 'Toluca, Estado de México',
   // Rellena con el número real (formato internacional, sin +, ni espacios) para el contacto por WhatsApp.
@@ -16,8 +16,10 @@ export const STORE = {
   instagram: 'https://instagram.com/mbgsport',
   // Horario de atención (se muestra en el footer).
   hours: 'Lun a Sáb · 10:00 – 20:00',
+  // Por ahora solo hay recogida en tienda; pon false para reactivar el envío a domicilio.
+  pickupOnly: true,
   // Envío gratis a partir de este monto (MXN). Pon null para desactivar.
-  freeShippingFrom: 1500,
+  freeShippingFrom: null,
   shippingCost: 120,
   currency: 'MXN',
   locale: 'es-MX',
@@ -25,6 +27,7 @@ export const STORE = {
 
 // Calcula el costo de envío según el subtotal (envío gratis desde cierto monto).
 export function calcShipping(subtotal) {
+  if (STORE.pickupOnly) return 0
   if (subtotal <= 0) return 0
   if (STORE.freeShippingFrom && subtotal >= STORE.freeShippingFrom) return 0
   return STORE.shippingCost

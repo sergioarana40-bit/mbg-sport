@@ -17,7 +17,8 @@ export default function Checkout() {
   const { items, subtotal, appliedCoupon, clearCart } = useCart()
   const { user, profile } = useAuth()
   const [form, setForm] = useState(EMPTY)
-  const [delivery, setDelivery] = useState('shipping') // 'shipping' | 'pickup'
+  // 'shipping' | 'pickup' — con pickupOnly solo se ofrece recoger en tienda.
+  const [delivery, setDelivery] = useState(STORE.pickupOnly ? 'pickup' : 'shipping')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -192,16 +193,26 @@ export default function Checkout() {
         <div className="space-y-6">
           {/* Entrega */}
           <div className="rounded-2xl border border-line bg-surface p-5">
-            <h2 className="font-display text-lg font-bold text-fg">¿Cómo quieres recibirlo?</h2>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              {deliveryOption(
-                'shipping',
-                Truck,
-                'Envío a domicilio',
-                '2–4 días hábiles',
-                'Gratis · pedido +$1,500',
-                'text-emerald-400'
-              )}
+            <h2 className="font-display text-lg font-bold text-fg">
+              {STORE.pickupOnly ? 'Entrega' : '¿Cómo quieres recibirlo?'}
+            </h2>
+            {STORE.pickupOnly && (
+              <p className="mt-1 text-sm text-fg-muted">
+                Por ahora todos los pedidos se recogen en nuestra tienda, sin costo de envío.
+              </p>
+            )}
+            <div className={`mt-4 grid gap-3 ${STORE.pickupOnly ? '' : 'sm:grid-cols-2'}`}>
+              {!STORE.pickupOnly &&
+                deliveryOption(
+                  'shipping',
+                  Truck,
+                  'Envío a domicilio',
+                  '2–4 días hábiles',
+                  STORE.freeShippingFrom
+                    ? `Gratis · pedido +${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')}`
+                    : formatPrice(STORE.shippingCost),
+                  'text-emerald-400'
+                )}
               {deliveryOption(
                 'pickup',
                 Store,
@@ -357,6 +368,13 @@ export default function Checkout() {
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-fg-subtle">
               <Lock className="h-3.5 w-3.5" />
               Pago protegido con MercadoPago
+            </p>
+            <p className="mt-2 text-center text-[11px] leading-relaxed text-fg-subtle">
+              Al pagar aceptas nuestros{' '}
+              <Link to="/terminos" className="underline underline-offset-2 transition hover:text-fg">
+                términos y condiciones
+              </Link>
+              .
             </p>
           </div>
           <Link

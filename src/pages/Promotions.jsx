@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Copy, Check, Truck, CreditCard, AlertCircle } from 'lucide-react'
+import { Copy, Check, Truck, Store, CreditCard, AlertCircle } from 'lucide-react'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
 import { getActiveCoupons, findCoupon, couponLabel } from '../lib/coupons'
@@ -179,20 +179,34 @@ export default function Promotions() {
           ))}
 
           {/* Beneficios permanentes (diseño 07) */}
-          {STORE.freeShippingFrom && (
+          {STORE.pickupOnly ? (
             <div className="flex items-center gap-3 rounded-[15px] border border-line bg-surface p-4">
               <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[11px] bg-brand-600/15 text-brand-500">
-                <Truck className="h-[22px] w-[22px]" strokeWidth={1.7} />
+                <Store className="h-[22px] w-[22px]" strokeWidth={1.7} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-fg">
-                  Envío gratis desde {money(STORE.freeShippingFrom)}
-                </p>
+                <p className="text-sm font-semibold text-fg">Recoge en tienda sin costo</p>
                 <p className="mt-0.5 text-[11.5px] text-fg-muted">
-                  En todos los pedidos · a todo México
+                  Tu pedido listo hoy · {STORE.city}
                 </p>
               </div>
             </div>
+          ) : (
+            STORE.freeShippingFrom && (
+              <div className="flex items-center gap-3 rounded-[15px] border border-line bg-surface p-4">
+                <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[11px] bg-brand-600/15 text-brand-500">
+                  <Truck className="h-[22px] w-[22px]" strokeWidth={1.7} />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-fg">
+                    Envío gratis desde {money(STORE.freeShippingFrom)}
+                  </p>
+                  <p className="mt-0.5 text-[11.5px] text-fg-muted">
+                    En todos los pedidos · a todo México
+                  </p>
+                </div>
+              </div>
+            )
           )}
           <div className="flex items-center gap-3 rounded-[15px] border border-line bg-surface p-4">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-[11px] bg-blue-400/15 text-blue-400">

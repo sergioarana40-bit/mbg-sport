@@ -7,6 +7,7 @@ import Cart from './pages/Cart'
 import Checkout from './pages/Checkout'
 import Promotions from './pages/Promotions'
 import OrderConfirmation from './pages/OrderConfirmation'
+import Terms from './pages/Terms'
 import NotFound from './pages/NotFound'
 
 import Favorites from './pages/Favorites'
@@ -38,6 +39,7 @@ export default function App() {
         <Route path="/carrito" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/pedido/:id" element={<OrderConfirmation />} />
+        <Route path="/terminos" element={<Terms />} />
         <Route path="/cuenta" element={<Account />} />
         <Route path="/cuenta/pedidos/:id" element={<OrderTracking />} />
         <Route path="/cuenta/login" element={<CustomerLogin />} />

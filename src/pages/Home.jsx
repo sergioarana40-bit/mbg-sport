@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { ArrowRight, Truck, ShieldCheck, CreditCard, Store, Search } from 'lucide-react'
+import { ArrowRight, PackageCheck, ShieldCheck, CreditCard, Store, Search } from 'lucide-react'
 import ProductCard from '../components/ProductCard'
 import CategoryIcon from '../components/CategoryIcon'
 import Spinner from '../components/Spinner'
@@ -9,7 +9,7 @@ import { STORE, formatPrice } from '../config'
 
 const BENEFITS = [
   { icon: CreditCard, title: 'Pago seguro', text: 'MercadoPago' },
-  { icon: Truck, title: 'Envíos', text: 'Gratis desde $1,500' },
+  { icon: PackageCheck, title: 'Recoge en tienda', text: 'Tu pedido listo hoy' },
   { icon: Store, title: 'Tienda física', text: 'Visítanos en Toluca' },
   { icon: ShieldCheck, title: 'Garantía', text: 'Productos originales' },
 ]
