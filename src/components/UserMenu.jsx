@@ -30,8 +30,8 @@ export default function UserMenu() {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen((o) => !o)}
-        className={`grid h-10 w-10 place-items-center rounded-lg transition hover:bg-surface-2 hover:text-fg ${
-          user ? 'text-brand-400' : 'text-fg-muted'
+        className={`grid h-10 w-10 place-items-center rounded-lg transition hover:bg-white/10 ${
+          user ? 'text-accent-400' : 'text-white'
         }`}
         aria-label="Cuenta"
         aria-expanded={open}
@@ -40,7 +40,7 @@ export default function UserMenu() {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-12 z-50 w-56 rounded-xl border border-line bg-surface p-2 shadow-2xl">
+        <div className="sticker absolute right-0 top-12 z-50 w-56 p-2">
           {user ? (
             <>
               <div className="px-3 py-2">

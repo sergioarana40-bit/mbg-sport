@@ -26,48 +26,52 @@ function FavoriteCard({ product }) {
   return (
     <Link
       to={`/producto/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-[15px] border border-line bg-surface transition hover:-translate-y-0.5 hover:border-brand-500/40"
+      className="group flex flex-col overflow-hidden rounded-[10px] border-2 border-ink bg-white shadow-hard-sm transition hover:-translate-y-0.5 lg:shadow-hard"
     >
       <div className="relative">
-        <ProductImage src={product.image_url} alt={product.name} className="aspect-square" />
+        <ProductImage
+          src={product.image_url}
+          alt={product.name}
+          className="aspect-square border-b-2 border-ink"
+        />
         <FavoriteButton
           productId={product.id}
           size={4}
-          className="absolute right-2 top-2 h-[30px] w-[30px] bg-ink/70 text-brand-500"
+          className="absolute right-2 top-2 h-[34px] w-[34px] rounded-lg border-2 border-ink bg-white text-fg"
         />
         {outOfStock && <span className="badge-out absolute bottom-2 left-2">Agotado</span>}
       </div>
-      <div className="flex flex-1 flex-col gap-1.5 p-3">
+      <div className="flex flex-1 flex-col p-3.5">
         {product.category_name && (
-          <span className="text-[10px] font-semibold uppercase tracking-[.06em] text-brand-400">
+          <span className="text-[10px] font-bold uppercase tracking-[.12em] text-fg-subtle">
             {product.category_name}
           </span>
         )}
-        <h3 className="line-clamp-2 text-[13px] font-semibold leading-tight text-fg transition group-hover:text-brand-400">
+        <h3 className="mt-1 line-clamp-2 text-[13.5px] font-semibold leading-snug text-fg">
           {product.name}
         </h3>
-        <span className="mt-0.5 font-display text-lg font-bold text-fg">
-          {formatPrice(product.price)}
-        </span>
+        <span className="price-tag mt-2 self-start text-base">{formatPrice(product.price)}</span>
         <button
           onClick={handleAdd}
           disabled={outOfStock}
-          className={`mt-1.5 flex h-9 items-center justify-center gap-1.5 rounded-[10px] text-[12.5px] font-semibold transition ${
+          className={`mt-3 flex h-[38px] items-center justify-center gap-2 rounded-lg font-display text-[11.5px] font-extrabold uppercase transition ${
             outOfStock
-              ? 'cursor-not-allowed bg-surface-2 text-fg-subtle'
+              ? 'cursor-not-allowed border-2 border-[#d9d9d9] bg-white text-fg-subtle'
               : added
-                ? 'bg-emerald-600 text-white'
-                : 'bg-surface-3 text-fg hover:bg-surface-2 active:scale-[.98]'
+                ? 'bg-state-paid text-white'
+                : 'bg-ink text-white hover:bg-ink-2 active:scale-[.98]'
           }`}
         >
           {added ? (
             <>
-              <Check className="h-4 w-4" /> Agregado
+              <Check className="h-3.5 w-3.5" /> Agregado
             </>
+          ) : outOfStock ? (
+            'Agotado'
           ) : (
             <>
-              <ShoppingCart className="h-4 w-4" strokeWidth={1.8} />
-              {outOfStock ? 'Agotado' : 'Agregar'}
+              <ShoppingCart className="h-3.5 w-3.5" strokeWidth={2} />
+              Agregar
             </>
           )}
         </button>
@@ -103,21 +107,21 @@ export default function Favorites() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl">
-            Favoritos
+          <h1 className="title-stamp text-lg sm:text-2xl">
+            <span>Favoritos</span>
           </h1>
-          <p className="mt-1 text-sm text-fg-muted">
+          <p className="mt-2.5 text-[12.5px] font-medium text-fg-subtle">
             {count} producto{count === 1 ? '' : 's'} guardado{count === 1 ? '' : 's'}
           </p>
         </div>
-        {/* Agregar todo (diseño 08) */}
+        {/* Agregar todo */}
         {inStock.length > 0 && (
           <button
             onClick={addAll}
-            className={`inline-flex items-center gap-2 rounded-[11px] px-4 py-2.5 text-[13px] font-semibold text-white transition active:scale-[.98] ${
-              addedAll ? 'bg-emerald-600' : 'bg-brand-600 hover:bg-brand-700'
+            className={`inline-flex items-center gap-2 rounded-[10px] border-2 border-ink px-4 py-2.5 font-display text-[11.5px] font-extrabold uppercase text-white shadow-hard-sm transition active:translate-x-0.5 active:translate-y-0.5 active:shadow-none ${
+              addedAll ? 'bg-state-paid' : 'bg-brand-600 hover:bg-brand-700'
             }`}
           >
             {addedAll ? (
@@ -126,7 +130,7 @@ export default function Favorites() {
               </>
             ) : (
               <>
-                <ShoppingCart className="h-4 w-4" strokeWidth={1.8} />
+                <ShoppingCart className="h-4 w-4" strokeWidth={2} />
                 Agregar todo
               </>
             )}
@@ -140,16 +144,16 @@ export default function Favorites() {
         </div>
       ) : products.length === 0 ? (
         <div className="mx-auto max-w-md py-16 text-center">
-          <div className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-surface-2">
-            <Heart className="h-8 w-8 text-fg-subtle" />
+          <div className="sticker mx-auto grid h-16 w-16 place-items-center rounded-full">
+            <Heart className="h-8 w-8 text-brand-600" />
           </div>
-          <h2 className="mt-5 font-display text-xl font-bold text-fg">
+          <h2 className="mt-5 font-display text-xl font-extrabold text-fg">
             Aún no tienes favoritos
           </h2>
-          <p className="mt-2 text-sm text-fg-muted">
+          <p className="mt-2 text-sm font-medium text-fg-muted">
             Toca el corazón en cualquier producto para guardarlo aquí.
           </p>
-          <Link to="/catalogo" className="btn-primary mt-6">
+          <Link to="/catalogo" className="btn-sticker mt-6">
             Explorar catálogo
             <ArrowRight className="h-4.5 w-4.5" />
           </Link>

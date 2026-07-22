@@ -25,13 +25,18 @@ function fmtDateTime(iso) {
   }).format(new Date(iso))
 }
 
-const STEPS = [
-  { label: 'Pedido confirmado', icon: Check, note: 'Recibimos tu pedido' },
-  { label: 'Pago aprobado', icon: CreditCard, note: 'MercadoPago' },
-  { label: 'En preparación', icon: Package, note: 'Armando tu pedido' },
-  { label: 'Enviado', icon: Truck, note: 'En camino' },
-  { label: 'Entregado', icon: Home, note: 'Recibido' },
-]
+// Pasos del pedido; con recogida en tienda el 4º paso es "Listo para recoger".
+function stepsFor(deliveryMethod) {
+  return [
+    { label: 'Pedido confirmado', icon: Check, note: 'Recibimos tu pedido' },
+    { label: 'Pago aprobado', icon: CreditCard, note: 'MercadoPago' },
+    { label: 'En preparación', icon: Package, note: 'Armando tu pedido' },
+    deliveryMethod === 'pickup'
+      ? { label: 'Listo para recoger', icon: Package, note: 'Te esperamos en tienda' }
+      : { label: 'Enviado', icon: Truck, note: 'En camino' },
+    { label: 'Entregado', icon: Home, note: 'Recibido' },
+  ]
+}
 const STATUS_STEP = { pending: 0, paid: 1, processing: 2, shipped: 3, delivered: 4 }
 
 export default function OrderTracking() {
@@ -88,76 +93,75 @@ export default function OrderTracking() {
     <div className="mx-auto max-w-lg px-4 py-8">
       <Link
         to="/cuenta"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-fg-muted hover:text-fg"
+        className="mb-4 inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#4a4a4a] hover:text-fg"
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft className="h-4 w-4" strokeWidth={2.5} />
         Mi cuenta
       </Link>
 
       <div className="flex items-center justify-between gap-3">
-        <h1 className="font-display text-2xl font-bold tracking-tight text-fg">Seguimiento</h1>
-        <span className="font-mono text-sm text-fg-subtle">
+        <h1 className="title-stamp text-lg sm:text-xl">
+          <span>Seguimiento</span>
+        </h1>
+        <span className="font-mono text-[13px] font-bold text-fg-subtle">
           #{order.id.slice(0, 8).toUpperCase()}
         </span>
       </div>
 
-      {/* Entrega estimada (diseño 09: icono azul de información) */}
-      <div className="mt-5 flex items-center gap-3 rounded-2xl border border-line bg-surface p-4">
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-[11px] bg-blue-400/15 text-blue-400">
+      {/* Método de entrega (diseño 1b: icono en cuadro amarillo) */}
+      <div className="mt-5 flex items-center gap-3 rounded-[10px] border-2 border-ink bg-white px-4 py-3.5">
+        <span className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-lg border-2 border-ink bg-accent-400 text-fg">
           {order.delivery_method === 'pickup' ? (
-            <Home className="h-[21px] w-[21px]" strokeWidth={1.7} />
+            <Home className="h-5 w-5" strokeWidth={1.8} />
           ) : (
-            <Truck className="h-[21px] w-[21px]" strokeWidth={1.7} />
+            <Truck className="h-5 w-5" strokeWidth={1.8} />
           )}
         </span>
-        <div className="flex-1">
-          <p className="text-[13.5px] font-semibold text-fg">
+        <div className="min-w-0 flex-1">
+          <p className="text-[13.5px] font-bold text-fg">
             {order.delivery_method === 'pickup' ? 'Recoge en tienda' : 'Entrega estimada'}
           </p>
-          <p className="text-xs text-fg-muted">
+          <p className="text-xs font-medium text-fg-subtle">
             {order.delivery_method === 'pickup' ? STORE.city : '2–4 días hábiles'}
           </p>
         </div>
         <StatusBadge status={order.status} />
       </div>
 
-      {/* Timeline */}
+      {/* Timeline (póster 1b: hechos negros con check amarillo, actual rojo) */}
       {cancelled ? (
-        <div className="mt-5 flex items-center gap-3 rounded-2xl border border-brand-600/30 bg-brand-600/10 p-4">
-          <XCircle className="h-6 w-6 text-brand-500" />
-          <p className="text-sm font-semibold text-fg">Este pedido fue cancelado.</p>
+        <div className="mt-5 flex items-center gap-3 rounded-[10px] border-2 border-ink bg-brand-600 p-4 text-white">
+          <XCircle className="h-6 w-6" />
+          <p className="text-sm font-bold">Este pedido fue cancelado.</p>
         </div>
       ) : (
         <div className="mt-6 pl-1">
-          {STEPS.map((step, i) => {
+          {stepsFor(order.delivery_method).map((step, i, steps) => {
             const isCurrent = i === current && order.status !== 'delivered'
             const done = i < current || (i === current && order.status === 'delivered')
-            const last = i === STEPS.length - 1
+            const last = i === steps.length - 1
             return (
               <div key={step.label} className="flex gap-3.5">
                 <div className="flex flex-col items-center">
-                  {/* Círculo del paso (diseño 09): verde=hecho, rojo con halo=actual, gris=pendiente */}
                   {done ? (
-                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-emerald-400 text-ink">
-                      <Check className="h-[11px] w-[11px]" strokeWidth={3.2} />
+                    <span className="grid h-[22px] w-[22px] shrink-0 place-items-center rounded-full bg-ink">
+                      <Check className="h-[11px] w-[11px] text-accent-400" strokeWidth={3.5} />
                     </span>
                   ) : isCurrent ? (
-                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-600 text-white shadow-[0_0_0_4px_rgba(220,38,38,.2)]">
-                      <Check className="h-[11px] w-[11px]" strokeWidth={2.5} />
-                    </span>
+                    <span className="h-[22px] w-[22px] shrink-0 rounded-full border-2 border-ink bg-brand-600 shadow-[0_0_0_4px_rgba(255,0,0,.18)]" />
                   ) : (
-                    <span className="h-5 w-5 shrink-0 rounded-full border-2 border-[#3f3f46] bg-surface-2" />
+                    <span className="h-[22px] w-[22px] shrink-0 rounded-full border-2 border-fg-subtle bg-white" />
                   )}
                   {!last && (
                     <span
-                      className={`w-0.5 flex-1 ${done ? 'bg-emerald-400' : 'bg-[#3f3f46]'}`}
-                      style={{ minHeight: '30px' }}
+                      className={`w-[3px] flex-1 ${done ? 'bg-ink' : 'bg-[#d9d9d9]'}`}
+                      style={{ minHeight: '26px' }}
                     />
                   )}
                 </div>
-                <div className="pb-5">
+                <div className="pb-[18px]">
                   <p
-                    className={`text-sm font-semibold leading-5 ${
+                    className={`text-[13.5px] font-bold leading-[22px] ${
                       done || isCurrent ? 'text-fg' : 'text-fg-subtle'
                     }`}
                   >
@@ -165,7 +169,11 @@ export default function OrderTracking() {
                   </p>
                   <p
                     className={`text-[11.5px] ${
-                      isCurrent ? 'text-brand-400' : done ? 'text-fg-subtle' : 'text-[#52525b]'
+                      isCurrent
+                        ? 'font-bold text-brand-600'
+                        : done
+                          ? 'font-medium text-fg-subtle'
+                          : 'font-medium text-[#b0b0b0]'
                     }`}
                   >
                     {isCurrent ? `Ahora · ${step.note.toLowerCase()}` : done ? step.note : 'Pendiente'}
@@ -178,26 +186,22 @@ export default function OrderTracking() {
       )}
 
       {/* Resumen breve */}
-      <div className="mt-2 rounded-2xl border border-line bg-surface p-4">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-fg-muted">
-            {order.order_items?.reduce((n, i) => n + i.quantity, 0)} artículo(s) ·{' '}
-            {fmtDateTime(order.created_at)}
-          </span>
-          <span className="font-display text-lg font-bold text-brand-500">
-            {formatPrice(order.total)}
-          </span>
-        </div>
+      <div className="mt-2 flex items-center justify-between rounded-[10px] border-2 border-ink bg-white px-4 py-3.5 text-[12.5px]">
+        <span className="font-medium text-[#4a4a4a]">
+          {order.order_items?.reduce((n, i) => n + i.quantity, 0)} artículo(s) ·{' '}
+          {fmtDateTime(order.created_at)}
+        </span>
+        <span className="price-tag text-base">{formatPrice(order.total)}</span>
       </div>
 
-      {/* WhatsApp (diseño 09: botón oscuro) */}
+      {/* WhatsApp (botón negro con icono amarillo) */}
       <a
         href={waLink}
         target="_blank"
         rel="noreferrer"
-        className="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-surface-3 text-sm font-semibold text-fg transition hover:bg-surface-2"
+        className="mt-4 flex h-12 w-full items-center justify-center gap-2.5 rounded-[10px] bg-ink font-display text-[12.5px] font-extrabold uppercase tracking-[.06em] text-white transition hover:bg-ink-2"
       >
-        <WhatsAppIcon className="h-[17px] w-[17px]" />
+        <WhatsAppIcon className="h-4 w-4 text-accent-400" />
         Contactar por WhatsApp
       </a>
     </div>

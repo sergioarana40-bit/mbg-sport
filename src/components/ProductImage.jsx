@@ -1,5 +1,10 @@
 import { useState } from 'react'
-import { Dumbbell } from 'lucide-react'
+
+// Rayas diagonales claras del póster 1b para cuando no hay foto.
+const STRIPES = {
+  background:
+    'repeating-linear-gradient(45deg,#f8f8f8,#f8f8f8 12px,#efefef 12px,#efefef 24px)',
+}
 
 // Muestra la foto del producto; si no hay o falla, muestra un placeholder de marca.
 export default function ProductImage({ src, alt, className = '' }) {
@@ -8,7 +13,8 @@ export default function ProductImage({ src, alt, className = '' }) {
 
   return (
     <div
-      className={`relative flex items-center justify-center overflow-hidden bg-gradient-to-br from-surface-2 to-surface ${className}`}
+      className={`relative flex items-center justify-center overflow-hidden ${className}`}
+      style={showImage ? undefined : STRIPES}
     >
       {showImage ? (
         <img
@@ -19,12 +25,7 @@ export default function ProductImage({ src, alt, className = '' }) {
           className="h-full w-full object-cover"
         />
       ) : (
-        <div className="flex flex-col items-center gap-2 text-fg-subtle">
-          <Dumbbell className="h-10 w-10" strokeWidth={1.5} />
-          <span className="px-3 text-center text-xs font-medium uppercase tracking-wide">
-            MBG Sport
-          </span>
-        </div>
+        <img src="/brand/isotipo.png" alt="" className="w-1/2 opacity-80" loading="lazy" />
       )}
     </div>
   )

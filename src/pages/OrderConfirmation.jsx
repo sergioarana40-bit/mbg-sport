@@ -16,41 +16,42 @@ function resolveStatus(raw) {
   return 'success'
 }
 
+// Círculo sticker del póster: amarillo para éxito/pendiente, rojo para fallo.
 const VIEWS = {
   success: {
     icon: CheckCircle2,
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/15',
+    color: 'text-fg',
+    bg: 'bg-accent-400',
     title: '¡Gracias por tu compra!',
-    text: 'Recibimos tu pago. Te contactaremos para coordinar la entrega.',
+    text: 'Recibimos tu pago. Te avisaremos cuando tu pedido esté listo para recoger.',
   },
   pending: {
     icon: Clock,
-    color: 'text-amber-400',
-    bg: 'bg-amber-500/15',
+    color: 'text-fg',
+    bg: 'bg-accent-400',
     title: 'Pago pendiente',
     text: 'Tu pago está en proceso. Te avisaremos cuando se confirme.',
   },
   failure: {
     icon: XCircle,
-    color: 'text-brand-500',
-    bg: 'bg-brand-600/15',
+    color: 'text-white',
+    bg: 'bg-brand-600',
     title: 'El pago no se completó',
     text: 'No se realizó ningún cargo. Puedes intentar de nuevo.',
   },
   demo: {
     icon: CheckCircle2,
-    color: 'text-emerald-400',
-    bg: 'bg-emerald-500/15',
+    color: 'text-fg',
+    bg: 'bg-accent-400',
     title: '¡Pedido simulado con éxito!',
     text: 'Esto es una demostración. Conecta Supabase y MercadoPago para pedidos reales.',
   },
 }
 
 const STATUS_PILL = {
-  success: { label: 'Pagado', cls: 'bg-emerald-400/15 text-emerald-400' },
-  pending: { label: 'Pendiente', cls: 'bg-amber-400/15 text-amber-400' },
-  demo: { label: 'Demo', cls: 'bg-emerald-400/15 text-emerald-400' },
+  success: { label: 'Pagado' },
+  pending: { label: 'Pendiente' },
+  demo: { label: 'Demo' },
 }
 
 export default function OrderConfirmation() {
@@ -88,11 +89,15 @@ export default function OrderConfirmation() {
 
   return (
     <div className="mx-auto max-w-lg px-4 py-16 text-center">
-      <div className={`mx-auto grid h-20 w-20 place-items-center rounded-full ${view.bg}`}>
-        <Icon className={`h-11 w-11 ${view.color}`} />
+      <div
+        className={`mx-auto grid h-[84px] w-[84px] place-items-center rounded-full border-[3px] border-ink shadow-hard ${view.bg}`}
+      >
+        <Icon className={`h-10 w-10 ${view.color}`} strokeWidth={2.5} />
       </div>
-      <h1 className="mt-6 font-display text-3xl font-bold text-fg">{view.title}</h1>
-      <p className="mt-3 text-fg-muted">{view.text}</p>
+      <h1 className="mt-6 font-display text-3xl font-black uppercase leading-none text-fg">
+        {view.title}
+      </h1>
+      <p className="mt-3 text-sm font-medium leading-relaxed text-[#4a4a4a]">{view.text}</p>
 
       {loading && (
         <div className="mt-6 flex justify-center">
@@ -100,42 +105,44 @@ export default function OrderConfirmation() {
         </div>
       )}
 
-      {/* Tarjeta del pedido (diseño 05) */}
+      {/* Tarjeta del pedido (sticker, diseño 1b) */}
       {id && id !== 'demo' && status !== 'failure' && (
-        <div className="mt-6 rounded-[14px] border border-line bg-surface p-4 text-left">
-          <div className="mb-3 flex items-center justify-between">
+        <div className="sticker mt-6 p-[18px] text-left">
+          <div className="flex items-center justify-between">
             <div>
-              <p className="text-[11px] text-fg-subtle">Pedido</p>
-              <p className="font-display text-lg font-bold text-fg">
+              <p className="text-[10px] font-bold uppercase tracking-[.12em] text-fg-subtle">
+                Pedido
+              </p>
+              <p className="mt-0.5 font-mono text-lg font-bold text-fg">
                 #{id.slice(0, 8).toUpperCase()}
               </p>
             </div>
             {STATUS_PILL[status] && (
-              <span
-                className={`rounded-full px-3 py-1.5 text-[11.5px] font-bold ${STATUS_PILL[status].cls}`}
-              >
+              <span className="rounded-full border-2 border-ink bg-accent-400 px-3 py-1 font-display text-[10px] font-extrabold uppercase text-fg">
                 {STATUS_PILL[status].label}
               </span>
             )}
           </div>
           {order && (
             <>
-              <div className="flex justify-between border-t border-line pt-3 text-[12.5px] text-fg-muted">
-                <span>
+              <div className="mt-3.5 flex justify-between border-t-2 border-ink pt-3 text-[12.5px]">
+                <span className="font-medium text-[#4a4a4a]">
                   {order.order_items?.reduce((n, i) => n + i.quantity, 0)} artículo
                   {order.order_items?.reduce((n, i) => n + i.quantity, 0) === 1 ? '' : 's'}
                 </span>
-                <span className="font-medium text-fg">{formatPrice(order.total)}</span>
+                <span className="font-display font-extrabold text-fg">
+                  {formatPrice(order.total)}
+                </span>
               </div>
-              <div className="mt-2.5 flex items-center gap-2 text-xs text-fg-muted">
+              <div className="mt-2.5 flex items-center gap-2 text-xs font-semibold text-fg">
                 {order.delivery_method === 'pickup' ? (
                   <>
-                    <Store className="h-[15px] w-[15px] shrink-0 text-brand-500" strokeWidth={1.7} />
-                    Recoge en tienda · {STORE.city.split(',')[0]}
+                    <Store className="h-[15px] w-[15px] shrink-0 text-brand-600" strokeWidth={2} />
+                    Recoge en tienda · {STORE.city.split(',')[0]} · Listo hoy
                   </>
                 ) : (
                   <>
-                    <Truck className="h-[15px] w-[15px] shrink-0 text-brand-500" strokeWidth={1.7} />
+                    <Truck className="h-[15px] w-[15px] shrink-0 text-brand-600" strokeWidth={2} />
                     Envío a domicilio · 2–4 días hábiles
                   </>
                 )}
@@ -145,19 +152,19 @@ export default function OrderConfirmation() {
         </div>
       )}
 
-      {/* Banner instalar PWA (diseño 05) */}
+      {/* Banner instalar PWA */}
       {!standalone && status !== 'failure' && (
-        <div className="mt-4 flex items-center gap-3 rounded-xl border border-accent-400/25 bg-accent-400/10 px-3.5 py-3 text-left">
-          <Download className="h-[19px] w-[19px] shrink-0 text-accent-400" strokeWidth={1.8} />
-          <span className="text-xs text-accent-400">
-            Instala MBG Sport para seguir tu pedido
+        <div className="mt-4 flex items-center gap-3 rounded-[10px] border-2 border-ink bg-accent-400 px-3.5 py-3 text-left">
+          <Download className="h-[19px] w-[19px] shrink-0 text-fg" strokeWidth={2} />
+          <span className="text-xs font-bold text-fg">
+            Instala {STORE.name} para seguir tu pedido
           </span>
         </div>
       )}
 
-      <div className="mt-8 flex flex-col gap-2.5">
+      <div className="mt-8 flex flex-col gap-3">
         {status === 'failure' ? (
-          <Link to="/checkout" className="btn-primary w-full">
+          <Link to="/checkout" className="btn-sticker h-[50px] w-full">
             Intentar de nuevo
           </Link>
         ) : (
@@ -165,19 +172,19 @@ export default function OrderConfirmation() {
             {id && id !== 'demo' && (
               <Link
                 to={user ? `/cuenta/pedidos/${id}` : '/cuenta/login'}
-                className="btn-primary w-full"
+                className="btn-sticker h-[50px] w-full"
               >
                 Ver mi pedido
               </Link>
             )}
-            <Link to="/catalogo" className="btn-ghost w-full">
+            <Link to="/catalogo" className="btn-secondary h-12 w-full">
               Seguir comprando
-              <ArrowRight className="h-4.5 w-4.5" />
+              <ArrowRight className="h-[15px] w-[15px]" strokeWidth={2.5} />
             </Link>
           </>
         )}
-        <p className="mt-2 text-sm text-fg-muted">
-          ¿Dudas? Visítanos en {STORE.city} o escríbenos.
+        <p className="mt-2 text-xs font-medium text-fg-subtle">
+          ¿Dudas? Visítanos en {STORE.city} o escríbenos por WhatsApp.
         </p>
       </div>
     </div>

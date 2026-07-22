@@ -33,26 +33,33 @@ export default function Login() {
     }
   }
 
+  // Fondo negro con puntos amarillos del póster 1b.
+  const DOTS_STYLE = {
+    backgroundImage: 'radial-gradient(rgba(255,215,0,.08) 1.5px, transparent 1.5px)',
+    backgroundSize: '18px 18px',
+  }
+
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-ink px-4">
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            'radial-gradient(50% 60% at 50% 0%, rgba(220,38,38,0.35) 0%, rgba(220,38,38,0) 70%)',
-        }}
-      />
-      <div className="relative w-full max-w-sm">
-        <div className="mb-6 flex justify-center">
-          <Logo light />
+    <div className="flex min-h-screen items-center justify-center bg-ink px-4" style={DOTS_STYLE}>
+      <div className="w-full max-w-sm py-12">
+        <div className="mb-7 flex justify-center">
+          <Logo size={36} />
         </div>
 
-        <div className="rounded-2xl border border-line bg-surface p-6 shadow-2xl">
-          <h1 className="font-display text-xl font-bold text-fg">Acceso administrador</h1>
-          <p className="mt-1 text-sm text-fg-muted">Ingresa para gestionar tu tienda.</p>
+        {/* Tarjeta blanca con sombra dura roja (diseño 1b) */}
+        <div
+          className="rounded-xl border-[3px] border-ink bg-white p-7"
+          style={{ boxShadow: '6px 6px 0 #FF0000' }}
+        >
+          <h1 className="font-display text-[19px] font-black uppercase text-fg">
+            Acceso administrador
+          </h1>
+          <p className="mt-1.5 text-[12.5px] font-medium text-fg-subtle">
+            Ingresa para gestionar tu tienda.
+          </p>
 
           {!isSupabaseConfigured && (
-            <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-300">
+            <div className="mt-4 flex items-start gap-2 rounded-lg border-2 border-ink bg-accent-400/50 p-3 text-xs font-medium text-fg">
               <AlertCircle className="h-4 w-4 shrink-0" />
               Backend no configurado. El acceso se habilita al conectar Supabase.
             </div>
@@ -83,27 +90,23 @@ export default function Login() {
             </div>
 
             {error && (
-              <p className="flex items-center gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
+              <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {error}
               </p>
             )}
 
-            <button type="submit" disabled={loading} className="btn-primary w-full">
-              {loading ? (
-                <Spinner size={5} className="border-white/40 border-t-white" />
-              ) : (
-                'Entrar'
-              )}
+            <button type="submit" disabled={loading} className="btn-sticker h-12 w-full">
+              {loading ? <Spinner size={5} className="border-white/40 border-t-white" /> : 'Entrar'}
             </button>
           </form>
         </div>
 
         <Link
           to="/"
-          className="mt-5 flex items-center justify-center gap-2 text-sm text-fg-muted transition hover:text-fg"
+          className="mt-5 flex items-center justify-center gap-2 text-[12.5px] font-semibold text-[#9a9aa0] transition hover:text-white"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2.5} />
           Volver a la tienda
         </Link>
       </div>

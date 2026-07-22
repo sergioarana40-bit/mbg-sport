@@ -85,8 +85,10 @@ export default function ProductReviews({ productId, onSummary }) {
   }
 
   return (
-    <section id="resenas" className="mt-12 scroll-mt-32 border-t border-line pt-8">
-      <h2 className="font-display text-2xl font-bold tracking-tight text-fg">Reseñas</h2>
+    <section id="resenas" className="mt-12 scroll-mt-32 pt-2">
+      <h2 className="title-stamp text-xl">
+        <span>Reseñas</span>
+      </h2>
 
       {loading ? (
         <div className="flex justify-center py-10">
@@ -96,23 +98,23 @@ export default function ProductReviews({ productId, onSummary }) {
         <div className="mt-5">
           {/* Resumen */}
           {count > 0 && (
-            <div className="flex flex-col gap-5 rounded-2xl border border-line bg-surface p-5 sm:flex-row sm:items-center sm:gap-8">
+            <div className="sticker flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:gap-8">
               <div className="text-center">
-                <div className="font-display text-5xl font-bold leading-none text-fg">
+                <div className="font-display text-5xl font-black leading-none text-fg">
                   {avg.toFixed(1)}
                 </div>
-                <StarRating value={avg} size={3.5} className="mt-2 justify-center" />
-                <div className="mt-1 text-xs text-fg-subtle">
+                <StarRating value={avg} size={3.75} className="mt-2.5 justify-center" />
+                <div className="mt-2 text-xs font-medium text-fg-subtle">
                   {count} reseña{count === 1 ? '' : 's'}
                 </div>
               </div>
               <div className="flex flex-1 flex-col gap-1.5">
                 {dist.map((d) => (
                   <div key={d.star} className="flex items-center gap-2">
-                    <span className="w-3 text-xs text-fg-subtle">{d.star}</span>
-                    <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-3">
+                    <span className="w-3 text-xs font-bold text-fg">{d.star}</span>
+                    <span className="h-2 flex-1 overflow-hidden rounded-full border border-ink bg-white">
                       <span
-                        className="block h-full rounded-full bg-accent-400"
+                        className="block h-full bg-accent-400"
                         style={{ width: `${d.pct}%` }}
                       />
                     </span>
@@ -129,15 +131,15 @@ export default function ProductReviews({ productId, onSummary }) {
               !showForm && (
                 <button
                   onClick={() => setShowForm(true)}
-                  className="btn-secondary w-full sm:w-auto"
+                  className="btn-primary w-full px-5 py-3 text-[11.5px] sm:w-auto"
                 >
-                  <Pencil className="h-4.5 w-4.5" />
+                  <Pencil className="h-4 w-4" />
                   Escribir reseña
                 </button>
               )
             ) : (
-              <p className="rounded-xl bg-surface-2 px-4 py-3 text-sm text-fg-muted">
-                <Link to="/cuenta/login" className="font-semibold text-brand-400 hover:text-brand-300">
+              <p className="rounded-[10px] border-2 border-ink bg-surface-2 px-4 py-3 text-sm font-medium text-fg-muted">
+                <Link to="/cuenta/login" className="font-bold text-brand-600 hover:text-brand-700">
                   Inicia sesión
                 </Link>{' '}
                 para dejar tu reseña.
@@ -145,8 +147,8 @@ export default function ProductReviews({ productId, onSummary }) {
             )}
 
             {showForm && (
-              <form onSubmit={submit} className="rounded-2xl border border-line bg-surface p-5">
-                <p className="text-sm font-medium text-fg-muted">Tu calificación</p>
+              <form onSubmit={submit} className="sticker p-5">
+                <p className="text-sm font-bold text-fg">Tu calificación</p>
                 <StarRating value={rating} size={7} onChange={setRating} className="mt-2" />
                 <textarea
                   className="field mt-4"
@@ -156,7 +158,7 @@ export default function ProductReviews({ productId, onSummary }) {
                   placeholder="Cuéntanos tu experiencia con el producto…"
                 />
                 {error && (
-                  <p className="mt-3 flex items-center gap-2 rounded-lg bg-brand-600/15 p-2.5 text-sm text-brand-300">
+                  <p className="mt-3 flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-2.5 text-sm font-semibold text-white">
                     <AlertCircle className="h-4 w-4 shrink-0" />
                     {error}
                   </p>
@@ -165,11 +167,11 @@ export default function ProductReviews({ productId, onSummary }) {
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="rounded-lg px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-2"
+                    className="rounded-lg px-4 py-2 text-sm font-bold text-fg-muted hover:bg-surface-2"
                   >
                     Cancelar
                   </button>
-                  <button type="submit" disabled={saving} className="btn-primary px-5 py-2 text-sm">
+                  <button type="submit" disabled={saving} className="btn-primary px-6 py-2.5 text-xs">
                     {saving && <Spinner size={4} className="border-white/40 border-t-white" />}
                     Publicar
                   </button>
@@ -180,25 +182,29 @@ export default function ProductReviews({ productId, onSummary }) {
 
           {/* Lista de reseñas */}
           {count === 0 ? (
-            <p className="mt-5 rounded-2xl border border-dashed border-line py-10 text-center text-sm text-fg-muted">
+            <p className="mt-5 rounded-[10px] border-2 border-dashed border-ink py-10 text-center text-sm font-medium text-fg-muted">
               Todavía no hay reseñas. ¡Sé el primero en opinar!
             </p>
           ) : (
-            <div className="mt-5 space-y-3">
+            <div className="mt-5 space-y-3.5">
               {reviews.map((r) => (
-                <div key={r.id} className="rounded-2xl border border-line bg-surface p-4">
+                <div key={r.id} className="rounded-[10px] border-2 border-ink bg-white px-[18px] py-4">
                   <div className="flex items-center gap-3">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-surface-3 text-xs font-bold text-fg-muted">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full border-2 border-ink bg-accent-400 text-xs font-black text-fg">
                       {initials(r.author)}
                     </span>
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-fg">{r.author}</p>
-                      <StarRating value={r.rating} size={3} />
+                      <p className="text-[13px] font-bold text-fg">{r.author}</p>
+                      <StarRating value={r.rating} size={3.25} />
                     </div>
-                    <span className="text-xs text-fg-subtle">{fmtDate(r.created_at)}</span>
+                    <span className="text-[11px] font-medium text-fg-subtle">
+                      {fmtDate(r.created_at)}
+                    </span>
                   </div>
                   {r.body && (
-                    <p className="mt-2.5 text-sm leading-relaxed text-fg-muted">{r.body}</p>
+                    <p className="mt-2 text-[13.5px] font-medium leading-relaxed text-[#4a4a4a]">
+                      {r.body}
+                    </p>
                   )}
                 </div>
               ))}

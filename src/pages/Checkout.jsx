@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, Navigate } from 'react-router-dom'
-import { Lock, AlertCircle, CreditCard, Truck, Store, Check, MapPin } from 'lucide-react'
+import { AlertCircle, CreditCard } from 'lucide-react'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
@@ -11,6 +11,19 @@ import { createMercadoPagoPreference } from '../lib/mercadopago'
 import { isSupabaseConfigured } from '../lib/supabase'
 
 const EMPTY = { name: '', email: '', phone: '', address: '', notes: '' }
+
+// Radio del póster: círculo blanco con borde negro y punto rojo al estar activo.
+function PosterRadio({ active, dimmed = false }) {
+  return (
+    <span
+      className={`relative inline-block h-5 w-5 shrink-0 rounded-full border-2 bg-white ${
+        dimmed ? 'border-fg-subtle' : 'border-ink'
+      }`}
+    >
+      {active && <span className="absolute inset-[3px] rounded-full bg-brand-600" />}
+    </span>
+  )
+}
 
 export default function Checkout() {
   const navigate = useNavigate()
@@ -105,83 +118,35 @@ export default function Checkout() {
     }
   }
 
-  // Tarjeta de método de entrega (diseño 06): seleccionada = borde rojo + fondo rojizo.
-  const deliveryOption = (value, Icon, title, subtitle, note, noteColor) => {
-    const active = delivery === value
-    return (
-      <button
-        type="button"
-        onClick={() => setDelivery(value)}
-        className={`flex items-center gap-3 rounded-[15px] p-4 text-left transition ${
-          active
-            ? 'border-[1.5px] border-brand-600 bg-[#1a1315]'
-            : 'border border-line bg-surface hover:bg-surface-2'
-        }`}
-      >
-        <span
-          className={`grid h-[42px] w-[42px] shrink-0 place-items-center rounded-[11px] ${
-            active ? 'bg-brand-600/15 text-brand-500' : 'bg-surface-2 text-fg-muted'
-          }`}
-        >
-          <Icon className="h-[21px] w-[21px]" strokeWidth={1.7} />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block text-sm font-semibold text-fg">{title}</span>
-          <span className="block text-xs text-fg-muted">{subtitle}</span>
-          <span className={`block text-xs font-semibold ${noteColor}`}>{note}</span>
-        </span>
-        {active ? (
-          <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-brand-600">
-            <Check className="h-3 w-3 text-white" strokeWidth={3} />
-          </span>
-        ) : (
-          <span className="h-5 w-5 shrink-0 rounded-full border-2 border-[#3f3f46]" />
-        )}
-      </button>
-    )
-  }
-
-  // Paso del stepper (diseño 06).
-  const step = (n, label, state) => (
-    <span
-      className={`flex items-center gap-2 ${
-        state === 'active' ? 'font-semibold text-fg' : 'text-fg-subtle'
-      }`}
-    >
-      <span
-        className={`grid h-[22px] w-[22px] place-items-center rounded-full text-[11px] ${
-          state === 'active'
-            ? 'bg-brand-600 text-white'
-            : state === 'done'
-              ? 'bg-emerald-400/20 text-emerald-400'
-              : 'bg-surface-3 text-fg-muted'
-        }`}
-      >
-        {state === 'done' ? <Check className="h-3 w-3" strokeWidth={3} /> : n}
-      </span>
-      {label}
-    </span>
+  // Etiqueta de campo (mayúsculas pequeñas del póster).
+  const label = (text) => (
+    <p className="mb-1.5 text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
+      {text}
+    </p>
   )
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      {/* Stepper Carrito › Entrega › Pago (diseño 06) */}
-      <div className="mb-5 flex items-center gap-2.5 text-[12.5px] sm:gap-3">
-        <Link to="/carrito" className="transition hover:opacity-80">
-          {step(1, 'Carrito', 'done')}
-        </Link>
-        <span className="h-px w-5 bg-[#3f3f46] sm:w-[26px]" />
-        {step(2, 'Entrega', 'active')}
-        <span className="h-px w-5 bg-[#3f3f46] sm:w-[26px]" />
-        {step(3, 'Pago', 'pending')}
+      {/* Título + stepper (diseño 1b) */}
+      <div className="flex flex-wrap items-center gap-4">
+        <h1 className="title-stamp text-lg sm:text-2xl">
+          <span>Checkout</span>
+        </h1>
+        <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[.06em]">
+          <Link to="/carrito" className="text-fg-subtle transition hover:text-fg">
+            1 · Carrito
+          </Link>
+          <span className="text-fg-subtle">→</span>
+          <span className="rounded-full border-2 border-ink bg-accent-400 px-2.5 py-1 text-fg">
+            2 · Datos y pago
+          </span>
+          <span className="text-fg-subtle">→</span>
+          <span className="text-fg-subtle">3 · Confirmación</span>
+        </div>
       </div>
 
-      <h1 className="mb-6 font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl">
-        Finalizar compra
-      </h1>
-
       {!isSupabaseConfigured && (
-        <div className="mb-6 flex items-start gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-300">
+        <div className="mt-6 flex items-start gap-3 rounded-[10px] border-2 border-ink bg-accent-400/40 p-4 text-sm font-medium text-fg">
           <AlertCircle className="h-5 w-5 shrink-0" />
           <p>
             <b>Modo demostración.</b> Conecta Supabase y MercadoPago para procesar pagos reales.
@@ -189,89 +154,25 @@ export default function Checkout() {
         </div>
       )}
 
-      <form onSubmit={handlePay} className="grid gap-8 lg:grid-cols-[1fr_340px]">
+      <form onSubmit={handlePay} className="mt-6 grid items-start gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
-          {/* Entrega */}
-          <div className="rounded-2xl border border-line bg-surface p-5">
-            <h2 className="font-display text-lg font-bold text-fg">
-              {STORE.pickupOnly ? 'Entrega' : '¿Cómo quieres recibirlo?'}
+          {/* Datos de contacto */}
+          <div className="rounded-[10px] border-2 border-ink bg-white p-5 sm:p-6">
+            <h2 className="font-display text-[15px] font-extrabold uppercase text-fg">
+              Datos de contacto
             </h2>
-            {STORE.pickupOnly && (
-              <p className="mt-1 text-sm text-fg-muted">
-                Por ahora todos los pedidos se recogen en nuestra tienda, sin costo de envío.
-              </p>
-            )}
-            <div className={`mt-4 grid gap-3 ${STORE.pickupOnly ? '' : 'sm:grid-cols-2'}`}>
-              {!STORE.pickupOnly &&
-                deliveryOption(
-                  'shipping',
-                  Truck,
-                  'Envío a domicilio',
-                  '2–4 días hábiles',
-                  STORE.freeShippingFrom
-                    ? `Gratis · pedido +${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')}`
-                    : formatPrice(STORE.shippingCost),
-                  'text-emerald-400'
-                )}
-              {deliveryOption(
-                'pickup',
-                Store,
-                'Recoge en tienda',
-                'Listo hoy en tienda',
-                'Sin costo',
-                'text-accent-400'
-              )}
-            </div>
-            {/* Tarjeta de la tienda (diseño 06) */}
-            {delivery === 'pickup' && (
-              <div className="mt-4 overflow-hidden rounded-[15px] border border-line bg-surface-2">
-                <div
-                  className="grid h-[96px] place-items-center"
-                  style={{
-                    background:
-                      'repeating-linear-gradient(45deg,#1a1a1f,#1a1a1f 10px,#202027 10px,#202027 20px)',
-                  }}
-                >
-                  <MapPin className="h-7 w-7 text-brand-600" fill="currentColor" strokeWidth={1} />
-                </div>
-                <div className="p-4">
-                  <p className="text-[13.5px] font-semibold text-fg">
-                    {STORE.name} · Santa Clara
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-fg-muted">{STORE.address}</p>
-                  <p className="mt-1.5 text-[11.5px] text-fg-subtle">{STORE.hours}</p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Datos */}
-          <div className="space-y-4 rounded-2xl border border-line bg-surface p-5">
-            <h2 className="font-display text-lg font-bold text-fg">Datos de contacto</h2>
-            <div>
-              <label className="mb-1 block text-sm font-medium text-fg-muted">Nombre completo</label>
-              <input
-                className="field"
-                value={form.name}
-                onChange={(e) => update('name', e.target.value)}
-                placeholder="Juan Pérez"
-              />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="mt-4 grid gap-3.5 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-fg-muted">Correo</label>
+                {label('Nombre completo')}
                 <input
-                  type="email"
                   className="field"
-                  value={form.email}
-                  onChange={(e) => update('email', e.target.value)}
-                  placeholder="juan@correo.com"
+                  value={form.name}
+                  onChange={(e) => update('name', e.target.value)}
+                  placeholder="Juan Pérez"
                 />
               </div>
               <div>
-                <label className="mb-1 block text-sm font-medium text-fg-muted">
-                  Teléfono / WhatsApp
-                </label>
+                {label('Teléfono / WhatsApp')}
                 <input
                   className="field"
                   value={form.phone}
@@ -280,22 +181,18 @@ export default function Checkout() {
                 />
               </div>
             </div>
-            {delivery === 'shipping' && (
-              <div>
-                <label className="mb-1 block text-sm font-medium text-fg-muted">
-                  Dirección de envío
-                </label>
-                <textarea
-                  className="field"
-                  rows={3}
-                  value={form.address}
-                  onChange={(e) => update('address', e.target.value)}
-                  placeholder="Calle y número, colonia, ciudad, C.P."
-                />
-              </div>
-            )}
-            <div>
-              <label className="mb-1 block text-sm font-medium text-fg-muted">Notas (opcional)</label>
+            <div className="mt-3.5">
+              {label('Correo electrónico')}
+              <input
+                type="email"
+                className="field"
+                value={form.email}
+                onChange={(e) => update('email', e.target.value)}
+                placeholder="tu@correo.com"
+              />
+            </div>
+            <div className="mt-3.5">
+              {label('Notas (opcional)')}
               <input
                 className="field"
                 value={form.notes}
@@ -304,72 +201,169 @@ export default function Checkout() {
               />
             </div>
           </div>
+
+          {/* Entrega */}
+          <div className="rounded-[10px] border-2 border-ink bg-white p-5 sm:p-6">
+            <h2 className="font-display text-[15px] font-extrabold uppercase text-fg">Entrega</h2>
+            <div className="mt-4 flex flex-col gap-3">
+              {/* Recoger en tienda (seleccionada, amarilla) */}
+              <button
+                type="button"
+                onClick={() => setDelivery('pickup')}
+                className={`flex items-center gap-3.5 rounded-[10px] border-2 px-4 py-3.5 text-left transition ${
+                  delivery === 'pickup'
+                    ? 'border-ink bg-accent-400'
+                    : 'border-ink bg-white hover:bg-surface-2'
+                }`}
+              >
+                <PosterRadio active={delivery === 'pickup'} />
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[13.5px] font-bold text-fg">Recoger en tienda</span>
+                  <span className="mt-0.5 block text-xs font-medium text-[#4a4a4a]">
+                    {STORE.address.split(',').slice(0, 2).join(',')} · Listo hoy
+                  </span>
+                </span>
+                <span className="font-display text-[11px] font-extrabold uppercase text-fg">
+                  Gratis
+                </span>
+              </button>
+
+              {/* Envío a domicilio */}
+              {STORE.pickupOnly ? (
+                <div className="flex items-center gap-3.5 rounded-[10px] border-2 border-dashed border-fg-subtle px-4 py-3.5 text-fg-subtle">
+                  <PosterRadio active={false} dimmed />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[13.5px] font-bold">Envío a domicilio</span>
+                    <span className="mt-0.5 block text-xs font-medium">Próximamente</span>
+                  </span>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setDelivery('shipping')}
+                  className={`flex items-center gap-3.5 rounded-[10px] border-2 px-4 py-3.5 text-left transition ${
+                    delivery === 'shipping'
+                      ? 'border-ink bg-accent-400'
+                      : 'border-ink bg-white hover:bg-surface-2'
+                  }`}
+                >
+                  <PosterRadio active={delivery === 'shipping'} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[13.5px] font-bold text-fg">Envío a domicilio</span>
+                    <span className="mt-0.5 block text-xs font-medium text-[#4a4a4a]">
+                      2–4 días hábiles
+                    </span>
+                  </span>
+                  <span className="font-display text-[11px] font-extrabold uppercase text-fg">
+                    {base.shipping === 0 ? 'Gratis' : formatPrice(STORE.shippingCost)}
+                  </span>
+                </button>
+              )}
+
+              {delivery === 'shipping' && !STORE.pickupOnly && (
+                <div>
+                  {label('Dirección de envío')}
+                  <textarea
+                    className="field"
+                    rows={3}
+                    value={form.address}
+                    onChange={(e) => update('address', e.target.value)}
+                    placeholder="Calle y número, colonia, ciudad, C.P."
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Pago */}
+          <div className="rounded-[10px] border-2 border-ink bg-white p-5 sm:p-6">
+            <h2 className="font-display text-[15px] font-extrabold uppercase text-fg">Pago</h2>
+            <div className="mt-4 flex items-center gap-3.5 rounded-[10px] border-2 border-ink p-4">
+              <CreditCard className="h-6 w-6 shrink-0 text-fg" strokeWidth={1.8} />
+              <span className="min-w-0 flex-1">
+                <span className="block text-[13.5px] font-bold text-fg">MercadoPago</span>
+                <span className="mt-0.5 block text-xs font-medium text-[#4a4a4a]">
+                  Tarjetas, transferencia y meses sin intereses. Serás redirigido para pagar.
+                </span>
+              </span>
+              <span className="hidden shrink-0 rounded-md border-2 border-ink bg-accent-400 px-2 py-1 font-display text-[10px] font-extrabold uppercase text-fg sm:inline-block">
+                Pago seguro
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Resumen y pago */}
-        <aside className="lg:sticky lg:top-32 lg:self-start">
-          <div className="rounded-2xl border border-line bg-surface p-5">
-            <h2 className="font-display text-lg font-bold text-fg">Tu pedido</h2>
+        <aside className="lg:sticky lg:top-36 lg:self-start">
+          <div className="sticker p-5">
+            <h2 className="font-display text-base font-extrabold uppercase text-fg">Tu pedido</h2>
 
-            <ul className="mt-4 space-y-2 text-sm">
+            <ul className="mt-3.5 space-y-2.5 text-[13px]">
               {items.map((i) => (
                 <li key={i.id} className="flex justify-between gap-3">
-                  <span className="text-fg-muted">
+                  <span className="font-semibold text-fg">
                     {i.quantity}× {i.name}
                   </span>
-                  <span className="shrink-0 font-medium text-fg">
+                  <span className="shrink-0 whitespace-nowrap font-bold text-fg">
                     {formatPrice(i.price * i.quantity)}
                   </span>
                 </li>
               ))}
             </ul>
 
-            <dl className="mt-4 space-y-2 border-t border-line pt-4 text-sm">
+            <dl className="mt-3.5 space-y-2.5 border-t-2 border-ink pt-3.5 text-[13.5px]">
               <div className="flex justify-between">
-                <dt className="text-fg-muted">Subtotal</dt>
-                <dd className="font-medium text-fg">{formatPrice(subtotal)}</dd>
+                <dt className="font-medium text-[#4a4a4a]">Subtotal</dt>
+                <dd className="font-bold text-fg">{formatPrice(subtotal)}</dd>
               </div>
               {discount > 0 && (
                 <div className="flex justify-between">
-                  <dt className="text-fg-muted">Descuento {appliedCoupon ? `(${appliedCoupon.code})` : ''}</dt>
-                  <dd className="font-medium text-emerald-400">−{formatPrice(discount)}</dd>
+                  <dt className="font-semibold text-brand-600">
+                    Cupón {appliedCoupon ? appliedCoupon.code : ''}
+                    {appliedCoupon?.type === 'percent' && ` (−${Number(appliedCoupon.value)}%)`}
+                  </dt>
+                  <dd className="font-bold text-brand-600">−{formatPrice(discount)}</dd>
                 </div>
               )}
               <div className="flex justify-between">
-                <dt className="text-fg-muted">{delivery === 'pickup' ? 'Recogida' : 'Envío'}</dt>
-                <dd className="font-medium text-fg">
-                  {shipping === 0 ? <span className="text-emerald-400">Gratis</span> : formatPrice(shipping)}
+                <dt className="font-medium text-[#4a4a4a]">Entrega</dt>
+                <dd className="font-bold text-fg">
+                  {delivery === 'pickup'
+                    ? 'Recoge en tienda'
+                    : shipping === 0
+                      ? 'Gratis'
+                      : formatPrice(shipping)}
                 </dd>
               </div>
-              <div className="flex justify-between border-t border-line pt-2 text-base">
-                <dt className="font-semibold text-fg">Total</dt>
-                <dd className="font-display text-xl font-bold text-brand-500">{formatPrice(total)}</dd>
+              <div className="mt-1 flex items-center justify-between border-t-2 border-ink pt-3">
+                <dt className="font-display text-[15px] font-extrabold uppercase text-fg">Total</dt>
+                <dd>
+                  <span className="price-tag px-2.5 text-[22px] font-black">
+                    {formatPrice(total)}
+                  </span>
+                </dd>
               </div>
             </dl>
 
             {error && (
-              <p className="mt-4 flex items-start gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
+              <p className="mt-4 flex items-start gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
                 <AlertCircle className="h-4.5 w-4.5 shrink-0" />
                 {error}
               </p>
             )}
 
-            <button type="submit" disabled={loading} className="btn-primary mt-5 w-full">
+            <button type="submit" disabled={loading} className="btn-sticker mt-4 h-[50px] w-full">
               {loading ? (
                 <Spinner size={5} className="border-white/40 border-t-white" />
               ) : (
-                <>
-                  <CreditCard className="h-5 w-5" />
-                  Pagar {formatPrice(total)}
-                </>
+                'Pagar con MercadoPago'
               )}
             </button>
 
-            <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-fg-subtle">
-              <Lock className="h-3.5 w-3.5" />
-              Pago protegido con MercadoPago
+            <p className="mt-3 text-center text-[11px] font-medium text-fg-subtle">
+              Pago procesado por MercadoPago · datos protegidos
             </p>
-            <p className="mt-2 text-center text-[11px] leading-relaxed text-fg-subtle">
+            <p className="mt-1.5 text-center text-[11px] font-medium leading-relaxed text-fg-subtle">
               Al pagar aceptas nuestros{' '}
               <Link to="/terminos" className="underline underline-offset-2 transition hover:text-fg">
                 términos y condiciones
@@ -379,7 +373,7 @@ export default function Checkout() {
           </div>
           <Link
             to="/carrito"
-            className="mt-3 block text-center text-sm font-medium text-fg-muted hover:text-brand-400"
+            className="mt-3 block text-center text-[13px] font-semibold text-[#4a4a4a] transition hover:text-fg"
           >
             Volver al carrito
           </Link>

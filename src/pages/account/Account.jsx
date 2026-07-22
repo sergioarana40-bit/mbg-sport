@@ -139,57 +139,61 @@ export default function Account() {
   }
 
   const menuItem =
-    'flex w-full items-center gap-3 px-4 py-3.5 text-left transition hover:bg-surface-2'
+    'flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-surface-2'
   const menuIcon =
-    'grid h-[34px] w-[34px] shrink-0 place-items-center rounded-[9px] bg-surface-2 text-brand-500'
+    'grid h-9 w-9 shrink-0 place-items-center rounded-lg border-2 border-ink bg-accent-400 text-fg'
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
-      <h1 className="font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl">
-        Mi cuenta
+      <h1 className="title-stamp text-lg sm:text-2xl">
+        <span>Mi cuenta</span>
       </h1>
 
       {isAdmin && (
         <Link
           to="/admin"
-          className="mt-5 flex items-center gap-3 rounded-2xl border border-brand-600/30 bg-brand-600/10 p-4 transition hover:bg-brand-600/15"
+          className="mt-6 flex items-center gap-3 rounded-[10px] border-2 border-ink bg-accent-400 p-4 transition hover:bg-accent-300"
         >
-          <ShieldCheck className="h-5 w-5 text-brand-400" />
+          <ShieldCheck className="h-5 w-5 text-fg" strokeWidth={2} />
           <div className="flex-1">
-            <p className="text-sm font-semibold text-fg">Tienes acceso de administrador</p>
-            <p className="text-xs text-fg-muted">Gestiona productos, pedidos y estadísticas.</p>
+            <p className="text-sm font-bold text-fg">Tienes acceso de administrador</p>
+            <p className="text-xs font-medium text-fg">
+              Gestiona productos, pedidos y estadísticas.
+            </p>
           </div>
-          <ChevronRight className="h-5 w-5 text-fg-subtle" />
+          <ChevronRight className="h-5 w-5 text-fg" strokeWidth={2.5} />
         </Link>
       )}
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[340px_1fr]">
         {/* Columna izquierda: perfil, menú y direcciones (diseño 09) */}
         <div className="space-y-4">
-          {/* Tarjeta de perfil */}
-          <div className="rounded-[15px] border border-line bg-surface p-4">
+          {/* Tarjeta de perfil (sticker) */}
+          <div className="sticker p-[18px]">
             <div className="flex items-center gap-3.5">
-              <span className="grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full bg-brand-600 font-display text-lg font-bold text-white">
+              <span className="grid h-[52px] w-[52px] shrink-0 place-items-center rounded-full border-2 border-ink bg-brand-600 font-display text-lg font-extrabold text-white">
                 {initials(profile?.full_name, user.email)}
               </span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-semibold text-fg">
+                <p className="truncate text-[15px] font-bold text-fg">
                   {profile?.full_name || 'Completa tu perfil'}
                 </p>
-                <p className="truncate text-xs text-fg-muted">{user.email}</p>
+                <p className="truncate text-xs font-medium text-fg-subtle">{user.email}</p>
               </div>
               <button
                 onClick={() => setEditing((v) => !v)}
-                className="text-[12.5px] font-semibold text-brand-500 transition hover:text-brand-400"
+                className="text-[12.5px] font-bold text-brand-600 transition hover:text-brand-700"
               >
                 {editing ? 'Cerrar' : 'Editar'}
               </button>
             </div>
 
             {editing && (
-              <form onSubmit={handleSave} className="mt-4 space-y-3 border-t border-line pt-4">
+              <form onSubmit={handleSave} className="mt-4 space-y-3 border-t-2 border-ink pt-4">
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-fg-muted">Nombre</label>
+                  <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
+                    Nombre
+                  </label>
                   <input
                     className="field"
                     value={form.full_name}
@@ -197,7 +201,9 @@ export default function Account() {
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-sm font-medium text-fg-muted">Teléfono</label>
+                  <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
+                    Teléfono
+                  </label>
                   <input
                     className="field"
                     value={form.phone}
@@ -207,8 +213,8 @@ export default function Account() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className={`w-full rounded-xl py-2.5 text-sm font-semibold text-white transition ${
-                    saved ? 'bg-emerald-600' : 'bg-brand-600 hover:bg-brand-700'
+                  className={`w-full rounded-[10px] py-2.5 font-display text-xs font-extrabold uppercase tracking-[.06em] text-white transition ${
+                    saved ? 'bg-state-paid' : 'bg-ink hover:bg-ink-2'
                   }`}
                 >
                   {saving ? (
@@ -225,58 +231,58 @@ export default function Account() {
             )}
           </div>
 
-          {/* Menú (diseño 09) */}
-          <div className="divide-y divide-line overflow-hidden rounded-[15px] border border-line bg-surface">
+          {/* Menú (diseño 1b: filas con divisor negro) */}
+          <div className="divide-y-2 divide-ink overflow-hidden rounded-[10px] border-2 border-ink bg-white">
             <a href="#pedidos" className={menuItem}>
               <span className={menuIcon}>
                 <ShoppingBag className="h-[18px] w-[18px]" strokeWidth={1.7} />
               </span>
-              <span className="flex-1 text-sm font-medium text-fg">Mis pedidos</span>
-              <ChevronRight className="h-4 w-4 text-fg-subtle" />
+              <span className="flex-1 text-[13.5px] font-bold text-fg">Mis pedidos</span>
+              <ChevronRight className="h-4 w-4 text-fg-subtle" strokeWidth={2.5} />
             </a>
             <Link to="/favoritos" className={menuItem}>
               <span className={menuIcon}>
                 <Heart className="h-[18px] w-[18px]" strokeWidth={1.7} />
               </span>
-              <span className="flex-1 text-sm font-medium text-fg">Favoritos</span>
-              <ChevronRight className="h-4 w-4 text-fg-subtle" />
+              <span className="flex-1 text-[13.5px] font-bold text-fg">Favoritos</span>
+              <ChevronRight className="h-4 w-4 text-fg-subtle" strokeWidth={2.5} />
             </Link>
             <a href="#direcciones" className={menuItem}>
               <span className={menuIcon}>
                 <MapPin className="h-[18px] w-[18px]" strokeWidth={1.7} />
               </span>
-              <span className="flex-1 text-sm font-medium text-fg">Direcciones</span>
-              <ChevronRight className="h-4 w-4 text-fg-subtle" />
+              <span className="flex-1 text-[13.5px] font-bold text-fg">Direcciones</span>
+              <ChevronRight className="h-4 w-4 text-fg-subtle" strokeWidth={2.5} />
             </a>
             <div className="flex items-center gap-3 px-4 py-3.5">
               <span className={menuIcon}>
                 <Bell className="h-[18px] w-[18px]" strokeWidth={1.7} />
               </span>
-              <span className="flex-1 text-sm font-medium text-fg">Notificaciones</span>
+              <span className="flex-1 text-[13.5px] font-bold text-fg">Notificaciones</span>
               <button
                 onClick={toggleNotif}
                 role="switch"
                 aria-checked={notifOn}
                 aria-label="Notificaciones"
-                className={`relative h-[23px] w-10 shrink-0 rounded-full transition ${
+                className={`relative h-[23px] w-10 shrink-0 rounded-full border-2 border-ink transition ${
                   notifOn ? 'bg-brand-600' : 'bg-surface-3'
                 }`}
               >
                 <span
-                  className={`absolute top-[3px] h-[17px] w-[17px] rounded-full bg-white transition-all ${
-                    notifOn ? 'left-[20px]' : 'left-[3px]'
+                  className={`absolute top-[2px] h-[15px] w-[15px] rounded-full bg-white transition-all ${
+                    notifOn ? 'left-[19px]' : 'left-[2px]'
                   }`}
                 />
               </button>
             </div>
           </div>
 
-          {/* Cerrar sesión (diseño 09) */}
+          {/* Cerrar sesión (contorno rojo, diseño 1b) */}
           <button
             onClick={handleLogout}
-            className="flex w-full items-center justify-center gap-2 rounded-[13px] border border-brand-500/30 py-3.5 text-sm font-semibold text-brand-400 transition hover:bg-brand-600/10"
+            className="flex h-[46px] w-full items-center justify-center gap-2 rounded-[10px] border-2 border-brand-600 font-display text-xs font-extrabold uppercase tracking-[.06em] text-brand-600 transition hover:bg-brand-600 hover:text-white"
           >
-            <LogOut className="h-[17px] w-[17px]" strokeWidth={1.8} />
+            <LogOut className="h-[15px] w-[15px]" strokeWidth={2} />
             Cerrar sesión
           </button>
 
@@ -288,59 +294,61 @@ export default function Account() {
 
         {/* Historial de pedidos (diseño 09) */}
         <div id="pedidos" className="scroll-mt-32">
-          <h2 className="mb-3 font-display text-lg font-bold text-fg">Mis pedidos</h2>
+          <h2 className="mb-3.5 font-display text-lg font-extrabold uppercase text-fg">
+            Mis pedidos
+          </h2>
           {ordersLoading ? (
             <div className="flex justify-center py-16">
               <Spinner />
             </div>
           ) : orders.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-line py-16 text-center">
-              <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-surface-2">
-                <Package className="h-7 w-7 text-fg-subtle" />
+            <div className="rounded-[10px] border-2 border-dashed border-ink py-16 text-center">
+              <div className="sticker mx-auto grid h-14 w-14 place-items-center rounded-full">
+                <Package className="h-7 w-7 text-fg" />
               </div>
-              <p className="mt-4 font-semibold text-fg">Aún no tienes pedidos</p>
+              <p className="mt-4 font-display font-extrabold uppercase text-fg">
+                Aún no tienes pedidos
+              </p>
               <Link
                 to="/catalogo"
-                className="mt-3 inline-block text-sm font-medium text-brand-400 hover:text-brand-300"
+                className="mt-3 inline-block text-sm font-bold text-brand-600 hover:text-brand-700"
               >
                 Ir al catálogo
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {orders.map((o) => {
                 const itemCount = o.order_items?.reduce((n, i) => n + i.quantity, 0) ?? 0
                 const active = ACTIVE_STATES.includes(o.status)
                 return (
-                  <div key={o.id} className="rounded-[15px] border border-line bg-surface p-4">
+                  <div key={o.id} className="rounded-[10px] border-2 border-ink bg-white px-[18px] py-4">
                     <div className="flex items-center justify-between gap-3">
                       <Link to={`/cuenta/pedidos/${o.id}`} className="min-w-0 transition hover:opacity-80">
-                        <p className="font-display text-[17px] font-bold text-fg">
+                        <p className="font-mono text-base font-bold text-fg">
                           #{o.id.slice(0, 8).toUpperCase()}
                         </p>
-                        <p className="text-[11.5px] text-fg-subtle">
+                        <p className="mt-0.5 text-[11.5px] font-medium text-fg-subtle">
                           {fmtDate(o.created_at)} · {itemCount} artículo{itemCount === 1 ? '' : 's'}
                         </p>
                       </Link>
                       <StatusBadge status={o.status} />
                     </div>
-                    <div className="mt-3.5 flex items-center justify-between border-t border-line pt-3">
-                      <span className="font-display text-base font-semibold text-fg">
-                        {formatPrice(o.total)}
-                      </span>
+                    <div className="mt-3 flex items-center justify-between border-t-2 border-ink pt-3">
+                      <span className="price-tag text-[15px]">{formatPrice(o.total)}</span>
                       {active ? (
                         <Link
                           to={`/cuenta/pedidos/${o.id}`}
-                          className="inline-flex items-center gap-1.5 rounded-[10px] bg-brand-600 px-3.5 py-2 text-xs font-semibold text-white transition hover:bg-brand-700"
+                          className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-brand-600 px-3.5 py-2 font-display text-[11px] font-extrabold uppercase text-white shadow-hard-sm transition hover:bg-brand-700 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
                         >
                           Seguir pedido
-                          <ArrowRight className="h-3.5 w-3.5" />
+                          <ArrowRight className="h-3 w-3" strokeWidth={3} />
                         </Link>
                       ) : (
                         <button
                           onClick={() => rebuy(o)}
                           disabled={rebuying === o.id}
-                          className="text-xs font-semibold text-fg-muted transition hover:text-fg disabled:opacity-50"
+                          className="text-xs font-bold text-[#4a4a4a] underline transition hover:text-fg disabled:opacity-50"
                         >
                           {rebuying === o.id ? 'Agregando…' : 'Volver a comprar'}
                         </button>

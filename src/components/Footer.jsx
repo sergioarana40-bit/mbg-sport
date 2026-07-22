@@ -25,11 +25,13 @@ function InstagramIcon({ className = 'h-5 w-5' }) {
 
 export default function Footer() {
   return (
-    <footer className="mt-16 hidden border-t border-line bg-ink text-fg-muted md:block">
+    <footer className="mt-16 hidden bg-ink text-[#a3a3a8] md:block">
+      {/* Franja de marca amarillo → rojo (diseño 1b) */}
+      <div className="h-[3px] bg-gradient-to-r from-accent-400 to-brand-600" />
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <Logo light />
-          <p className="mt-4 max-w-xs text-sm leading-relaxed text-fg-subtle">
+          <Logo size={30} />
+          <p className="mt-3.5 max-w-[280px] text-[13px] leading-relaxed text-fg-subtle">
             {STORE.description}
           </p>
           <div className="mt-4 flex gap-3">
@@ -37,7 +39,7 @@ export default function Footer() {
               href={STORE.instagram}
               target="_blank"
               rel="noreferrer"
-              className="grid h-9 w-9 place-items-center rounded-lg bg-surface-2 transition hover:bg-brand-600 hover:text-white"
+              className="grid h-9 w-9 place-items-center rounded-lg border border-ink-line text-[#a3a3a8] transition hover:border-accent-400 hover:text-accent-400"
               aria-label="Instagram"
             >
               <InstagramIcon className="h-4.5 w-4.5" />
@@ -46,69 +48,74 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-fg">
+          <h4 className="font-display text-xs font-bold uppercase tracking-[.1em] text-accent-400">
             Tienda
           </h4>
-          <ul className="mt-4 space-y-2 text-sm">
+          <ul className="mt-4 space-y-2.5 text-[13px]">
             <li>
-              <Link to="/catalogo" className="transition hover:text-fg">
+              <Link to="/catalogo" className="transition hover:text-white">
                 Todo el catálogo
               </Link>
             </li>
             <li>
-              <Link to="/carrito" className="transition hover:text-fg">
+              <Link to="/#servicio" className="transition hover:text-white">
+                Servicio técnico
+              </Link>
+            </li>
+            <li>
+              <Link to="/carrito" className="transition hover:text-white">
                 Mi carrito
               </Link>
             </li>
             <li>
-              <Link to="/terminos" className="transition hover:text-fg">
+              <Link to="/terminos" className="transition hover:text-white">
                 Términos y condiciones
-              </Link>
-            </li>
-            <li>
-              <Link to="/admin/login" className="transition hover:text-fg">
-                Acceso administrador
               </Link>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-fg">
+          <h4 className="font-display text-xs font-bold uppercase tracking-[.1em] text-accent-400">
             Contacto
           </h4>
-          <ul className="mt-4 space-y-3 text-sm">
+          <ul className="mt-4 space-y-3 text-[13px]">
             <li className="flex gap-2.5">
-              <MapPin className="h-4.5 w-4.5 shrink-0 text-brand-500" />
+              <MapPin className="h-4 w-4 shrink-0 text-brand-600" />
               <span>{STORE.address}</span>
             </li>
             <li className="flex gap-2.5">
-              <Phone className="h-4.5 w-4.5 shrink-0 text-brand-500" />
+              <Phone className="h-4 w-4 shrink-0 text-brand-600" />
               <span>{STORE.phone}</span>
             </li>
             <li className="flex gap-2.5">
-              <Mail className="h-4.5 w-4.5 shrink-0 text-brand-500" />
+              <Mail className="h-4 w-4 shrink-0 text-brand-600" />
               <span>{STORE.email}</span>
             </li>
           </ul>
         </div>
 
         <div>
-          <h4 className="font-display text-sm font-bold uppercase tracking-wide text-fg">
+          <h4 className="font-display text-xs font-bold uppercase tracking-[.1em] text-accent-400">
             Horario
           </h4>
-          <ul className="mt-4 space-y-3 text-sm">
+          <ul className="mt-4 space-y-3 text-[13px]">
             <li className="flex gap-2.5">
-              <Clock className="h-4.5 w-4.5 shrink-0 text-brand-500" />
+              <Clock className="h-4 w-4 shrink-0 text-brand-600" />
               <span>{STORE.hours}</span>
             </li>
           </ul>
         </div>
       </div>
 
-      <div className="border-t border-line">
-        <div className="mx-auto max-w-7xl px-4 py-5 text-center text-xs text-fg-subtle">
-          © {new Date().getFullYear()} {STORE.name}. Todos los derechos reservados.
+      <div className="border-t border-[#222]">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 text-[11.5px] text-fg-subtle">
+          <span>
+            © {new Date().getFullYear()} {STORE.name} ® · Todos los derechos reservados
+          </span>
+          <Link to="/admin/login" className="transition hover:text-white">
+            Acceso administrador
+          </Link>
         </div>
       </div>
     </footer>

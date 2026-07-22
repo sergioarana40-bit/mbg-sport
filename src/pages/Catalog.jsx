@@ -6,7 +6,7 @@ import PriceRange from '../components/PriceRange'
 import Spinner from '../components/Spinner'
 import { getCategories, getProducts } from '../lib/api'
 
-// Interruptor rojo del diseño (40×23, perilla blanca).
+// Interruptor rojo del póster (40×23, borde negro, perilla blanca).
 function Toggle({ on, onClick, label }) {
   return (
     <button
@@ -15,20 +15,20 @@ function Toggle({ on, onClick, label }) {
       role="switch"
       aria-checked={on}
       aria-label={label}
-      className={`relative h-[23px] w-10 shrink-0 rounded-full transition ${
+      className={`relative h-[23px] w-10 shrink-0 rounded-full border-2 border-ink transition ${
         on ? 'bg-brand-600' : 'bg-surface-3'
       }`}
     >
       <span
-        className={`absolute top-[3px] h-[17px] w-[17px] rounded-full bg-white transition-all ${
-          on ? 'left-[20px]' : 'left-[3px]'
+        className={`absolute top-[2px] h-[15px] w-[15px] rounded-full bg-white transition-all ${
+          on ? 'left-[19px]' : 'left-[2px]'
         }`}
       />
     </button>
   )
 }
 
-// Casilla de categoría (check rojo del diseño).
+// Casilla de categoría (cuadro con borde negro; marcada = relleno rojo).
 function CategoryCheck({ checked, name, onClick }) {
   return (
     <button
@@ -37,13 +37,15 @@ function CategoryCheck({ checked, name, onClick }) {
       className="flex w-full items-center gap-2.5 py-[5px] text-left"
     >
       <span
-        className={`grid h-[18px] w-[18px] shrink-0 place-items-center rounded-[5px] transition ${
-          checked ? 'bg-brand-600' : 'border-[1.5px] border-[#3f3f46]'
+        className={`grid h-[18px] w-[18px] shrink-0 place-items-center rounded-[4px] border-2 border-ink transition ${
+          checked ? 'bg-brand-600' : 'bg-white'
         }`}
       >
         {checked && <Check className="h-[11px] w-[11px] text-white" strokeWidth={3.2} />}
       </span>
-      <span className={`text-[13px] ${checked ? 'font-semibold text-fg' : 'text-fg-muted'}`}>
+      <span
+        className={`text-[13px] font-semibold ${checked ? 'text-fg' : 'text-[#4a4a4a]'}`}
+      >
         {name}
       </span>
     </button>
@@ -134,7 +136,7 @@ export default function Catalog() {
       <select
         value={sort}
         onChange={(e) => setSort(e.target.value)}
-        className="w-auto cursor-pointer appearance-none rounded-[10px] border border-line bg-surface px-3.5 py-2 text-[12.5px] text-fg outline-none transition focus:border-brand-500"
+        className="w-auto cursor-pointer appearance-none rounded-lg border-2 border-ink bg-white px-3.5 py-2 text-[13px] font-semibold text-fg outline-none transition focus:border-brand-600"
       >
         <option value="recent">Más recientes</option>
         <option value="price-asc">Precio: menor a mayor</option>
@@ -179,24 +181,24 @@ export default function Catalog() {
   )
 
   const stockSection = (
-    <div className="flex items-center justify-between gap-3 rounded-[11px] border border-line bg-surface px-3.5 py-3">
-      <span className="text-[12.5px] font-medium text-fg">Solo productos en stock</span>
+    <div className="flex items-center justify-between gap-3 rounded-[10px] border-2 border-ink bg-white px-3.5 py-3">
+      <span className="text-[12.5px] font-semibold text-fg">Solo productos en stock</span>
       <Toggle on={onlyStock} onClick={() => setOnlyStock((v) => !v)} label="Solo en stock" />
     </div>
   )
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-5 lg:py-8">
-      {/* Header móvil: flecha atrás + título (diseño 03) */}
+      {/* Header móvil: flecha atrás + título */}
       <div className="mb-1 flex items-center gap-3 lg:hidden">
         <button
           onClick={goBack}
           aria-label="Volver"
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] bg-surface text-fg-muted transition hover:text-fg"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-[10px] border-2 border-ink bg-white text-fg transition hover:bg-surface-2"
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <h1 className="min-w-0 truncate font-display text-lg font-bold uppercase text-fg">
+        <h1 className="min-w-0 truncate font-display text-lg font-extrabold uppercase text-fg">
           {title}
         </h1>
       </div>
@@ -208,10 +210,10 @@ export default function Catalog() {
         {/* Columna de filtros (escritorio) */}
         <aside className="hidden lg:sticky lg:top-32 lg:flex lg:flex-col lg:gap-6 lg:self-start">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold uppercase text-fg">Filtros</h2>
+            <h2 className="font-display text-lg font-extrabold uppercase text-fg">Filtros</h2>
             <button
               onClick={clearFilters}
-              className={`text-xs font-semibold text-brand-500 transition hover:text-brand-400 ${
+              className={`text-xs font-bold text-brand-600 transition hover:text-brand-700 ${
                 activeFilters > 0 ? '' : 'pointer-events-none opacity-0'
               }`}
             >
@@ -226,12 +228,12 @@ export default function Catalog() {
         {/* Resultados */}
         <div className="min-w-0">
           {/* Encabezado de resultados (escritorio) */}
-          <div className="mb-4 hidden items-end justify-between lg:flex">
+          <div className="mb-6 hidden items-end justify-between lg:flex">
             <div>
-              <h1 className="font-display text-[26px] font-bold uppercase leading-tight text-fg">
-                {title}
+              <h1 className="title-stamp text-2xl">
+                <span>{title}</span>
               </h1>
-              <p className="text-[12.5px] text-fg-subtle">
+              <p className="mt-2.5 text-[12.5px] font-medium text-fg-subtle">
                 {loading
                   ? 'Cargando…'
                   : `${filtered.length} producto${filtered.length === 1 ? '' : 's'}`}
@@ -245,15 +247,15 @@ export default function Catalog() {
               <Spinner />
             </div>
           ) : filtered.length === 0 ? (
-            <div className="rounded-2xl border border-dashed border-line py-20 text-center">
-              <p className="font-semibold text-fg">Sin resultados</p>
+            <div className="rounded-[10px] border-2 border-dashed border-ink py-20 text-center">
+              <p className="font-display font-extrabold uppercase text-fg">Sin resultados</p>
               <p className="mt-1 text-sm text-fg-muted">
                 Ajusta los filtros o prueba con otra categoría.
               </p>
               {activeFilters > 0 && (
                 <button
                   onClick={clearFilters}
-                  className="mt-4 text-sm font-semibold text-brand-500 hover:text-brand-400"
+                  className="mt-4 text-sm font-bold text-brand-600 hover:text-brand-700"
                 >
                   Limpiar filtros
                 </button>
@@ -272,7 +274,7 @@ export default function Catalog() {
       {/* Pill flotante de filtros (móvil, diseño 03) */}
       <button
         onClick={() => setFiltersOpen(true)}
-        className="fixed bottom-[96px] left-1/2 z-30 inline-flex -translate-x-1/2 items-center gap-2 rounded-full bg-brand-600 px-5 py-3 text-[13.5px] font-semibold text-white shadow-[0_10px_24px_rgba(220,38,38,.5)] transition active:scale-95 lg:hidden"
+        className="fixed bottom-[96px] left-1/2 z-30 inline-flex -translate-x-1/2 items-center gap-2 rounded-full border-2 border-ink bg-brand-600 px-5 py-3 font-display text-[12px] font-extrabold uppercase tracking-[.06em] text-white shadow-hard-sm transition active:scale-95 lg:hidden"
       >
         <Filter className="h-4 w-4" />
         Filtros{activeFilters > 0 && ` · ${activeFilters}`}
@@ -285,15 +287,15 @@ export default function Catalog() {
             className="absolute inset-0 bg-black/55 backdrop-blur-sm"
             onClick={() => setFiltersOpen(false)}
           />
-          <div className="absolute inset-x-0 bottom-0 max-h-[82vh] overflow-y-auto rounded-t-[26px] border-t border-line bg-surface px-5 pb-8 pt-2">
-            <span className="mx-auto mb-3.5 block h-1 w-10 rounded-full bg-[#3f3f46]" />
+          <div className="absolute inset-x-0 bottom-0 max-h-[82vh] overflow-y-auto rounded-t-[26px] border-t-[3px] border-ink bg-white px-5 pb-8 pt-2">
+            <span className="mx-auto mb-3.5 block h-1 w-10 rounded-full bg-surface-3" />
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-xl font-bold uppercase text-fg">Filtros</h2>
+              <h2 className="font-display text-xl font-extrabold uppercase text-fg">Filtros</h2>
               <div className="flex items-center gap-3">
                 {activeFilters > 0 && (
                   <button
                     onClick={clearFilters}
-                    className="text-[12.5px] font-semibold text-brand-500"
+                    className="text-[12.5px] font-bold text-brand-600"
                   >
                     Limpiar
                   </button>

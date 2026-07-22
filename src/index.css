@@ -1,61 +1,71 @@
 /* ==========================================================================
-   MBG Sport · Dirección "ESTADIO" (oscura / premium deportivo)
-   Tema para Tailwind CSS v4
+   MBG Sport · Dirección "1b PÓSTER GRAFFITI" (clara / rojo · amarillo · negro)
+   Tema para Tailwind CSS v4 — según Tienda MBGSPORT 1b.dc.html
    ========================================================================== */
 
 @import "tailwindcss";
 
 @theme {
   /* ---- Tipografía ---- */
-  --font-sans:    "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Oswald", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans:    "Jura", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Montserrat", "Jura", ui-sans-serif, system-ui, sans-serif;
 
-  /* ---- Marca · rojo MBG ---- */
-  --color-brand-50:  #fef2f2;
-  --color-brand-100: #fee2e2;
-  --color-brand-200: #fecaca;
-  --color-brand-300: #fca5a5;
-  --color-brand-400: #f87171;
-  --color-brand-500: #ef4444;
-  --color-brand-600: #dc2626;   /* CTA principal */
-  --color-brand-700: #b91c1c;   /* hover */
-  --color-brand-800: #991b1b;
-  --color-brand-900: #7f1d1d;
+  /* ---- Marca · rojo MBG (rojo puro del póster) ---- */
+  --color-brand-50:  #fff1f1;
+  --color-brand-100: #ffe0e0;
+  --color-brand-200: #ffc5c5;
+  --color-brand-300: #ff9b9b;
+  --color-brand-400: #ff5252;
+  --color-brand-500: #ff1f1f;
+  --color-brand-600: #ff0000;   /* CTA principal */
+  --color-brand-700: #c00000;   /* hover */
+  --color-brand-800: #9b0000;
+  --color-brand-900: #7f0404;
 
-  /* ---- Acento · oro (reservado para ofertas / destacados) ---- */
-  --color-accent-400: #facc15;
-  --color-accent-500: #eab308;
+  /* ---- Acento · amarillo del póster ---- */
+  --color-accent-300: #ffe14d;
+  --color-accent-400: #ffd700;
+  --color-accent-500: #eec500;
 
-  /* ---- Superficies oscuras (ESTADIO) ---- */
-  --color-ink:       #0b0b0d;             /* fondo de página */
-  --color-surface:   #141417;             /* tarjetas y paneles */
-  --color-surface-2: #1c1c21;             /* chips y controles */
-  --color-surface-3: #26262b;             /* botón secundario */
-  --color-line:      rgba(255,255,255,.08); /* bordes sutiles */
+  /* ---- Superficies (tema claro; el negro vive en header/footer/bandas) ---- */
+  --color-ink:       #000000;   /* bandas negras (header, footer, beneficios) */
+  --color-ink-2:     #17171a;   /* controles dentro de bandas negras */
+  --color-ink-line:  #26262b;   /* divisores dentro de bandas negras */
+  --color-surface:   #ffffff;   /* tarjetas y paneles */
+  --color-surface-2: #f4f4f5;   /* chips y controles suaves */
+  --color-surface-3: #e9e9eb;   /* botón secundario suave */
+  --color-line:      #e4e4e7;   /* bordes sutiles sobre blanco */
 
-  /* ---- Texto ---- */
-  --color-fg:        #f5f5f4;   /* principal */
-  --color-fg-muted:  #a1a1aa;   /* secundario */
-  --color-fg-subtle: #71717a;   /* terciario / labels */
+  /* ---- Texto (sobre fondo claro) ---- */
+  --color-fg:        #000000;   /* principal */
+  --color-fg-muted:  #52525b;   /* secundario */
+  --color-fg-subtle: #808080;   /* terciario / labels */
 
-  /* ---- Estados de pedido (badges del admin) ---- */
-  --color-state-paid:     #34d399;  /* Pagado / Entregado */
-  --color-state-progress: #60a5fa;  /* En preparación */
-  --color-state-shipped:  #a78bfa;  /* Enviado */
-  --color-state-pending:  #facc15;  /* Pendiente */
+  /* ---- Estados de pedido (badges del admin, sobre claro) ---- */
+  --color-state-paid:     #0b8f5b;  /* Pagado / Entregado */
+  --color-state-progress: #1d4ed8;  /* En preparación */
+  --color-state-shipped:  #6d28d9;  /* Enviado */
+  --color-state-pending:  #b45309;  /* Pendiente */
+
+  /* ---- Sombra dura del póster ---- */
+  --shadow-hard:    4px 4px 0 #000000;
+  --shadow-hard-sm: 3px 3px 0 #000000;
+  --shadow-hard-lg: 8px 8px 0 rgba(0, 0, 0, 0.18);
 }
 
 @layer base {
   html { scroll-behavior: smooth; }
   body {
-    @apply bg-ink text-fg font-sans antialiased;
+    @apply bg-white text-fg font-sans antialiased;
   }
-  h1, h2, h3, .font-display {
+  /* Titulares de póster: Montserrat pesada, mayúsculas.
+     (h3 queda fuera: en tarjetas los nombres de producto van en caja normal) */
+  h1, h2, .font-display {
     font-family: var(--font-display);
     text-transform: uppercase;
     letter-spacing: -0.01em;
   }
-  ::selection { background: var(--color-brand-600); color: #fff; }
+  ::selection { background: var(--color-accent-400); color: #000; }
 
   /* Oculta scrollbars en carruseles horizontales (chips, categorías) */
   .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -71,55 +81,99 @@
 }
 
 /* ==========================================================================
-   Clases de componente reutilizables
+   Clases de componente reutilizables (lenguaje "póster graffiti")
    ========================================================================== */
 @layer components {
 
   /* ---- Botones ---- */
+  /* Principal: bloque negro con texto blanco (botón "Ver catálogo" del póster) */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600
-           px-6 py-3 font-semibold text-white transition
-           hover:bg-brand-700 active:scale-[.98];
+    @apply inline-flex items-center justify-center gap-2.5 rounded-[10px] bg-ink
+           px-6 py-3.5 font-display text-[13px] font-extrabold uppercase tracking-[.08em]
+           text-white transition hover:bg-ink-2 active:scale-[.98];
+  }
+  /* Sticker rojo: borde negro + sombra dura (botón "Servicio técnico") */
+  .btn-sticker {
+    @apply inline-flex items-center justify-center gap-2.5 rounded-[10px] bg-brand-600
+           px-6 py-3 font-display text-[13px] font-extrabold uppercase tracking-[.08em]
+           text-white transition hover:bg-brand-700 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none;
+    border: 3px solid #000;
+    box-shadow: var(--shadow-hard);
+  }
+  /* Sticker amarillo (CTA de WhatsApp / cupones) */
+  .btn-sticker-yellow {
+    @apply inline-flex items-center justify-center gap-2.5 rounded-[10px] bg-accent-400
+           px-6 py-3 font-display text-[13px] font-extrabold uppercase tracking-[.08em]
+           text-fg transition hover:bg-accent-300 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none;
+    border: 3px solid #000;
+    box-shadow: var(--shadow-hard);
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-surface-3
-           px-6 py-3 font-semibold text-fg transition hover:bg-surface-2;
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px] border-2 border-ink
+           bg-white px-6 py-3 font-display text-[13px] font-extrabold uppercase tracking-[.06em]
+           text-fg transition hover:bg-surface-2 active:scale-[.98];
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl border
-           border-white/20 px-6 py-3 font-semibold text-fg transition hover:bg-white/10;
+    @apply inline-flex items-center justify-center gap-2 rounded-[10px] border border-line
+           px-6 py-3 font-semibold text-fg-muted transition hover:bg-surface-2 hover:text-fg;
   }
 
-  /* ---- Superficie / tarjeta ---- */
-  .surface      { @apply rounded-2xl border border-white/10 bg-surface; }
+  /* ---- Tarjeta sticker (borde negro + sombra dura) ---- */
+  .sticker      { @apply rounded-[10px] border-2 border-ink bg-white shadow-hard; }
+  .sticker-sm   { @apply rounded-lg border-2 border-ink bg-white shadow-hard-sm; }
+  /* Superficie suave (paneles sin sticker) */
+  .surface      { @apply rounded-2xl border border-line bg-surface; }
   .surface-soft { @apply rounded-xl bg-surface-2; }
 
-  /* ---- Campo de formulario (input/select/textarea) ---- */
+  /* ---- Sello de título (bloque rojo inclinado de secciones) ---- */
+  .title-stamp {
+    @apply inline-block bg-brand-600 px-[18px] py-2 font-display text-2xl font-extrabold
+           uppercase text-white;
+    transform: skew(-6deg);
+  }
+  .title-stamp > * { display: inline-block; transform: skew(6deg); }
+
+  /* ---- Etiqueta de precio (bloque amarillo) ---- */
+  .price-tag { @apply inline-block bg-accent-400 px-2 py-[3px] font-display font-extrabold text-fg; }
+
+  /* ---- Campo de formulario claro (borde negro 2px, según póster) ---- */
   .field {
-    @apply w-full rounded-xl border border-line bg-surface-2 px-3.5 py-2.5 text-sm
-           text-fg placeholder:text-fg-subtle outline-none transition
-           focus:border-brand-500 focus:ring-2 focus:ring-brand-600/30;
+    @apply w-full rounded-lg border-2 border-ink bg-white px-3.5 text-[13px] font-medium
+           text-fg placeholder:text-fg-subtle outline-none transition h-11
+           focus:border-brand-600 focus:ring-2 focus:ring-brand-600/25;
+  }
+  textarea.field { @apply h-auto py-2.5; }
+  /* Campo oscuro (buscador dentro del header negro) */
+  .field-dark {
+    @apply w-full rounded-[10px] bg-ink-2 px-3.5 text-[13px] font-medium text-white
+           placeholder:text-fg-subtle outline-none transition h-11
+           focus:border-accent-400;
+    border: 1.5px solid #3a3a40;
   }
 
   /* ---- Chips de categoría / filtro ---- */
-  .chip        { @apply whitespace-nowrap rounded-full bg-surface-2 px-4 py-2 text-sm text-fg-muted transition; }
-  .chip-active { @apply bg-brand-600 text-white; }
+  .chip        { @apply whitespace-nowrap rounded-full border-2 border-ink bg-white px-4 py-1.5 text-xs font-bold uppercase text-fg transition; }
+  .chip-active { @apply bg-ink text-white; }
 
   /* ---- Badges ---- */
-  .badge-featured { @apply rounded-full bg-accent-400 px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-ink; }
-  .badge-out      { @apply rounded-full bg-black/70 px-2 py-0.5 text-[11px] font-semibold text-white; }
+  .badge-featured {
+    @apply rounded-[5px] border-2 border-ink bg-brand-600 px-2 py-1 font-display text-[10px]
+           font-extrabold uppercase text-white;
+  }
+  .badge-out { @apply rounded-[5px] border-2 border-ink bg-ink px-2 py-1 font-display text-[10px] font-extrabold uppercase text-white; }
 
-  /* ---- Barra de navegación inferior (PWA móvil) ---- */
+  /* ---- Barra de navegación inferior (PWA móvil) — banda negra del póster ---- */
   .bottom-nav {
-    @apply flex items-start justify-around border-t
-           border-white/10 bg-ink/95 px-2 pt-2 backdrop-blur;
+    @apply flex items-start justify-around bg-ink px-2 pt-2;
+    border-top: 3px solid var(--color-accent-400);
     padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
   }
-  .bottom-nav__item        { @apply flex flex-col items-center gap-1 text-[10px] text-fg-subtle transition; }
-  .bottom-nav__item--active { @apply text-brand-500 font-semibold; }
-  /* Botón central elevado (buscar) */
+  .bottom-nav__item        { @apply flex flex-col items-center gap-1 text-[10px] font-bold uppercase tracking-wide text-[#9a9aa0] transition; }
+  .bottom-nav__item--active { @apply text-accent-400; }
+  /* Botón central elevado (buscar): sticker rojo con sombra amarilla */
   .bottom-nav__fab {
-    @apply -mt-3.5 grid h-13 w-13 place-items-center rounded-2xl bg-brand-600 text-white;
-    box-shadow: 0 8px 18px rgba(220,38,38,.45);
+    @apply -mt-3.5 grid h-[50px] w-[50px] place-items-center rounded-[14px] bg-brand-600 text-white;
+    border: 3px solid #000;
+    box-shadow: 3px 3px 0 rgba(255, 215, 0, 0.9);
   }
 }

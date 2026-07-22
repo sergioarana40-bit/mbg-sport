@@ -75,14 +75,16 @@ export default function AddressManager({ userId }) {
   }
 
   return (
-    <div className="rounded-2xl border border-line bg-surface p-5">
+    <div className="rounded-[10px] border-2 border-ink bg-white p-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-bold text-fg">Mis direcciones</h2>
+        <h2 className="font-display text-base font-extrabold uppercase text-fg">
+          Mis direcciones
+        </h2>
         <button
           onClick={openNew}
-          className="inline-flex items-center gap-1.5 rounded-lg bg-surface-3 px-3 py-1.5 text-sm font-semibold text-fg transition hover:bg-surface-2"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-ink px-3 py-1.5 font-display text-[11px] font-extrabold uppercase text-white transition hover:bg-ink-2"
         >
-          <Plus className="h-4 w-4" />
+          <Plus className="h-3.5 w-3.5" strokeWidth={2.5} />
           Agregar
         </button>
       </div>
@@ -98,34 +100,34 @@ export default function AddressManager({ userId }) {
       ) : (
         <ul className="mt-4 space-y-2">
           {addresses.map((a) => (
-            <li key={a.id} className="flex gap-3 rounded-xl bg-surface-2 p-3">
-              <MapPin className="mt-0.5 h-4.5 w-4.5 shrink-0 text-brand-400" />
+            <li key={a.id} className="flex gap-3 rounded-[10px] border-2 border-ink bg-white p-3">
+              <MapPin className="mt-0.5 h-4.5 w-4.5 shrink-0 text-brand-600" strokeWidth={2} />
               <div className="min-w-0 flex-1">
-                <p className="flex items-center gap-2 text-sm font-semibold text-fg">
+                <p className="flex items-center gap-2 text-sm font-bold text-fg">
                   {a.label || 'Dirección'}
                   {a.is_default && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-600/15 px-2 py-0.5 text-[10px] font-bold text-brand-400">
-                      <Star className="h-3 w-3 fill-brand-400" /> Principal
+                    <span className="inline-flex items-center gap-1 rounded-full border-2 border-ink bg-accent-400 px-2 py-0.5 font-display text-[9px] font-extrabold uppercase text-fg">
+                      <Star className="h-2.5 w-2.5 fill-fg" /> Principal
                     </span>
                   )}
                 </p>
-                <p className="text-xs text-fg-muted">{a.full_address}</p>
+                <p className="text-xs font-medium text-[#4a4a4a]">{a.full_address}</p>
                 {a.recipient && <p className="text-xs text-fg-subtle">{a.recipient} · {a.phone}</p>}
               </div>
               <div className="flex gap-1">
                 <button
                   onClick={() => openEdit(a)}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-surface-3 hover:text-brand-400"
+                  className="grid h-8 w-8 place-items-center rounded-lg border-2 border-ink text-fg transition hover:bg-accent-400"
                   aria-label="Editar"
                 >
-                  <Pencil className="h-4 w-4" />
+                  <Pencil className="h-3.5 w-3.5" />
                 </button>
                 <button
                   onClick={() => setConfirmDelete(a)}
-                  className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-brand-600/15 hover:text-brand-400"
+                  className="grid h-8 w-8 place-items-center rounded-lg border-2 border-ink text-fg transition hover:bg-brand-600 hover:text-white"
                   aria-label="Eliminar"
                 >
-                  <Trash2 className="h-4 w-4" />
+                  <Trash2 className="h-3.5 w-3.5" />
                 </button>
               </div>
             </li>
@@ -186,13 +188,13 @@ export default function AddressManager({ userId }) {
               type="checkbox"
               checked={form.is_default}
               onChange={(e) => setForm({ ...form, is_default: e.target.checked })}
-              className="h-4 w-4 rounded border-line bg-surface-2 text-brand-600 focus:ring-brand-500"
+              className="h-4 w-4 rounded border-2 border-ink accent-brand-600"
             />
             Usar como dirección principal
           </label>
 
           {error && (
-            <p className="flex items-center gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
+            <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
               <AlertCircle className="h-4 w-4 shrink-0" />
               {error}
             </p>

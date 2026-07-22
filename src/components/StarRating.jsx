@@ -12,8 +12,8 @@ export default function StarRating({ value = 0, size = 4, onChange, className = 
         const star = (
           <Star
             style={{ height: px, width: px }}
-            strokeWidth={1.6}
-            className={filled ? 'fill-accent-400 text-accent-400' : 'fill-transparent text-fg-subtle'}
+            strokeWidth={1.5}
+            className={filled ? 'fill-accent-400 text-ink' : 'fill-transparent text-fg-subtle'}
           />
         )
         return interactive ? (

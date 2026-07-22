@@ -20,7 +20,7 @@ function fmtDateTime(iso) {
 
 const STATUS_KEYS = Object.keys(ORDER_STATUS)
 const selectClass =
-  'rounded-lg border border-line bg-surface-2 px-2 py-1 text-xs text-fg outline-none focus:border-brand-500'
+  'cursor-pointer rounded-lg border-2 border-ink bg-white px-2 py-1 text-xs font-bold text-fg outline-none focus:border-brand-600'
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([])
@@ -57,12 +57,18 @@ export default function AdminOrders() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-fg">Pedidos</h1>
-          <p className="text-sm text-fg-muted">{orders.length} en total</p>
+          <h1 className="title-stamp text-lg sm:text-xl">
+            <span>Pedidos</span>
+          </h1>
+          <p className="mt-2 text-xs font-medium text-fg-subtle">{orders.length} en total</p>
         </div>
-        <select value={filter} onChange={(e) => setFilter(e.target.value)} className="field w-auto py-2">
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="w-auto cursor-pointer rounded-lg border-2 border-ink bg-white px-3.5 py-2 text-[12.5px] font-semibold text-fg outline-none focus:border-brand-600"
+        >
           <option value="all">Todos los estados</option>
           {STATUS_KEYS.map((k) => (
             <option key={k} value={k}>
@@ -77,40 +83,42 @@ export default function AdminOrders() {
           <Spinner />
         </div>
       ) : orders.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-line py-20 text-center">
-          <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-surface-2">
-            <Package className="h-7 w-7 text-fg-subtle" />
+        <div className="rounded-[10px] border-2 border-dashed border-ink py-20 text-center">
+          <div className="sticker mx-auto grid h-14 w-14 place-items-center rounded-full">
+            <Package className="h-7 w-7 text-fg" />
           </div>
-          <p className="mt-4 font-semibold text-fg">Aún no hay pedidos</p>
-          <p className="mt-1 text-sm text-fg-muted">
+          <p className="mt-4 font-display font-extrabold uppercase text-fg">Aún no hay pedidos</p>
+          <p className="mt-1 text-sm font-medium text-fg-muted">
             {isSupabaseConfigured
               ? 'Cuando un cliente compre, el pedido aparecerá aquí.'
               : 'Conecta Supabase para recibir pedidos reales.'}
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-line bg-surface">
+        <div className="overflow-hidden rounded-[10px] border-2 border-ink bg-white">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-line bg-surface-2 text-left text-xs uppercase tracking-wide text-fg-subtle">
-                  <th className="px-4 py-3 font-semibold">Pedido</th>
-                  <th className="px-4 py-3 font-semibold">Cliente</th>
-                  <th className="px-4 py-3 font-semibold">Fecha</th>
-                  <th className="px-4 py-3 font-semibold">Total</th>
-                  <th className="px-4 py-3 font-semibold">Estado</th>
+                <tr className="bg-ink text-left text-[10px] uppercase tracking-[.08em] text-white">
+                  <th className="px-4 py-3 font-bold">Pedido</th>
+                  <th className="px-4 py-3 font-bold">Cliente</th>
+                  <th className="px-4 py-3 font-bold">Fecha</th>
+                  <th className="px-4 py-3 font-bold">Total</th>
+                  <th className="px-4 py-3 font-bold">Estado</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-y divide-[#e5e5e5]">
                 {filtered.map((o) => (
                   <tr key={o.id} className="transition hover:bg-surface-2">
-                    <td className="px-4 py-3 font-mono text-xs text-fg-subtle">
+                    <td className="px-4 py-3 font-mono text-xs font-bold text-fg">
                       #{o.id.slice(0, 8).toUpperCase()}
                     </td>
-                    <td className="px-4 py-3 font-medium text-fg">{o.customer_name}</td>
-                    <td className="px-4 py-3 text-fg-muted">{fmtDateTime(o.created_at)}</td>
-                    <td className="px-4 py-3 font-semibold text-fg">{formatPrice(o.total)}</td>
+                    <td className="px-4 py-3 font-semibold text-fg">{o.customer_name}</td>
+                    <td className="px-4 py-3 font-medium text-[#4a4a4a]">
+                      {fmtDateTime(o.created_at)}
+                    </td>
+                    <td className="px-4 py-3 font-bold text-fg">{formatPrice(o.total)}</td>
                     <td className="px-4 py-3">
                       <select
                         value={o.status}
@@ -127,10 +135,10 @@ export default function AdminOrders() {
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => setSelected(o)}
-                        className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-surface-3 hover:text-brand-400"
+                        className="grid h-[30px] w-[30px] place-items-center rounded-[7px] border-2 border-ink text-fg transition hover:bg-accent-400"
                         aria-label="Ver detalle"
                       >
-                        <Eye className="h-4 w-4" />
+                        <Eye className="h-3.5 w-3.5" />
                       </button>
                     </td>
                   </tr>
@@ -151,26 +159,28 @@ export default function AdminOrders() {
           <div className="space-y-5">
             <div className="flex items-center justify-between">
               <StatusBadge status={selected.status} />
-              <span className="text-sm text-fg-muted">{fmtDateTime(selected.created_at)}</span>
+              <span className="text-[12.5px] font-medium text-fg-subtle">
+                {fmtDateTime(selected.created_at)}
+              </span>
             </div>
 
             {/* Datos del cliente */}
-            <div className="space-y-2 rounded-lg bg-surface-2 p-4 text-sm">
-              <p className="font-semibold text-fg">{selected.customer_name}</p>
-              <p className="flex items-center gap-2 text-fg-muted">
+            <div className="space-y-2 rounded-[10px] border-2 border-ink bg-surface-2 p-4 text-sm">
+              <p className="font-bold text-fg">{selected.customer_name}</p>
+              <p className="flex items-center gap-2 font-medium text-[#4a4a4a]">
                 <Mail className="h-4 w-4 text-fg-subtle" />
                 {selected.customer_email}
               </p>
-              <p className="flex items-center gap-2 text-fg-muted">
+              <p className="flex items-center gap-2 font-medium text-[#4a4a4a]">
                 <Phone className="h-4 w-4 text-fg-subtle" />
                 {selected.customer_phone}
               </p>
-              <p className="flex items-start gap-2 text-fg-muted">
+              <p className="flex items-start gap-2 font-medium text-[#4a4a4a]">
                 <MapPin className="h-4 w-4 shrink-0 text-fg-subtle" />
                 {selected.customer_address}
               </p>
               {selected.notes && (
-                <p className="flex items-start gap-2 text-fg-muted">
+                <p className="flex items-start gap-2 font-medium text-[#4a4a4a]">
                   <StickyNote className="h-4 w-4 shrink-0 text-fg-subtle" />
                   {selected.notes}
                 </p>
@@ -179,14 +189,16 @@ export default function AdminOrders() {
 
             {/* Items */}
             <div>
-              <h3 className="mb-2 text-sm font-semibold text-fg">Productos</h3>
-              <ul className="divide-y divide-line rounded-lg border border-line">
+              <h3 className="mb-2 text-[12.5px] font-bold uppercase tracking-[.06em] text-fg">
+                Productos
+              </h3>
+              <ul className="divide-y divide-[#e5e5e5] rounded-[10px] border-2 border-ink">
                 {selected.order_items?.map((i) => (
                   <li key={i.id} className="flex justify-between gap-3 px-3 py-2 text-sm">
-                    <span className="text-fg-muted">
+                    <span className="font-medium text-[#4a4a4a]">
                       {i.quantity}× {i.product_name}
                     </span>
-                    <span className="font-medium text-fg">
+                    <span className="font-bold text-fg">
                       {formatPrice(i.price * i.quantity)}
                     </span>
                   </li>
@@ -197,34 +209,36 @@ export default function AdminOrders() {
             {/* Totales */}
             <dl className="space-y-1.5 text-sm">
               <div className="flex justify-between">
-                <dt className="text-fg-muted">Subtotal</dt>
-                <dd className="text-fg">{formatPrice(selected.subtotal)}</dd>
+                <dt className="font-medium text-[#4a4a4a]">Subtotal</dt>
+                <dd className="font-bold text-fg">{formatPrice(selected.subtotal)}</dd>
               </div>
               {Number(selected.discount) > 0 && (
                 <div className="flex justify-between">
-                  <dt className="text-fg-muted">
+                  <dt className="font-semibold text-brand-600">
                     Descuento{selected.coupon_code ? ` (${selected.coupon_code})` : ''}
                   </dt>
-                  <dd className="text-emerald-400">−{formatPrice(selected.discount)}</dd>
+                  <dd className="font-bold text-brand-600">−{formatPrice(selected.discount)}</dd>
                 </div>
               )}
               <div className="flex justify-between">
-                <dt className="text-fg-muted">
+                <dt className="font-medium text-[#4a4a4a]">
                   {selected.delivery_method === 'pickup' ? 'Recogida en tienda' : 'Envío'}
                 </dt>
-                <dd className="text-fg">
+                <dd className="font-bold text-fg">
                   {Number(selected.shipping) === 0 ? 'Gratis' : formatPrice(selected.shipping)}
                 </dd>
               </div>
-              <div className="flex justify-between border-t border-line pt-2 text-base font-semibold">
-                <dt className="text-fg">Total</dt>
-                <dd className="text-brand-500">{formatPrice(selected.total)}</dd>
+              <div className="flex items-center justify-between border-t-2 border-ink pt-2.5">
+                <dt className="font-display text-[15px] font-extrabold uppercase text-fg">Total</dt>
+                <dd>
+                  <span className="price-tag text-lg">{formatPrice(selected.total)}</span>
+                </dd>
               </div>
             </dl>
 
             {/* Cambiar estado */}
             <div>
-              <label className="mb-1 block text-sm font-medium text-fg-muted">
+              <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
                 Cambiar estado
               </label>
               <select

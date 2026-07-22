@@ -1,18 +1,16 @@
 import { Link } from 'react-router-dom'
 
-export default function Logo({ to = '/', light = false, className = '' }) {
+// Logotipo oficial MBGSPORT (PNG del manual de marca, en public/brand/).
+// `size` = alto en px, o `sizeClassName` (p. ej. "h-8 md:h-10") para alto responsivo.
+export default function Logo({ to = '/', size = 40, sizeClassName = '', className = '' }) {
   return (
-    <Link to={to} className={`inline-flex items-center gap-2.5 ${className}`}>
-      <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-brand-600 font-display text-base font-bold leading-none text-white shadow-sm ring-1 ring-black/10">
-        MBG
-      </span>
-      <span
-        className={`font-display text-xl font-bold uppercase leading-none tracking-tight ${
-          light ? 'text-white' : 'text-fg'
-        }`}
-      >
-        Sport
-      </span>
+    <Link to={to} className={`inline-flex shrink-0 items-center ${className}`}>
+      <img
+        src="/brand/logotipo.png"
+        alt="MBGSPORT"
+        style={sizeClassName ? undefined : { height: size }}
+        className={`block w-auto ${sizeClassName}`}
+      />
     </Link>
   )
 }

@@ -29,18 +29,14 @@ export default function CustomerLogin() {
 
   return (
     <div className="mx-auto max-w-sm px-4 py-12">
-      <h1 className="text-center font-display text-2xl font-bold text-fg">
-        Iniciar sesión
-      </h1>
-      <p className="mt-1 text-center text-sm text-fg-muted">
-        Accede a tu cuenta para ver tus pedidos.
-      </p>
+      {/* Tarjeta sticker (diseño 1b) */}
+      <form onSubmit={handleSubmit} className="sticker rounded-xl p-7">
+        <h1 className="font-display text-xl font-black uppercase text-fg">Iniciar sesión</h1>
+        <p className="mt-1.5 text-[12.5px] font-medium text-fg-subtle">
+          Accede a tu cuenta para ver tus pedidos.
+        </p>
 
-      <form
-        onSubmit={handleSubmit}
-        className="mt-6 space-y-4 rounded-2xl border border-line bg-surface p-6"
-      >
-        <div className="relative">
+        <div className="relative mt-5">
           <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
           <input
             type="email"
@@ -51,7 +47,7 @@ export default function CustomerLogin() {
             autoComplete="email"
           />
         </div>
-        <div className="relative">
+        <div className="relative mt-3">
           <Lock className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
           <input
             type="password"
@@ -64,27 +60,23 @@ export default function CustomerLogin() {
         </div>
 
         {error && (
-          <p className="flex items-center gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
+          <p className="mt-4 flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
             <AlertCircle className="h-4 w-4 shrink-0" />
             {error}
           </p>
         )}
 
-        <button type="submit" disabled={loading} className="btn-primary w-full">
-          {loading ? (
-            <Spinner size={5} className="border-white/40 border-t-white" />
-          ) : (
-            'Entrar'
-          )}
+        <button type="submit" disabled={loading} className="btn-sticker mt-5 h-12 w-full">
+          {loading ? <Spinner size={5} className="border-white/40 border-t-white" /> : 'Entrar'}
         </button>
-      </form>
 
-      <p className="mt-4 text-center text-sm text-fg-muted">
-        ¿No tienes cuenta?{' '}
-        <Link to="/cuenta/registro" className="font-medium text-brand-400 hover:text-brand-300">
-          Crear cuenta
-        </Link>
-      </p>
+        <p className="mt-4 text-center text-[12.5px] font-medium text-[#4a4a4a]">
+          ¿No tienes cuenta?{' '}
+          <Link to="/cuenta/registro" className="font-bold text-brand-600 hover:text-brand-700">
+            Crear cuenta
+          </Link>
+        </p>
+      </form>
     </div>
   )
 }

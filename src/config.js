@@ -2,10 +2,10 @@
 // Edita aquí los datos del negocio; se usan en toda la app.
 
 export const STORE = {
-  name: 'MBG Sport',
-  tagline: 'Todo para tu entrenamiento',
+  name: 'MBGSPORT',
+  tagline: 'El estándar en tu entrenamiento',
   description:
-    'Pesas, barras, cardio, ropa y refacciones. Los mejores precios en Toluca.',
+    'El aliado integral del mundo fitness. Refacciones, equipo, suplementación y ropa deportiva en Toluca.',
   address: 'Av. Independencia Oriente 612, Col. Santa Clara, Toluca, México 50090',
   city: 'Toluca, Estado de México',
   // Rellena con el número real (formato internacional, sin +, ni espacios) para el contacto por WhatsApp.

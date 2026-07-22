@@ -48,17 +48,18 @@ export default function Register() {
     }
   }
 
+  // Tarjeta amarilla con puntos del póster 1b.
+  const DOTS_STYLE = {
+    backgroundImage: 'radial-gradient(rgba(0,0,0,.06) 1.5px, transparent 1.5px)',
+    backgroundSize: '14px 14px',
+  }
+
   return (
     <div className="mx-auto max-w-sm px-4 py-12">
-      <h1 className="text-center font-display text-2xl font-bold text-fg">Crear cuenta</h1>
-      <p className="mt-1 text-center text-sm text-fg-muted">
-        Guarda tus datos y sigue tus pedidos.
-      </p>
-
       {message ? (
-        <div className="mt-6 flex flex-col items-center gap-3 rounded-2xl border border-line bg-surface p-6 text-center">
-          <CheckCircle2 className="h-10 w-10 text-emerald-400" />
-          <p className="text-sm text-fg-muted">{message}</p>
+        <div className="sticker mt-2 flex flex-col items-center gap-3 rounded-xl p-7 text-center">
+          <CheckCircle2 className="h-10 w-10 text-state-paid" />
+          <p className="text-sm font-medium text-[#4a4a4a]">{message}</p>
           <Link to="/cuenta/login" className="btn-primary mt-2 w-full">
             Ir a iniciar sesión
           </Link>
@@ -67,8 +68,13 @@ export default function Register() {
         <>
           <form
             onSubmit={handleSubmit}
-            className="mt-6 space-y-4 rounded-2xl border border-line bg-surface p-6"
+            className="sticker space-y-3 rounded-xl bg-accent-400 p-7"
+            style={DOTS_STYLE}
           >
+            <h1 className="font-display text-xl font-black uppercase text-fg">Crear cuenta</h1>
+            <p className="!mt-1.5 text-[12.5px] font-semibold text-fg">
+              Guarda tus datos y sigue tus pedidos.
+            </p>
             <div className="relative">
               <User className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
               <input
@@ -113,13 +119,13 @@ export default function Register() {
             </div>
 
             {error && (
-              <p className="flex items-center gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
+              <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
                 <AlertCircle className="h-4 w-4 shrink-0" />
                 {error}
               </p>
             )}
 
-            <button type="submit" disabled={loading} className="btn-primary w-full">
+            <button type="submit" disabled={loading} className="btn-primary !mt-5 h-12 w-full">
               {loading ? (
                 <Spinner size={5} className="border-white/40 border-t-white" />
               ) : (
@@ -128,9 +134,9 @@ export default function Register() {
             </button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-fg-muted">
+          <p className="mt-4 text-center text-[12.5px] font-medium text-[#4a4a4a]">
             ¿Ya tienes cuenta?{' '}
-            <Link to="/cuenta/login" className="font-medium text-brand-400 hover:text-brand-300">
+            <Link to="/cuenta/login" className="font-bold text-brand-600 hover:text-brand-700">
               Iniciar sesión
             </Link>
           </p>

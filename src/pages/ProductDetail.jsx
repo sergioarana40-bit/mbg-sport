@@ -40,8 +40,8 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="mx-auto max-w-2xl px-4 py-24 text-center">
-        <h1 className="font-display text-2xl font-bold text-fg">Producto no encontrado</h1>
-        <Link to="/catalogo" className="mt-4 inline-block text-brand-400 hover:underline">
+        <h1 className="font-display text-2xl font-extrabold text-fg">Producto no encontrado</h1>
+        <Link to="/catalogo" className="mt-4 inline-block font-bold text-brand-600 hover:underline">
           Volver al catálogo
         </Link>
       </div>
@@ -65,45 +65,48 @@ export default function ProductDetail() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Breadcrumb */}
-      <nav className="mb-6 flex items-center gap-1.5 text-sm text-fg-muted">
-        <Link to="/" className="hover:text-brand-400">
+      <nav className="mb-6 flex items-center gap-1.5 text-[12.5px] font-medium text-fg-subtle">
+        <Link to="/" className="hover:text-brand-600">
           Inicio
         </Link>
-        <ChevronRight className="h-4 w-4" />
-        <Link to="/catalogo" className="hover:text-brand-400">
+        <ChevronRight className="h-[13px] w-[13px]" />
+        <Link to="/catalogo" className="hover:text-brand-600">
           Catálogo
         </Link>
-        <ChevronRight className="h-4 w-4" />
-        <span className="truncate text-fg">{product.name}</span>
+        <ChevronRight className="h-[13px] w-[13px]" />
+        <span className="truncate font-semibold text-fg">{product.name}</span>
       </nav>
 
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className="grid gap-8 md:grid-cols-2 lg:gap-11">
         <div className="relative">
           <ProductImage
             src={product.image_url}
             alt={product.name}
-            className="aspect-square rounded-2xl border border-line"
+            className="aspect-square rounded-[10px] border-2 border-ink shadow-hard"
           />
+          {product.featured && (
+            <span className="badge-featured absolute left-3 top-3">Destacado</span>
+          )}
           <FavoriteButton
             productId={product.id}
-            className="absolute right-3 top-3 h-10 w-10 bg-ink/50 text-white backdrop-blur hover:bg-ink/70"
+            className="absolute right-3 top-3 h-[38px] w-[38px] rounded-lg border-2 border-ink bg-white text-fg"
           />
         </div>
 
         <div>
           {product.category_name && (
-            <span className="text-sm font-medium uppercase tracking-wide text-brand-400">
+            <span className="text-[10px] font-bold uppercase tracking-[.14em] text-fg-subtle">
               {product.category_name}
             </span>
           )}
-          <h1 className="mt-1 font-display text-3xl font-bold leading-tight text-fg">
+          <h1 className="mt-2 font-display text-3xl font-black uppercase leading-none text-fg lg:text-4xl">
             {product.name}
           </h1>
 
-          {/* Calificación (diseño 04): estrellas + "4.8 · 128 reseñas" */}
-          <a href="#resenas" className="mt-2.5 inline-flex items-center gap-2 hover:opacity-80">
-            <StarRating value={reviewSummary?.avg ?? 0} size={3.75} />
-            <span className="text-[13px] text-fg-muted">
+          {/* Calificación: estrellas amarillas con contorno negro */}
+          <a href="#resenas" className="mt-3 inline-flex items-center gap-2 hover:opacity-80">
+            <StarRating value={reviewSummary?.avg ?? 0} size={4.25} />
+            <span className="text-[12.5px] font-semibold text-[#4a4a4a]">
               {reviewSummary?.count
                 ? `${reviewSummary.avg.toFixed(1)} · ${reviewSummary.count} reseña${
                     reviewSummary.count === 1 ? '' : 's'
@@ -112,95 +115,94 @@ export default function ProductDetail() {
             </span>
           </a>
 
-          <p className="mt-4 font-display text-3xl font-bold text-fg">
-            {formatPrice(product.price)}
+          <p className="mt-4">
+            <span className="price-tag px-3 py-1 text-2xl font-black lg:text-3xl">
+              {formatPrice(product.price)}
+            </span>
           </p>
 
-          <div className="mt-1.5 flex items-center gap-1.5 text-[13px]">
+          <div className="mt-3 flex items-center gap-1.5 text-[13px]">
             {outOfStock ? (
-              <span className="font-medium text-brand-500">Agotado</span>
+              <span className="badge-out">Agotado</span>
             ) : (
               <>
-                <Check className="h-[15px] w-[15px] text-emerald-400" strokeWidth={2.5} />
-                <span className="text-emerald-400">{product.stock} disponibles</span>
+                <Check className="h-[15px] w-[15px] text-fg" strokeWidth={3} />
+                <span className="font-bold text-fg">{product.stock} disponibles</span>
               </>
             )}
           </div>
 
           {product.description && (
-            <p className="mt-5 leading-relaxed text-fg-muted">{product.description}</p>
+            <p className="mt-4 max-w-[480px] text-[14.5px] font-medium leading-relaxed text-[#4a4a4a]">
+              {product.description}
+            </p>
           )}
 
-          {/* Cantidad + acciones */}
+          {/* Cantidad + acciones (póster 1b) */}
           {!outOfStock && (
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <div className="flex items-center rounded-xl border border-line">
+            <div className="mt-6 flex flex-wrap items-center gap-3.5">
+              <div className="flex items-center overflow-hidden rounded-[10px] border-2 border-ink">
                 <button
                   onClick={() => setQty((q) => Math.max(1, q - 1))}
-                  className="grid h-11 w-11 place-items-center text-fg-muted hover:bg-surface-2 disabled:opacity-40"
+                  className="grid h-11 w-11 place-items-center text-fg hover:bg-surface-2 disabled:opacity-40"
                   disabled={qty <= 1}
                   aria-label="Quitar uno"
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className="h-4 w-4" strokeWidth={2.5} />
                 </button>
-                <span className="w-10 text-center font-semibold text-fg">{qty}</span>
+                <span className="grid h-11 w-11 place-items-center border-x-2 border-ink text-[15px] font-bold text-fg">
+                  {qty}
+                </span>
                 <button
                   onClick={() => setQty((q) => Math.min(maxQty, q + 1))}
-                  className="grid h-11 w-11 place-items-center text-fg-muted hover:bg-surface-2 disabled:opacity-40"
+                  className="grid h-11 w-11 place-items-center text-fg hover:bg-surface-2 disabled:opacity-40"
                   disabled={qty >= maxQty}
                   aria-label="Agregar uno"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-4 w-4" strokeWidth={2.5} />
                 </button>
               </div>
 
               <button
                 onClick={handleAdd}
-                className={`inline-flex h-11 items-center gap-2 rounded-xl px-5 font-semibold transition ${
-                  added ? 'bg-emerald-600 text-white' : 'bg-surface-3 text-fg hover:bg-surface-2'
+                className={`inline-flex h-12 items-center gap-2.5 rounded-[10px] px-6 font-display text-[13px] font-extrabold uppercase tracking-[.08em] text-white transition ${
+                  added ? 'bg-state-paid' : 'bg-ink hover:bg-ink-2'
                 }`}
               >
                 {added ? (
                   <>
-                    <Check className="h-5 w-5" /> Agregado
+                    <Check className="h-[17px] w-[17px]" /> Agregado
                   </>
                 ) : (
                   <>
-                    <ShoppingCart className="h-5 w-5" /> Agregar
+                    <ShoppingCart className="h-[17px] w-[17px]" /> Agregar
                   </>
                 )}
               </button>
 
-              <button
-                onClick={buyNow}
-                className="inline-flex h-11 items-center gap-2 rounded-xl bg-brand-600 px-6 font-semibold text-white transition hover:bg-brand-700"
-              >
+              <button onClick={buyNow} className="btn-sticker h-12">
                 Comprar ahora
               </button>
             </div>
           )}
 
-          {/* Tarjetas de entrega (diseño 04) */}
-          <div className={`mt-6 grid gap-2.5 ${STORE.pickupOnly ? '' : 'sm:grid-cols-2'}`}>
-            <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3">
-              <Store className="h-[18px] w-[18px] shrink-0 text-brand-500" strokeWidth={1.7} />
-              <span className="text-xs text-fg-muted">
-                {STORE.pickupOnly
-                  ? `Recoge tu pedido en tienda · ${STORE.city.split(',')[0]}`
-                  : `Recoge hoy en tienda · ${STORE.city.split(',')[0]}`}
+          {/* Barra de recogida en tienda (amarilla, diseño 1b) */}
+          <div className="mt-5 flex max-w-[430px] items-center gap-2.5 rounded-[10px] border-2 border-ink bg-accent-400 px-4 py-3">
+            <Store className="h-[18px] w-[18px] shrink-0 text-fg" strokeWidth={2} />
+            <span className="text-[12.5px] font-semibold text-fg">
+              Recoge tu pedido en tienda · {STORE.city.split(',')[0]} · Listo hoy
+            </span>
+          </div>
+          {!STORE.pickupOnly && (
+            <div className="mt-2.5 flex max-w-[430px] items-center gap-2.5 rounded-[10px] border-2 border-ink bg-white px-4 py-3">
+              <Truck className="h-[18px] w-[18px] shrink-0 text-fg" strokeWidth={2} />
+              <span className="text-[12.5px] font-semibold text-fg">
+                {STORE.freeShippingFrom
+                  ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · 2–4 días`
+                  : 'Envío a domicilio · 2–4 días'}
               </span>
             </div>
-            {!STORE.pickupOnly && (
-              <div className="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3.5 py-3">
-                <Truck className="h-[18px] w-[18px] shrink-0 text-brand-500" strokeWidth={1.7} />
-                <span className="text-xs text-fg-muted">
-                  {STORE.freeShippingFrom
-                    ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · 2–4 días`
-                    : 'Envío a todo México · 2–4 días'}
-                </span>
-              </div>
-            )}
-          </div>
+          )}
         </div>
       </div>
 

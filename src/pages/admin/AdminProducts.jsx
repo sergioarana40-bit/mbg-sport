@@ -127,19 +127,24 @@ export default function AdminProducts() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-fg">Productos</h1>
-          <p className="text-sm text-fg-muted">{products.length} en total</p>
+          <h1 className="title-stamp text-lg sm:text-xl">
+            <span>Productos</span>
+          </h1>
+          <p className="mt-2 text-xs font-medium text-fg-subtle">{products.length} en total</p>
         </div>
-        <button onClick={openNew} className="btn-primary px-4 py-2.5 text-sm">
-          <Plus className="h-4.5 w-4.5" />
+        <button
+          onClick={openNew}
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 px-4 py-2.5 font-display text-[11.5px] font-extrabold uppercase text-white shadow-hard-sm transition hover:bg-brand-700 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+        >
+          <Plus className="h-3.5 w-3.5" strokeWidth={3} />
           Nuevo producto
         </button>
       </div>
 
       {!isSupabaseConfigured && (
-        <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-300">
+        <div className="flex items-start gap-2 rounded-[10px] border-2 border-ink bg-accent-400/50 p-4 text-sm font-medium text-fg">
           <AlertCircle className="h-5 w-5 shrink-0" />
           Modo demostración: puedes ver el catálogo, pero para crear o editar productos conecta
           Supabase.
@@ -163,20 +168,20 @@ export default function AdminProducts() {
           <Spinner />
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-line bg-surface">
+        <div className="overflow-hidden rounded-[10px] border-2 border-ink bg-white">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-line bg-surface-2 text-left text-xs uppercase tracking-wide text-fg-subtle">
-                  <th className="px-4 py-3 font-semibold">Producto</th>
-                  <th className="px-4 py-3 font-semibold">Categoría</th>
-                  <th className="px-4 py-3 font-semibold">Precio</th>
-                  <th className="px-4 py-3 font-semibold">Stock</th>
-                  <th className="px-4 py-3 font-semibold">Estado</th>
+                <tr className="bg-ink text-left text-[10px] uppercase tracking-[.08em] text-white">
+                  <th className="px-4 py-3 font-bold">Producto</th>
+                  <th className="px-4 py-3 font-bold">Categoría</th>
+                  <th className="px-4 py-3 font-bold">Precio</th>
+                  <th className="px-4 py-3 font-bold">Stock</th>
+                  <th className="px-4 py-3 font-bold">Estado</th>
                   <th className="px-4 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-line">
+              <tbody className="divide-y divide-[#e5e5e5]">
                 {filtered.map((p) => (
                   <tr key={p.id} className="transition hover:bg-surface-2">
                     <td className="px-4 py-3">
@@ -184,41 +189,41 @@ export default function AdminProducts() {
                         <ProductImage
                           src={p.image_url}
                           alt={p.name}
-                          className="h-11 w-11 shrink-0 rounded-lg border border-line"
+                          className="h-11 w-11 shrink-0 rounded-lg border-2 border-ink"
                         />
                         <div className="flex items-center gap-1.5">
-                          <span className="font-medium text-fg">{p.name}</span>
+                          <span className="font-semibold text-fg">{p.name}</span>
                           {p.featured && (
-                            <Star className="h-3.5 w-3.5 fill-accent-400 text-accent-400" />
+                            <Star className="h-3.5 w-3.5 fill-accent-400 text-ink" />
                           )}
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-fg-muted">{p.category_name}</td>
-                    <td className="px-4 py-3 font-semibold text-fg">{formatPrice(p.price)}</td>
-                    <td className="px-4 py-3 text-fg-muted">{p.stock ?? 0}</td>
+                    <td className="px-4 py-3 font-medium text-[#4a4a4a]">{p.category_name}</td>
+                    <td className="px-4 py-3 font-bold text-fg">{formatPrice(p.price)}</td>
+                    <td className="px-4 py-3 font-medium text-[#4a4a4a]">{p.stock ?? 0}</td>
                     <td className="px-4 py-3">
                       {p.active !== false ? (
-                        <span className="text-emerald-400">Activo</span>
+                        <span className="font-bold text-state-paid">Activo</span>
                       ) : (
-                        <span className="text-fg-subtle">Oculto</span>
+                        <span className="font-medium text-fg-subtle">Oculto</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <button
                           onClick={() => openEdit(p)}
-                          className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-surface-3 hover:text-brand-400"
+                          className="grid h-[30px] w-[30px] place-items-center rounded-[7px] border-2 border-ink text-fg transition hover:bg-accent-400"
                           aria-label="Editar"
                         >
-                          <Pencil className="h-4 w-4" />
+                          <Pencil className="h-3.5 w-3.5" />
                         </button>
                         <button
                           onClick={() => setConfirmDelete(p)}
-                          className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-brand-600/15 hover:text-brand-400"
+                          className="grid h-[30px] w-[30px] place-items-center rounded-[7px] border-2 border-ink text-fg transition hover:bg-brand-600 hover:text-white"
                           aria-label="Eliminar"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3.5 w-3.5" />
                         </button>
                       </div>
                     </td>
@@ -325,7 +330,7 @@ export default function AdminProducts() {
                 type="checkbox"
                 checked={form.featured}
                 onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                className="h-4 w-4 rounded border-line bg-surface-2 text-brand-600 focus:ring-brand-500"
+                className="h-4 w-4 rounded border-2 border-ink accent-brand-600"
               />
               Destacado
             </label>
@@ -334,14 +339,14 @@ export default function AdminProducts() {
                 type="checkbox"
                 checked={form.active}
                 onChange={(e) => setForm({ ...form, active: e.target.checked })}
-                className="h-4 w-4 rounded border-line bg-surface-2 text-brand-600 focus:ring-brand-500"
+                className="h-4 w-4 rounded border-2 border-ink accent-brand-600"
               />
               Visible en tienda
             </label>
           </div>
 
           {error && (
-            <p className="flex items-center gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
+            <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
               <AlertCircle className="h-4 w-4 shrink-0" />
               {error}
             </p>

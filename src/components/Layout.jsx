@@ -15,7 +15,7 @@ export default function Layout() {
   }, [pathname])
 
   return (
-    <div className="flex min-h-screen flex-col bg-ink text-fg">
+    <div className="flex min-h-screen flex-col bg-white text-fg">
       <OfflineBanner />
       <Header />
       {/* pb en móvil para dejar espacio a la barra inferior */}

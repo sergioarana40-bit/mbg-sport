@@ -32,26 +32,28 @@ export default function AdminLayout() {
     navigate('/admin/login')
   }
 
+  // Sidebar negro del póster 1b: activo = bloque rojo, resto gris.
   const linkClass = ({ isActive }) =>
-    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-      isActive
-        ? 'bg-brand-600 text-white'
-        : 'text-fg-muted hover:bg-surface-2 hover:text-fg'
+    `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[12.5px] font-bold uppercase tracking-[.04em] transition ${
+      isActive ? 'bg-brand-600 text-white' : 'text-[#9a9aa0] hover:bg-white/10 hover:text-white'
     }`
 
+  const footerLink =
+    'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-[12.5px] font-semibold uppercase tracking-[.04em] text-[#9a9aa0] transition hover:bg-white/10 hover:text-white'
+
   const sidebar = (
-    <div className="flex h-full flex-col border-r border-line bg-surface">
-      <div className="flex h-16 items-center justify-between border-b border-line px-4">
-        <Logo light />
+    <div className="flex h-full flex-col bg-ink">
+      <div className="flex h-16 items-center justify-between border-b border-ink-line px-4">
+        <Logo size={26} />
         <button
           onClick={() => setOpen(false)}
-          className="grid h-9 w-9 place-items-center rounded-lg text-fg-muted hover:bg-surface-2 lg:hidden"
+          className="grid h-9 w-9 place-items-center rounded-lg text-[#9a9aa0] hover:bg-white/10 lg:hidden"
           aria-label="Cerrar menú"
         >
           <X className="h-5 w-5" />
         </button>
       </div>
-      <nav className="flex-1 space-y-1 p-3">
+      <nav className="flex-1 space-y-1.5 p-3">
         {NAV.map((item) => (
           <NavLink
             key={item.to}
@@ -60,57 +62,53 @@ export default function AdminLayout() {
             onClick={() => setOpen(false)}
             className={linkClass}
           >
-            <item.icon className="h-5 w-5" />
+            <item.icon className="h-[17px] w-[17px]" strokeWidth={2} />
             {item.label}
           </NavLink>
         ))}
       </nav>
-      <div className="border-t border-line p-3">
-        <Link
-          to="/"
-          className="mb-1 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-fg-muted transition hover:bg-surface-2 hover:text-fg"
-        >
-          <Store className="h-5 w-5" />
+      <div className="border-t border-ink-line p-3">
+        <Link to="/" className={footerLink}>
+          <Store className="h-4 w-4" strokeWidth={2} />
           Ver tienda
         </Link>
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-fg-muted transition hover:bg-surface-2 hover:text-fg"
-        >
-          <LogOut className="h-5 w-5" />
+        <button onClick={handleLogout} className={footerLink}>
+          <LogOut className="h-4 w-4" strokeWidth={2} />
           Cerrar sesión
         </button>
       </div>
+      {/* Franja de marca (diseño 1b) */}
+      <div className="h-[3px] bg-gradient-to-r from-accent-400 to-brand-600" />
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-ink text-fg">
+    <div className="min-h-screen bg-white text-fg">
       {/* Sidebar desktop */}
-      <aside className="fixed inset-y-0 left-0 hidden w-60 lg:block">{sidebar}</aside>
+      <aside className="fixed inset-y-0 left-0 hidden w-[230px] lg:block">{sidebar}</aside>
 
       {/* Sidebar móvil */}
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
-          <div className="absolute inset-y-0 left-0 w-60">{sidebar}</div>
+          <div className="absolute inset-y-0 left-0 w-[230px]">{sidebar}</div>
         </div>
       )}
 
       {/* Contenido */}
-      <div className="lg:pl-60">
-        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-line bg-surface px-4">
+      <div className="lg:pl-[230px]">
+        <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b-2 border-ink bg-white px-4 sm:px-6">
           <button
             onClick={() => setOpen(true)}
-            className="grid h-10 w-10 place-items-center rounded-lg text-fg-muted hover:bg-surface-2 lg:hidden"
+            className="grid h-10 w-10 place-items-center rounded-lg border-2 border-ink text-fg hover:bg-surface-2 lg:hidden"
             aria-label="Abrir menú"
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-5 w-5" />
           </button>
-          <span className="font-display text-lg font-bold tracking-tight text-fg">
+          <span className="font-display text-[15px] font-extrabold uppercase tracking-tight text-fg">
             Panel de administración
           </span>
-          <span className="ml-auto hidden text-sm text-fg-muted sm:block">
+          <span className="ml-auto hidden text-[12.5px] font-medium text-fg-subtle sm:block">
             {user?.email}
           </span>
         </header>

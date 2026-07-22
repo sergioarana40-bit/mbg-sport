@@ -77,19 +77,26 @@ export default function AdminCategories() {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-fg">Categorías</h1>
-          <p className="text-sm text-fg-muted">{categories.length} categorías</p>
+          <h1 className="title-stamp text-lg sm:text-xl">
+            <span>Categorías</span>
+          </h1>
+          <p className="mt-2 text-xs font-medium text-fg-subtle">
+            {categories.length} categorías
+          </p>
         </div>
-        <button onClick={openNew} className="btn-primary px-4 py-2.5 text-sm">
-          <Plus className="h-4.5 w-4.5" />
+        <button
+          onClick={openNew}
+          className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 px-4 py-2.5 font-display text-[11.5px] font-extrabold uppercase text-white shadow-hard-sm transition hover:bg-brand-700 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+        >
+          <Plus className="h-3.5 w-3.5" strokeWidth={3} />
           Nueva categoría
         </button>
       </div>
 
       {!isSupabaseConfigured && (
-        <div className="flex items-start gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-300">
+        <div className="flex items-start gap-2 rounded-[10px] border-2 border-ink bg-accent-400/50 p-4 text-sm font-medium text-fg">
           <AlertCircle className="h-5 w-5 shrink-0" />
           Modo demostración: conecta Supabase para crear o editar categorías.
         </div>
@@ -100,32 +107,32 @@ export default function AdminCategories() {
           <Spinner />
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-line bg-surface">
-          <ul className="divide-y divide-line">
+        <div className="overflow-hidden rounded-[10px] border-2 border-ink bg-white">
+          <ul className="divide-y divide-[#e5e5e5]">
             {categories.map((c) => (
               <li key={c.id} className="flex items-center gap-3 px-4 py-3 transition hover:bg-surface-2">
                 <GripVertical className="h-4 w-4 text-fg-subtle" />
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-surface-2 text-fg-muted">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border-2 border-ink bg-accent-400 text-fg">
                   <CategoryIcon category={c} className="h-5 w-5" />
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-fg">{c.name}</p>
-                  <p className="truncate text-xs text-fg-subtle">/{c.slug}</p>
+                  <p className="font-semibold text-fg">{c.name}</p>
+                  <p className="truncate text-xs font-medium text-fg-subtle">/{c.slug}</p>
                 </div>
                 <div className="flex gap-1">
                   <button
                     onClick={() => openEdit(c)}
-                    className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-surface-3 hover:text-brand-400"
+                    className="grid h-[30px] w-[30px] place-items-center rounded-[7px] border-2 border-ink text-fg transition hover:bg-accent-400"
                     aria-label="Editar"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5" />
                   </button>
                   <button
                     onClick={() => setConfirmDelete(c)}
-                    className="grid h-8 w-8 place-items-center rounded-lg text-fg-muted hover:bg-brand-600/15 hover:text-brand-400"
+                    className="grid h-[30px] w-[30px] place-items-center rounded-[7px] border-2 border-ink text-fg transition hover:bg-brand-600 hover:text-white"
                     aria-label="Eliminar"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5" />
                   </button>
                 </div>
               </li>
@@ -168,7 +175,7 @@ export default function AdminCategories() {
           </div>
 
           {error && (
-            <p className="flex items-center gap-2 rounded-lg bg-brand-600/15 p-3 text-sm text-brand-300">
+            <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
               <AlertCircle className="h-4 w-4 shrink-0" />
               {error}
             </p>

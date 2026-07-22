@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react'
 
-// Slider doble de precio (diseño ESTADIO): pista gris, relleno rojo y
-// pulgares blancos arrastrables. Con inputs "Desde / Hasta" debajo.
+// Slider doble de precio (póster 1b): pista gris clara, tramo negro y
+// pulgares cuadrados amarillos con borde negro. Con inputs "Desde / Hasta" debajo.
 export default function PriceRange({ min, max, value, onChange, step = 10 }) {
   const trackRef = useRef(null)
   const [lo, hi] = value
@@ -61,17 +61,17 @@ export default function PriceRange({ min, max, value, onChange, step = 10 }) {
   }
 
   const thumb =
-    'absolute top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 cursor-grab rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,.5)] outline-none focus-visible:ring-2 focus-visible:ring-brand-500'
+    'absolute top-1/2 h-4 w-4 -translate-x-1/2 -translate-y-1/2 cursor-grab border-2 border-ink bg-accent-400 outline-none focus-visible:ring-2 focus-visible:ring-brand-600'
 
   return (
     <div>
       <div
         ref={trackRef}
         onPointerDown={onTrackDown}
-        className="relative mx-1.5 h-[5px] cursor-pointer rounded-full bg-[#27272a]"
+        className="relative mx-1.5 h-1 cursor-pointer bg-[#e5e5e5]"
       >
         <span
-          className="absolute inset-y-0 rounded-full bg-brand-600"
+          className="absolute inset-y-0 bg-ink"
           style={{ left: `${pct(lo)}%`, right: `${100 - pct(hi)}%` }}
         />
         <span
@@ -108,7 +108,7 @@ export default function PriceRange({ min, max, value, onChange, step = 10 }) {
           max={hi - step}
           onChange={(e) => clampInput('lo', e.target.value)}
           aria-label="Precio desde"
-          className="w-full min-w-0 flex-1 rounded-[10px] border border-line bg-ink px-3 py-2 text-[13px] text-fg outline-none transition focus:border-brand-500"
+          className="w-full min-w-0 flex-1 rounded-lg border-2 border-ink bg-white px-3 py-1.5 font-mono text-[12px] text-fg outline-none transition focus:border-brand-600"
         />
         <input
           type="number"
@@ -118,7 +118,7 @@ export default function PriceRange({ min, max, value, onChange, step = 10 }) {
           max={max}
           onChange={(e) => clampInput('hi', e.target.value)}
           aria-label="Precio hasta"
-          className="w-full min-w-0 flex-1 rounded-[10px] border border-line bg-ink px-3 py-2 text-[13px] text-fg outline-none transition focus:border-brand-500"
+          className="w-full min-w-0 flex-1 rounded-lg border-2 border-ink bg-white px-3 py-1.5 font-mono text-[12px] text-fg outline-none transition focus:border-brand-600"
         />
       </div>
     </div>

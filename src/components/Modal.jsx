@@ -22,11 +22,11 @@ export default function Modal({ open, onClose, title, children, maxWidth = 'max-
       <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="flex min-h-full items-start justify-center p-4">
         <div
-          className={`relative my-8 w-full ${maxWidth} rounded-2xl border border-line bg-surface shadow-2xl`}
+          className={`relative my-8 w-full ${maxWidth} rounded-xl border-2 border-ink bg-white shadow-hard`}
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="flex items-center justify-between border-b border-line px-5 py-4">
-            <h2 className="font-display text-lg font-bold text-fg">{title}</h2>
+          <div className="flex items-center justify-between border-b-2 border-ink px-5 py-4">
+            <h2 className="font-display text-lg font-extrabold uppercase text-fg">{title}</h2>
             <button
               onClick={onClose}
               className="grid h-9 w-9 place-items-center rounded-lg text-fg-muted hover:bg-surface-2"

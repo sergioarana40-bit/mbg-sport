@@ -6,6 +6,7 @@ import FavoriteButton from './FavoriteButton'
 import { formatPrice } from '../config'
 import { useCart } from '../context/CartContext'
 
+// Tarjeta de producto estilo sticker (borde negro + sombra dura, diseño 1b).
 export default function ProductCard({ product }) {
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
@@ -22,13 +23,13 @@ export default function ProductCard({ product }) {
   return (
     <Link
       to={`/producto/${product.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-surface transition hover:-translate-y-0.5 hover:border-brand-500/40"
+      className="group flex flex-col overflow-hidden rounded-[10px] border-2 border-ink bg-white shadow-hard-sm transition hover:-translate-y-0.5 lg:shadow-hard"
     >
       <div className="relative">
         <ProductImage
           src={product.image_url}
           alt={product.name}
-          className="aspect-square"
+          className="aspect-square border-b-2 border-ink"
         />
         {product.featured && (
           <span className="badge-featured absolute left-2 top-2">Destacado</span>
@@ -36,37 +37,39 @@ export default function ProductCard({ product }) {
         {outOfStock && <span className="badge-out absolute bottom-2 left-2">Agotado</span>}
         <FavoriteButton
           productId={product.id}
-          size={4.5}
-          className="absolute right-2 top-2 h-8 w-8 bg-ink/50 text-white backdrop-blur hover:bg-ink/70"
+          size={4}
+          className="absolute right-2 top-2 h-[34px] w-[34px] rounded-lg border-2 border-ink bg-white text-fg"
         />
       </div>
 
-      <div className="flex flex-1 flex-col p-3.5">
+      <div className="flex flex-1 flex-col p-3 lg:p-4">
         {product.category_name && (
-          <span className="mb-1 text-[11px] font-medium uppercase tracking-wide text-brand-400">
+          <span className="text-[10px] font-bold uppercase tracking-[.12em] text-fg-subtle">
             {product.category_name}
           </span>
         )}
-        <h3 className="line-clamp-2 text-sm font-semibold text-fg transition group-hover:text-brand-400">
+        <h3 className="mt-1 line-clamp-2 text-[13px] font-semibold leading-snug text-fg lg:text-[14.5px]">
           {product.name}
         </h3>
-        <div className="mt-auto flex items-end justify-between pt-3">
-          <span className="font-display text-lg font-bold text-fg">
-            {formatPrice(product.price)}
-          </span>
+        <div className="mt-auto flex items-end justify-between pt-3.5">
+          <span className="price-tag text-sm lg:text-base">{formatPrice(product.price)}</span>
           <button
             onClick={handleAdd}
             disabled={outOfStock}
             aria-label="Agregar al carrito"
-            className={`grid h-9 w-9 place-items-center rounded-lg transition ${
+            className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg transition ${
               outOfStock
-                ? 'cursor-not-allowed bg-surface-2 text-fg-subtle'
+                ? 'cursor-not-allowed bg-surface-3 text-fg-subtle'
                 : added
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-brand-600 text-white hover:bg-brand-700 active:scale-95'
+                  ? 'bg-state-paid text-white'
+                  : 'bg-ink text-white hover:bg-ink-2 active:scale-95'
             }`}
           >
-            {added ? <Check className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+            {added ? (
+              <Check className="h-[18px] w-[18px]" strokeWidth={2.5} />
+            ) : (
+              <Plus className="h-[18px] w-[18px]" strokeWidth={2.5} />
+            )}
           </button>
         </div>
       </div>

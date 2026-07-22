@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { ShoppingCart, Search, MapPin, Truck, Store, Heart } from 'lucide-react'
+import { ShoppingCart, Search, MapPin, Store, Heart } from 'lucide-react'
 import Logo from './Logo'
 import UserMenu from './UserMenu'
 import { useCart } from '../context/CartContext'
 import { useFavorites } from '../context/FavoritesContext'
 import { getCategories } from '../lib/api'
-import { STORE, formatPrice } from '../config'
+import { STORE } from '../config'
 
 export default function Header() {
   const { count } = useCart()
@@ -27,64 +27,52 @@ export default function Header() {
     navigate(q ? `/catalogo?buscar=${encodeURIComponent(q)}` : '/catalogo')
   }
 
-  // Enlace de categoría: el activo lleva subrayado rojo (diseño 03).
+  // Enlace de categoría sobre banda negra (diseño 1b): activo blanco con subrayado amarillo.
   const linkClass = ({ isActive }) =>
-    `whitespace-nowrap text-sm transition hover:text-brand-400 ${
-      isActive
-        ? 'font-semibold text-fg underline decoration-brand-600 decoration-2 underline-offset-[14px]'
-        : 'font-medium text-fg-muted'
+    `whitespace-nowrap pb-0.5 text-xs font-bold uppercase tracking-[.08em] transition hover:text-white ${
+      isActive ? 'border-b-2 border-accent-400 text-white' : 'text-white/65'
     }`
 
   return (
     <header className="sticky top-0 z-40">
-      {/* Barra superior */}
-      <div className="bg-black text-fg-muted">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs">
+      {/* Barra superior roja */}
+      <div className="bg-brand-600 text-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs font-bold">
           <span className="flex min-w-0 items-center gap-1.5">
-            {STORE.pickupOnly ? (
-              <Store className="h-3.5 w-3.5 shrink-0 text-accent-400" />
-            ) : (
-              <Truck className="h-3.5 w-3.5 shrink-0 text-accent-400" />
-            )}
-            <span className="truncate">
-              {STORE.pickupOnly
-                ? 'Recoge tu pedido en tienda · Listo hoy'
-                : STORE.freeShippingFrom
-                  ? `Envío gratis desde ${formatPrice(STORE.freeShippingFrom).replace(/\.00\b/, '')} · Recoge hoy en tienda`
-                  : 'Envíos a todo México'}
-            </span>
+            <Store className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">Recoge tu pedido en tienda · Listo hoy</span>
           </span>
           <span className="hidden items-center gap-1.5 sm:flex">
-            <MapPin className="h-3.5 w-3.5 text-accent-400" />
+            <MapPin className="h-3.5 w-3.5" />
             {STORE.city}
           </span>
         </div>
       </div>
 
-      {/* Barra principal */}
-      <div className="border-b border-line bg-ink/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center gap-4 px-4">
-          <Logo light />
+      {/* Banda negra principal */}
+      <div className="bg-ink">
+        <div className="mx-auto flex h-[60px] max-w-7xl items-center gap-6 px-4 md:h-[76px]">
+          <Logo sizeClassName="h-[26px] md:h-10" />
 
-          <form onSubmit={submitSearch} className="relative hidden flex-1 md:block">
+          <form onSubmit={submitSearch} className="relative hidden max-w-[560px] flex-1 md:block">
             <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-fg-subtle" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar pesas, barras, ropa…"
-              className="field pl-9"
+              placeholder="Buscar pesas, barras, refacciones…"
+              className="field-dark pl-9"
             />
           </form>
 
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex items-center gap-1 text-white">
             <Link
               to="/favoritos"
-              className="relative grid h-10 w-10 place-items-center rounded-lg text-fg-muted transition hover:bg-surface-2 hover:text-fg"
+              className="relative grid h-10 w-10 place-items-center rounded-lg transition hover:bg-white/10"
               aria-label="Favoritos"
             >
-              <Heart className="h-5.5 w-5.5" />
+              <Heart className="h-[21px] w-[21px]" />
               {favCount > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
+                <span className="absolute right-0.5 top-0.5 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-accent-400 px-1 text-[10.5px] font-bold text-fg">
                   {favCount}
                 </span>
               )}
@@ -92,12 +80,12 @@ export default function Header() {
             <UserMenu />
             <Link
               to="/carrito"
-              className="relative grid h-10 w-10 place-items-center rounded-lg text-fg-muted transition hover:bg-surface-2 hover:text-fg"
+              className="relative grid h-10 w-10 place-items-center rounded-lg transition hover:bg-white/10"
               aria-label="Carrito"
             >
-              <ShoppingCart className="h-5.5 w-5.5" />
+              <ShoppingCart className="h-[21px] w-[21px]" />
               {count > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-brand-600 px-1 text-[11px] font-bold text-white">
+                <span className="absolute right-0.5 top-0.5 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-accent-400 px-1 text-[10.5px] font-bold text-fg">
                   {count}
                 </span>
               )}
@@ -105,9 +93,20 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Navegación de categorías (desktop) */}
-        <nav className="hidden border-t border-line bg-ink md:block">
-          <div className="no-scrollbar mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-4 py-2.5">
+        {/* Buscador móvil dentro de la banda negra */}
+        <form onSubmit={submitSearch} className="relative px-4 pb-3 md:hidden">
+          <Search className="pointer-events-none absolute left-[27px] top-1/2 h-4 w-4 -translate-y-[calc(50%+6px)] text-fg-subtle" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar productos…"
+            className="field-dark h-[42px] pl-9"
+          />
+        </form>
+
+        {/* Navegación de categorías (escritorio) */}
+        <nav className="hidden border-t border-ink-line md:block">
+          <div className="no-scrollbar mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-4 py-3">
             <NavLink to="/catalogo" end className={linkClass}>
               Todo el catálogo
             </NavLink>
@@ -119,8 +118,8 @@ export default function Header() {
             <NavLink
               to="/promociones"
               className={({ isActive }) =>
-                `ml-auto whitespace-nowrap text-sm font-semibold transition ${
-                  isActive ? 'text-accent-400' : 'text-accent-400/80 hover:text-accent-400'
+                `ml-auto whitespace-nowrap text-xs font-bold uppercase tracking-[.08em] transition hover:text-accent-300 ${
+                  isActive ? 'text-accent-300' : 'text-accent-400'
                 }`
               }
             >

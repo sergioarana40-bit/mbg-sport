@@ -42,20 +42,20 @@ export default function Terms() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
       <div className="flex items-start gap-4">
-        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-brand-600/15 text-brand-500">
-          <FileText className="h-6 w-6" strokeWidth={1.7} />
+        <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border-2 border-ink bg-accent-400 text-fg">
+          <FileText className="h-6 w-6" strokeWidth={1.8} />
         </span>
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight text-fg sm:text-3xl">
-            Términos y condiciones
+          <h1 className="title-stamp text-lg sm:text-2xl">
+            <span>Términos y condiciones</span>
           </h1>
-          <p className="mt-1 text-sm text-fg-muted">
+          <p className="mt-2.5 text-sm font-medium text-fg-subtle">
             Servicio de mantenimiento de equipos de gimnasio
           </p>
         </div>
       </div>
 
-      <p className="mt-6 text-sm leading-relaxed text-fg-muted">
+      <p className="mt-6 text-sm font-medium leading-relaxed text-[#4a4a4a]">
         A continuación, se detallan los términos y condiciones aplicables a los servicios de
         mantenimiento preventivo y/o correctivo ofrecidos por nuestro equipo técnico:
       </p>
@@ -64,12 +64,14 @@ export default function Terms() {
         {SECTIONS.map((section) => (
           <section
             key={section.title}
-            className="rounded-2xl border border-line bg-surface p-5"
+            className="rounded-[10px] border-2 border-ink bg-white p-5"
           >
-            <h2 className="font-display text-lg font-bold text-fg">{section.title}</h2>
+            <h2 className="font-display text-base font-extrabold uppercase text-fg">
+              {section.title}
+            </h2>
             <div className="mt-3 space-y-3">
               {section.paragraphs.map((text, i) => (
-                <p key={i} className="text-sm leading-relaxed text-fg-muted">
+                <p key={i} className="text-sm font-medium leading-relaxed text-[#4a4a4a]">
                   {text}
                 </p>
               ))}
@@ -78,22 +80,22 @@ export default function Terms() {
         ))}
       </div>
 
-      <p className="mt-6 rounded-2xl border border-brand-600/30 bg-brand-600/10 p-5 text-sm font-semibold leading-relaxed text-fg">
+      <p className="mt-6 rounded-[10px] border-2 border-ink bg-accent-400 p-5 text-sm font-bold leading-relaxed text-fg">
         Al contratar nuestros servicios, el cliente declara haber leído y aceptado los términos y
         condiciones aquí expuestos.
       </p>
 
-      <div className="mt-10 border-t border-line pt-6 text-center">
-        <p className="font-display text-lg font-bold uppercase tracking-wide text-fg">
+      <div className="mt-10 border-t-2 border-ink pt-6 text-center">
+        <p className="font-display text-lg font-extrabold uppercase tracking-wide text-fg">
           ¡Gracias por su preferencia!
         </p>
         <ul className="mx-auto mt-4 inline-flex flex-col items-center gap-2 text-sm text-fg-muted">
           <li className="flex items-center gap-2">
-            <MapPin className="h-4 w-4 shrink-0 text-brand-500" />
+            <MapPin className="h-4 w-4 shrink-0 text-brand-600" />
             Aztecas #203, Plaza Zamarrero, Zinacantepec
           </li>
           <li className="flex items-center gap-2">
-            <Mail className="h-4 w-4 shrink-0 text-brand-500" />
+            <Mail className="h-4 w-4 shrink-0 text-brand-600" />
             <a
               href="mailto:mbgmantenimiento.gym@gmail.com"
               className="transition hover:text-fg"
@@ -102,7 +104,7 @@ export default function Terms() {
             </a>
           </li>
           <li className="flex items-center gap-2">
-            <Phone className="h-4 w-4 shrink-0 text-brand-500" />
+            <Phone className="h-4 w-4 shrink-0 text-brand-600" />
             <a href="tel:7227910584" className="transition hover:text-fg">
               722 791 0584
             </a>
