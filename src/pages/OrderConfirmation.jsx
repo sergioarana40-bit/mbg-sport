@@ -138,7 +138,22 @@ export default function OrderConfirmation() {
                 {order.delivery_method === 'pickup' ? (
                   <>
                     <Store className="h-[15px] w-[15px] shrink-0 text-brand-600" strokeWidth={2} />
-                    Recoge en tienda · {STORE.city.split(',')[0]} · Listo hoy
+                    <span>
+                      Recoge en tienda · {STORE.city.split(',')[0]} · Listo hoy
+                      {STORE.maps && (
+                        <>
+                          {' · '}
+                          <a
+                            href={STORE.maps}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-brand-600 underline underline-offset-2"
+                          >
+                            Cómo llegar
+                          </a>
+                        </>
+                      )}
+                    </span>
                   </>
                 ) : (
                   <>

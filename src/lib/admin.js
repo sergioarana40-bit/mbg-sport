@@ -300,10 +300,14 @@ export async function getPendingOrdersCount() {
 
 // Suscripción en vivo a cambios en pedidos (Realtime). Devuelve una función
 // para cancelarla. El callback se dispara en altas y cambios de estado.
+// El nombre del canal debe ser único por suscriptor: si dos componentes
+// (sidebar y lista de pedidos) comparten topic, el segundo `.on()` lanza
+// "cannot add postgres_changes callbacks after subscribe()".
+let channelSeq = 0
 export function subscribeOrders(onChange) {
   if (!isSupabaseConfigured) return () => {}
   const channel = supabase
-    .channel('orders-admin')
+    .channel(`orders-admin-${++channelSeq}`)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, onChange)
     .subscribe()
   return () => {

@@ -260,6 +260,17 @@ export default function Checkout() {
                 </button>
               )}
 
+              {delivery === 'pickup' && STORE.maps && (
+                <a
+                  href={STORE.maps}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 self-start text-[12.5px] font-bold text-brand-600 underline underline-offset-2 transition hover:text-brand-700"
+                >
+                  Cómo llegar a la tienda (Google Maps)
+                </a>
+              )}
+
               {delivery === 'shipping' && !STORE.pickupOnly && (
                 <div>
                   {label('Dirección de envío')}

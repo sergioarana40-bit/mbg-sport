@@ -6,14 +6,20 @@ export const STORE = {
   tagline: 'El estándar en tu entrenamiento',
   description:
     'El aliado integral del mundo fitness. Refacciones, equipo, suplementación y ropa deportiva en Toluca.',
-  address: 'Av. Independencia Oriente 612, Col. Santa Clara, Toluca, México 50090',
+  address: 'Aztecas #203, Plaza Zamarrero, San Luis Mextepec, Zinacantepec, Edo. Méx.',
   city: 'Toluca, Estado de México',
-  // Rellena con el número real (formato internacional, sin +, ni espacios) para el contacto por WhatsApp.
-  whatsapp: '5217221234567',
-  phone: '722 123 4567',
+  // Número real de la tienda (formato internacional para WhatsApp: 521 + 10 dígitos).
+  whatsapp: '5217227910584',
+  phone: '722 791 0584',
   email: 'contacto@mbgsport.com.mx',
   website: 'https://www.mbgsport.com.mx',
-  instagram: 'https://instagram.com/mbgsport',
+  // Ubicación en Google Maps (botones "Cómo llegar").
+  maps: 'https://maps.app.goo.gl/n11znDUDo9wHzgeS9',
+  // Redes sociales oficiales.
+  facebook: 'https://www.facebook.com/share/18x2WCBiop/',
+  instagram: 'https://www.instagram.com/mbgsport',
+  tiktok: 'https://www.tiktok.com/@mbgsport',
+  youtube: 'https://youtube.com/@mbgsport.toluca',
   // Horario de atención (se muestra en el footer).
   hours: 'Lun a Sáb · 10:00 – 20:00',
   // Por ahora solo hay recogida en tienda; pon false para reactivar el envío a domicilio.

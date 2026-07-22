@@ -33,6 +33,7 @@ export default function AdminLayout() {
   // Pedidos por atender (pendientes o pagados sin preparar) para el aviso del menú.
   const [pendingCount, setPendingCount] = useState(0)
 
+  // Suscripción única al montar: Realtime + refresco periódico de respaldo.
   useEffect(() => {
     let alive = true
     const refresh = () =>
@@ -40,7 +41,6 @@ export default function AdminLayout() {
         .then((n) => alive && setPendingCount(n))
         .catch(() => {})
     refresh()
-    // En vivo con Realtime + refresco periódico de respaldo.
     const unsubscribe = subscribeOrders(refresh)
     const interval = setInterval(refresh, 60_000)
     return () => {
@@ -48,7 +48,13 @@ export default function AdminLayout() {
       unsubscribe()
       clearInterval(interval)
     }
-    // Recalcula también al navegar dentro del panel (p. ej. tras cambiar estados).
+  }, [])
+
+  // Recalcula al navegar dentro del panel (p. ej. tras cambiar estados en Pedidos).
+  useEffect(() => {
+    getPendingOrdersCount()
+      .then(setPendingCount)
+      .catch(() => {})
   }, [pathname])
 
   async function handleLogout() {

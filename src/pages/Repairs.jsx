@@ -226,6 +226,17 @@ export default function Repairs() {
                 {STORE.hours}
               </li>
             </ul>
+            {STORE.maps && (
+              <a
+                href={STORE.maps}
+                target="_blank"
+                rel="noreferrer"
+                className="btn-primary mt-4 w-full px-4 py-2.5 text-[11px]"
+              >
+                <MapPin className="h-3.5 w-3.5 text-accent-400" />
+                Cómo llegar
+              </a>
+            )}
           </div>
         </div>
       </section>
