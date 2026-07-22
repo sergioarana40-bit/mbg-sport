@@ -58,7 +58,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/#servicio" className="transition hover:text-white">
+              <Link to="/reparaciones" className="transition hover:text-white">
                 Servicio técnico
               </Link>
             </li>

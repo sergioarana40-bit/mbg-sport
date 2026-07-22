@@ -81,10 +81,10 @@ export default function Home() {
                 Ver catálogo
                 <ArrowRight className="h-4 w-4 text-accent-400" strokeWidth={2.5} />
               </Link>
-              <a href="#servicio" className="btn-sticker">
+              <Link to="/reparaciones" className="btn-sticker">
                 <Wrench className="h-4 w-4" />
                 Servicio técnico
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -208,8 +208,8 @@ export default function Home() {
                 <MessageCircle className="h-[17px] w-[17px]" />
                 Cotizar por WhatsApp
               </a>
-              <Link to="/terminos" className="self-center text-[12.5px] font-bold text-white underline underline-offset-4 transition hover:text-accent-300">
-                Términos del servicio
+              <Link to="/reparaciones" className="self-center text-[12.5px] font-bold text-white underline underline-offset-4 transition hover:text-accent-300">
+                Conoce el servicio completo
               </Link>
             </div>
           </div>
