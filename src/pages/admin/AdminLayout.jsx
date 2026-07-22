@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { NavLink, Outlet, useNavigate, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { NavLink, Outlet, useNavigate, Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
   Package,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import Logo from '../../components/Logo'
+import { getPendingOrdersCount, subscribeOrders } from '../../lib/admin'
 
 const NAV = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -27,7 +28,28 @@ const NAV = [
 export default function AdminLayout() {
   const { user, signOut } = useAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
+  // Pedidos por atender (pendientes o pagados sin preparar) para el aviso del menú.
+  const [pendingCount, setPendingCount] = useState(0)
+
+  useEffect(() => {
+    let alive = true
+    const refresh = () =>
+      getPendingOrdersCount()
+        .then((n) => alive && setPendingCount(n))
+        .catch(() => {})
+    refresh()
+    // En vivo con Realtime + refresco periódico de respaldo.
+    const unsubscribe = subscribeOrders(refresh)
+    const interval = setInterval(refresh, 60_000)
+    return () => {
+      alive = false
+      unsubscribe()
+      clearInterval(interval)
+    }
+    // Recalcula también al navegar dentro del panel (p. ej. tras cambiar estados).
+  }, [pathname])
 
   async function handleLogout() {
     await signOut()
@@ -66,6 +88,11 @@ export default function AdminLayout() {
           >
             <item.icon className="h-[17px] w-[17px]" strokeWidth={2} />
             {item.label}
+            {item.to === '/admin/pedidos' && pendingCount > 0 && (
+              <span className="ml-auto grid h-[19px] min-w-[19px] place-items-center rounded-full border border-ink bg-accent-400 px-1 font-display text-[10.5px] font-extrabold text-fg">
+                {pendingCount > 99 ? '99+' : pendingCount}
+              </span>
+            )}
           </NavLink>
         ))}
       </nav>

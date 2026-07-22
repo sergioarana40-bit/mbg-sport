@@ -116,6 +116,19 @@ create policy "repair_works_admin_update" on public.repair_works
 create policy "repair_works_admin_delete" on public.repair_works
   for delete using (public.is_admin());
 
+-- ---------- Realtime: aviso de pedidos en vivo en el panel admin ----------
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime'
+      and schemaname = 'public'
+      and tablename = 'orders'
+  ) then
+    alter publication supabase_realtime add table public.orders;
+  end if;
+end $$;
+
 -- ---------- Storage: imágenes de productos ----------
 insert into storage.buckets (id, name, public)
 values ('products', 'products', true)

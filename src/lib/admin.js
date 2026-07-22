@@ -54,6 +54,29 @@ export async function deleteProduct(id) {
   if (error) throw error
 }
 
+// Edición rápida desde la tabla (precio/stock inline) sin mandar todo el producto.
+export async function updateProductFields(id, fields) {
+  if (!isSupabaseConfigured) return needBackend()
+  const { error } = await supabase.from('products').update(fields).eq('id', id)
+  if (error) throw error
+}
+
+/* --------------------- Acciones en lote (productos) --------------------- */
+
+export async function bulkUpdateProducts(ids, fields) {
+  if (!isSupabaseConfigured) return needBackend()
+  if (!ids.length) return
+  const { error } = await supabase.from('products').update(fields).in('id', ids)
+  if (error) throw error
+}
+
+export async function bulkDeleteProducts(ids) {
+  if (!isSupabaseConfigured) return needBackend()
+  if (!ids.length) return
+  const { error } = await supabase.from('products').delete().in('id', ids)
+  if (error) throw error
+}
+
 // Sube una imagen al bucket 'products' y devuelve su URL pública.
 export async function uploadProductImage(file) {
   if (!isSupabaseConfigured) return needBackend()
@@ -261,6 +284,31 @@ export async function updateOrderStatus(id, status) {
   if (!isSupabaseConfigured) return needBackend()
   const { error } = await supabase.from('orders').update({ status }).eq('id', id)
   if (error) throw error
+}
+
+// Pedidos "por atender" para el aviso del sidebar: pendientes de pago o
+// pagados que aún no entran a preparación.
+export async function getPendingOrdersCount() {
+  if (!isSupabaseConfigured) return 0
+  const { count, error } = await supabase
+    .from('orders')
+    .select('id', { count: 'exact', head: true })
+    .in('status', ['pending', 'paid'])
+  if (error) throw error
+  return count ?? 0
+}
+
+// Suscripción en vivo a cambios en pedidos (Realtime). Devuelve una función
+// para cancelarla. El callback se dispara en altas y cambios de estado.
+export function subscribeOrders(onChange) {
+  if (!isSupabaseConfigured) return () => {}
+  const channel = supabase
+    .channel('orders-admin')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, onChange)
+    .subscribe()
+  return () => {
+    supabase.removeChannel(channel)
+  }
 }
 
 /* ------------------------- Cupones ------------------------- */

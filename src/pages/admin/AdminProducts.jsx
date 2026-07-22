@@ -11,6 +11,10 @@ import {
   HelpCircle,
   Download,
   CheckCircle2,
+  Copy,
+  Eye,
+  EyeOff,
+  X,
 } from 'lucide-react'
 import Modal from '../../components/Modal'
 import Spinner from '../../components/Spinner'
@@ -24,8 +28,16 @@ import {
   deleteProduct,
   uploadProductImage,
   importProducts,
+  updateProductFields,
+  bulkUpdateProducts,
+  bulkDeleteProducts,
 } from '../../lib/admin'
-import { productsFromCsv, downloadCsvTemplate, norm } from '../../lib/csv'
+import {
+  productsFromCsv,
+  downloadCsvTemplate,
+  norm,
+  exportProductsCsv,
+} from '../../lib/csv'
 
 const EMPTY = {
   name: '',
@@ -36,6 +48,56 @@ const EMPTY = {
   featured: false,
   active: true,
   image_url: '',
+}
+
+// Celda editable al clic (precio/stock): Enter o clic fuera guarda, Esc cancela.
+function EditableCell({ value, format, onSave, min = 0, step = 1, width = 'w-24' }) {
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(String(value ?? ''))
+
+  function start() {
+    setDraft(String(value ?? ''))
+    setEditing(true)
+  }
+  function commit() {
+    setEditing(false)
+    const n = Number(draft)
+    if (draft === '' || Number.isNaN(n) || n < min || n === Number(value)) return
+    onSave(n)
+  }
+
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={start}
+        title="Clic para editar"
+        className="group/cell -mx-1.5 inline-flex items-center gap-1.5 rounded-md px-1.5 py-0.5 text-left transition hover:bg-accent-400/60"
+      >
+        <span>{format ? format(value) : value}</span>
+        <Pencil className="h-3 w-3 opacity-0 transition group-hover/cell:opacity-60" />
+      </button>
+    )
+  }
+  return (
+    <input
+      autoFocus
+      type="number"
+      min={min}
+      step={step}
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') e.currentTarget.blur()
+        if (e.key === 'Escape') {
+          setDraft(String(value ?? ''))
+          setEditing(false)
+        }
+      }}
+      className={`${width} rounded-md border-2 border-ink bg-white px-1.5 py-0.5 text-[13px] font-bold text-fg outline-none`}
+    />
+  )
 }
 
 export default function AdminProducts() {
@@ -58,6 +120,11 @@ export default function AdminProducts() {
   const [csvPreview, setCsvPreview] = useState(null) // { items, errors, fileName }
   const [importing, setImporting] = useState(false)
   const [importResult, setImportResult] = useState(null) // { created, updated, newCategories }
+
+  // Selección múltiple (acciones en lote)
+  const [selected, setSelected] = useState(() => new Set())
+  const [bulkBusy, setBulkBusy] = useState(false)
+  const [confirmBulkDelete, setConfirmBulkDelete] = useState(false)
 
   async function load() {
     setLoading(true)
@@ -189,6 +256,63 @@ export default function AdminProducts() {
     p.name.toLowerCase().includes(query.toLowerCase())
   )
 
+  // Edición inline (precio/stock) con actualización optimista.
+  async function saveInline(product, fields) {
+    setProducts((prev) => prev.map((p) => (p.id === product.id ? { ...p, ...fields } : p)))
+    try {
+      await updateProductFields(product.id, fields)
+    } catch (err) {
+      setError(err.message)
+      load()
+    }
+  }
+
+  // Duplicar: abre el formulario de alta con los datos copiados.
+  function duplicate(p) {
+    setForm({
+      name: `${p.name} (copia)`,
+      description: p.description || '',
+      price: p.price,
+      category_id: p.category_id || '',
+      stock: p.stock ?? '',
+      featured: !!p.featured,
+      active: p.active !== false,
+      image_url: p.image_url || '',
+    })
+    setImageFile(null)
+    setPreview(p.image_url || '')
+    setError('')
+    setModalOpen(true)
+  }
+
+  // Selección múltiple
+  function toggleSelect(id) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      if (next.has(id)) next.delete(id)
+      else next.add(id)
+      return next
+    })
+  }
+  const allSelected = filtered.length > 0 && filtered.every((p) => selected.has(p.id))
+  function toggleSelectAll() {
+    setSelected(allSelected ? new Set() : new Set(filtered.map((p) => p.id)))
+  }
+
+  async function runBulk(fn) {
+    setBulkBusy(true)
+    setError('')
+    try {
+      await fn([...selected])
+      setSelected(new Set())
+      await load()
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setBulkBusy(false)
+    }
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-3">
@@ -207,6 +331,15 @@ export default function AdminProducts() {
             onChange={onPickCsv}
             className="hidden"
           />
+          <button
+            onClick={() => exportProductsCsv(products)}
+            disabled={products.length === 0}
+            title="Descargar el catálogo como CSV"
+            className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2.5 font-display text-[11.5px] font-extrabold uppercase text-fg transition hover:bg-surface-2 disabled:opacity-50"
+          >
+            <Download className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Exportar
+          </button>
           <button
             onClick={() => csvInputRef.current?.click()}
             className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2.5 font-display text-[11.5px] font-extrabold uppercase text-fg transition hover:bg-surface-2"
@@ -271,6 +404,66 @@ export default function AdminProducts() {
         />
       </div>
 
+      {/* Barra de acciones en lote */}
+      {selected.size > 0 && (
+        <div className="flex flex-wrap items-center gap-2.5 rounded-[10px] border-2 border-ink bg-accent-400 px-4 py-3">
+          <span className="mr-1 font-display text-xs font-extrabold uppercase text-fg">
+            {selected.size} seleccionado{selected.size === 1 ? '' : 's'}
+          </span>
+          <button
+            onClick={() => runBulk((ids) => bulkUpdateProducts(ids, { active: true }))}
+            disabled={bulkBusy}
+            className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-3 py-1.5 font-display text-[10.5px] font-extrabold uppercase text-fg transition hover:bg-surface-2 disabled:opacity-50"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            Mostrar
+          </button>
+          <button
+            onClick={() => runBulk((ids) => bulkUpdateProducts(ids, { active: false }))}
+            disabled={bulkBusy}
+            className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-3 py-1.5 font-display text-[10.5px] font-extrabold uppercase text-fg transition hover:bg-surface-2 disabled:opacity-50"
+          >
+            <EyeOff className="h-3.5 w-3.5" />
+            Ocultar
+          </button>
+          <select
+            defaultValue=""
+            disabled={bulkBusy}
+            onChange={(e) => {
+              const v = e.target.value
+              e.target.value = ''
+              if (v) runBulk((ids) => bulkUpdateProducts(ids, { category_id: v }))
+            }}
+            className="cursor-pointer rounded-lg border-2 border-ink bg-white px-2.5 py-1.5 text-[11.5px] font-bold text-fg outline-none disabled:opacity-50"
+          >
+            <option value="" disabled>
+              Mover a categoría…
+            </option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+          <button
+            onClick={() => setConfirmBulkDelete(true)}
+            disabled={bulkBusy}
+            className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-brand-600 px-3 py-1.5 font-display text-[10.5px] font-extrabold uppercase text-white transition hover:bg-brand-700 disabled:opacity-50"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            Eliminar
+          </button>
+          <button
+            onClick={() => setSelected(new Set())}
+            aria-label="Quitar selección"
+            className="ml-auto grid h-7 w-7 place-items-center rounded-lg text-fg transition hover:bg-black/10"
+          >
+            <X className="h-4 w-4" strokeWidth={2.5} />
+          </button>
+          {bulkBusy && <Spinner size={4} />}
+        </div>
+      )}
+
       {/* Lista */}
       {loading ? (
         <div className="flex justify-center py-20">
@@ -282,6 +475,15 @@ export default function AdminProducts() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-ink text-left text-[10px] uppercase tracking-[.08em] text-white">
+                  <th className="w-10 px-4 py-3">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleSelectAll}
+                      aria-label="Seleccionar todos"
+                      className="h-4 w-4 cursor-pointer accent-accent-400"
+                    />
+                  </th>
                   <th className="px-4 py-3 font-bold">Producto</th>
                   <th className="px-4 py-3 font-bold">Categoría</th>
                   <th className="px-4 py-3 font-bold">Precio</th>
@@ -292,7 +494,21 @@ export default function AdminProducts() {
               </thead>
               <tbody className="divide-y divide-[#e5e5e5]">
                 {filtered.map((p) => (
-                  <tr key={p.id} className="transition hover:bg-surface-2">
+                  <tr
+                    key={p.id}
+                    className={`transition hover:bg-surface-2 ${
+                      selected.has(p.id) ? 'bg-accent-400/20' : ''
+                    }`}
+                  >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selected.has(p.id)}
+                        onChange={() => toggleSelect(p.id)}
+                        aria-label={`Seleccionar ${p.name}`}
+                        className="h-4 w-4 cursor-pointer accent-brand-600"
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <ProductImage
@@ -309,8 +525,24 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="px-4 py-3 font-medium text-[#4a4a4a]">{p.category_name}</td>
-                    <td className="px-4 py-3 font-bold text-fg">{formatPrice(p.price)}</td>
-                    <td className="px-4 py-3 font-medium text-[#4a4a4a]">{p.stock ?? 0}</td>
+                    <td className="px-4 py-3 font-bold text-fg">
+                      <EditableCell
+                        value={p.price}
+                        min={0}
+                        step={0.5}
+                        format={formatPrice}
+                        onSave={(n) => saveInline(p, { price: n })}
+                      />
+                    </td>
+                    <td className="px-4 py-3 font-medium text-[#4a4a4a]">
+                      <EditableCell
+                        value={p.stock ?? 0}
+                        min={0}
+                        step={1}
+                        width="w-16"
+                        onSave={(n) => saveInline(p, { stock: n })}
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       {p.active !== false ? (
                         <span className="font-bold text-state-paid">Activo</span>
@@ -321,9 +553,18 @@ export default function AdminProducts() {
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-1">
                         <button
+                          onClick={() => duplicate(p)}
+                          className="grid h-[30px] w-[30px] place-items-center rounded-[7px] border-2 border-ink text-fg transition hover:bg-accent-400"
+                          aria-label="Duplicar"
+                          title="Duplicar producto"
+                        >
+                          <Copy className="h-3.5 w-3.5" />
+                        </button>
+                        <button
                           onClick={() => openEdit(p)}
                           className="grid h-[30px] w-[30px] place-items-center rounded-[7px] border-2 border-ink text-fg transition hover:bg-accent-400"
                           aria-label="Editar"
+                          title="Editar"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </button>
@@ -331,6 +572,7 @@ export default function AdminProducts() {
                           onClick={() => setConfirmDelete(p)}
                           className="grid h-[30px] w-[30px] place-items-center rounded-[7px] border-2 border-ink text-fg transition hover:bg-brand-600 hover:text-white"
                           aria-label="Eliminar"
+                          title="Eliminar"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -340,7 +582,7 @@ export default function AdminProducts() {
                 ))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={6} className="px-4 py-12 text-center text-fg-subtle">
+                    <td colSpan={7} className="px-4 py-12 text-center text-fg-subtle">
                       No hay productos que coincidan.
                     </td>
                   </tr>
@@ -475,6 +717,44 @@ export default function AdminProducts() {
             </button>
           </div>
         </form>
+      </Modal>
+
+      {/* Error general (edición inline / acciones en lote) */}
+      {error && !modalOpen && !csvPreview && (
+        <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          {error}
+        </p>
+      )}
+
+      {/* Confirmar borrado en lote */}
+      <Modal
+        open={confirmBulkDelete}
+        onClose={() => setConfirmBulkDelete(false)}
+        title="Eliminar seleccionados"
+        maxWidth="max-w-sm"
+      >
+        <p className="text-sm font-medium text-[#4a4a4a]">
+          ¿Eliminar <b className="text-fg">{selected.size}</b> producto
+          {selected.size === 1 ? '' : 's'} del catálogo? Esta acción no se puede deshacer.
+        </p>
+        <div className="mt-5 flex justify-end gap-3">
+          <button
+            onClick={() => setConfirmBulkDelete(false)}
+            className="rounded-lg px-4 py-2 text-sm font-bold text-fg-muted hover:bg-surface-2"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => {
+              setConfirmBulkDelete(false)
+              runBulk((ids) => bulkDeleteProducts(ids))
+            }}
+            className="btn-sticker px-5 py-2 text-xs"
+          >
+            Eliminar {selected.size}
+          </button>
+        </div>
       </Modal>
 
       {/* Confirmar borrado */}

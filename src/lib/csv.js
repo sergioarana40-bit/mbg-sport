@@ -142,19 +142,103 @@ export function productsFromCsv(text) {
   return { items, errors }
 }
 
-// Plantilla de ejemplo para descargar desde el botón de ayuda.
-export function downloadCsvTemplate() {
-  const lines = [
-    'nombre,precio,stock,categoria,descripcion,destacado,activo,imagen',
-    'Mancuerna hexagonal 15 kg,850,10,Pesas y Mancuernas,"Recubrimiento de hule, mango antideslizante",si,si,',
-    'Banda para caminadora ProForm,1250,4,Refacciones,"Banda de repuesto 45 cm, instalación disponible",no,si,https://ejemplo.com/foto-banda.jpg',
-  ]
-  // BOM para que Excel abra los acentos correctamente.
+// Escapa un valor para CSV (comillas cuando hace falta).
+function cell(v) {
+  const s = v === null || v === undefined ? '' : String(v)
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
+
+// Descarga un CSV (con BOM para que Excel abra los acentos correctamente).
+export function downloadCsv(fileName, rows) {
+  const lines = rows.map((r) => r.map(cell).join(','))
   const blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = 'plantilla-productos.csv'
+  a.download = fileName
   a.click()
   URL.revokeObjectURL(url)
+}
+
+// Plantilla de ejemplo para descargar desde el botón de ayuda.
+export function downloadCsvTemplate() {
+  downloadCsv('plantilla-productos.csv', [
+    ['nombre', 'precio', 'stock', 'categoria', 'descripcion', 'destacado', 'activo', 'imagen'],
+    [
+      'Mancuerna hexagonal 15 kg',
+      '850',
+      '10',
+      'Pesas y Mancuernas',
+      'Recubrimiento de hule, mango antideslizante',
+      'si',
+      'si',
+      '',
+    ],
+    [
+      'Banda para caminadora ProForm',
+      '1250',
+      '4',
+      'Refacciones',
+      'Banda de repuesto 45 cm, instalación disponible',
+      'no',
+      'si',
+      'https://ejemplo.com/foto-banda.jpg',
+    ],
+  ])
+}
+
+const stamp = () => new Date().toISOString().slice(0, 10)
+
+// Exporta el catálogo con las mismas columnas que acepta la importación
+// (editar el archivo y volverlo a subir = actualización masiva).
+export function exportProductsCsv(products) {
+  downloadCsv(`productos-${stamp()}.csv`, [
+    ['nombre', 'precio', 'stock', 'categoria', 'descripcion', 'destacado', 'activo', 'imagen'],
+    ...products.map((p) => [
+      p.name,
+      p.price,
+      p.stock ?? 0,
+      p.category_name || '',
+      p.description || '',
+      p.featured ? 'si' : 'no',
+      p.active !== false ? 'si' : 'no',
+      p.image_url || '',
+    ]),
+  ])
+}
+
+// Exporta pedidos para respaldo/contabilidad.
+export function exportOrdersCsv(orders, statusLabels = {}) {
+  downloadCsv(`pedidos-${stamp()}.csv`, [
+    [
+      'pedido',
+      'fecha',
+      'cliente',
+      'correo',
+      'telefono',
+      'articulos',
+      'subtotal',
+      'descuento',
+      'cupon',
+      'total',
+      'estado',
+      'entrega',
+    ],
+    ...orders.map((o) => [
+      `#${o.id.slice(0, 8).toUpperCase()}`,
+      o.created_at ? new Date(o.created_at).toLocaleString('es-MX') : '',
+      o.customer_name || '',
+      o.customer_email || '',
+      o.customer_phone || '',
+      (o.order_items ?? [])
+        .map((i) => `${i.quantity}x ${i.product_name}`)
+        .join(' | '),
+      o.subtotal,
+      o.discount || 0,
+      o.coupon_code || '',
+      o.total,
+      statusLabels[o.status]?.label || o.status,
+      o.delivery_method === 'pickup' ? 'Recoge en tienda' : 'Envío a domicilio',
+    ]),
+  ])
 }
