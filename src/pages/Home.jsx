@@ -96,9 +96,10 @@ export default function Home() {
               className="mx-auto block w-[210px] lg:w-[400px]"
               style={{ filter: 'drop-shadow(0 24px 24px rgba(0,0,0,.28))' }}
             />
+            {/* Sticker abajo a la izquierda para no tapar la cara de la mascota */}
             <Link
               to="/promociones"
-              className="absolute -left-1.5 top-1.5 rotate-[-8deg] rounded-[10px] border-[3px] border-ink bg-brand-600 px-3 py-2 font-display text-[11px] font-extrabold uppercase text-white shadow-hard-sm transition hover:bg-brand-700 lg:px-4 lg:py-2.5 lg:text-[15px]"
+              className="absolute -left-1.5 bottom-5 rotate-[-8deg] rounded-[10px] border-[3px] border-ink bg-brand-600 px-3 py-2 font-display text-[11px] font-extrabold uppercase text-white shadow-hard-sm transition hover:bg-brand-700 lg:bottom-8 lg:px-4 lg:py-2.5 lg:text-[15px]"
             >
               −15% en tu 1ª compra
             </Link>
