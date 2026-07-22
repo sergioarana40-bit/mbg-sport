@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Wrench,
@@ -13,7 +14,9 @@ import {
   MapPin,
   Clock,
 } from 'lucide-react'
+import ProductImage from '../components/ProductImage'
 import { STORE } from '../config'
+import { getRepairWorks } from '../lib/api'
 
 // Página de Servicio técnico / Reparaciones (lenguaje póster 1b).
 // Contenido basado en la sección de servicio de la Home y en los
@@ -60,6 +63,15 @@ const CONDITIONS = [
 ]
 
 export default function Repairs() {
+  // Galería administrable desde /admin/reparaciones (la sección se oculta si está vacía).
+  const [works, setWorks] = useState([])
+
+  useEffect(() => {
+    getRepairWorks()
+      .then(setWorks)
+      .catch(() => setWorks([]))
+  }, [])
+
   const waLink = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
     'Hola, quiero cotizar la reparación / mantenimiento de mi equipo de gimnasio.'
   )}`
@@ -146,6 +158,36 @@ export default function Repairs() {
           ))}
         </div>
       </section>
+
+      {/* Trabajos recientes (contenido que el admin actualiza con fotos) */}
+      {works.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pt-10 lg:pt-14">
+          <div className="flex items-center justify-between">
+            <h2 className="title-stamp text-lg sm:text-2xl">
+              <span>Trabajos recientes</span>
+            </h2>
+          </div>
+          <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+            {works.map((w) => (
+              <article key={w.id} className="sticker flex flex-col overflow-hidden">
+                <ProductImage
+                  src={w.image_url}
+                  alt={w.title}
+                  className="aspect-[4/3] border-b-2 border-ink"
+                />
+                <div className="p-4">
+                  <h3 className="text-[14.5px] font-bold leading-snug text-fg">{w.title}</h3>
+                  {w.description && (
+                    <p className="mt-1.5 text-[12.5px] font-medium leading-relaxed text-[#4a4a4a]">
+                      {w.description}
+                    </p>
+                  )}
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Franja amarilla: condiciones + términos */}
       <section className="mt-12 border-y-2 border-ink bg-accent-400 lg:mt-14" style={DOTS_STYLE}>

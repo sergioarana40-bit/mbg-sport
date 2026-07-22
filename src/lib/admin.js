@@ -67,6 +67,63 @@ export async function uploadProductImage(file) {
   return data.publicUrl
 }
 
+/* ------------------- Trabajos del servicio técnico ------------------- */
+
+export async function getAllRepairWorks() {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('repair_works')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+export async function saveRepairWork(work) {
+  if (!isSupabaseConfigured) return needBackend()
+  const payload = {
+    title: work.title,
+    description: work.description || null,
+    image_url: work.image_url || null,
+    sort_order: Number(work.sort_order) || 0,
+    active: work.active !== false,
+  }
+  if (work.id) {
+    const { data, error } = await supabase
+      .from('repair_works')
+      .update(payload)
+      .eq('id', work.id)
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  }
+  const { data, error } = await supabase.from('repair_works').insert(payload).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteRepairWork(id) {
+  if (!isSupabaseConfigured) return needBackend()
+  const { error } = await supabase.from('repair_works').delete().eq('id', id)
+  if (error) throw error
+}
+
+// Sube la foto de un trabajo al bucket 'products' (carpeta repairs/) y devuelve su URL.
+export async function uploadRepairImage(file) {
+  if (!isSupabaseConfigured) return needBackend()
+  const ext = file.name.split('.').pop()
+  const path = `repairs/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const { error } = await supabase.storage.from('products').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  })
+  if (error) throw error
+  const { data } = supabase.storage.from('products').getPublicUrl(path)
+  return data.publicUrl
+}
+
 /* ------------------------- Categorías ------------------------- */
 
 export async function getAllCategories() {

@@ -9,6 +9,7 @@ import {
   LogOut,
   Store,
   Menu,
+  Wrench,
   X,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
@@ -20,6 +21,7 @@ const NAV = [
   { to: '/admin/productos', label: 'Productos', icon: Package },
   { to: '/admin/categorias', label: 'Categorías', icon: Tags },
   { to: '/admin/cupones', label: 'Cupones', icon: Ticket },
+  { to: '/admin/reparaciones', label: 'Servicio', icon: Wrench },
 ]
 
 export default function AdminLayout() {

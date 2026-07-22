@@ -91,6 +91,31 @@ create policy "order_items_public_insert" on public.order_items
 create policy "order_items_admin_read" on public.order_items
   for select to authenticated using (true);
 
+-- ---------- Trabajos del servicio técnico (galería de /reparaciones) ----------
+-- Contenido editable por el admin; el layout de la página es fijo en el frontend.
+create table if not exists public.repair_works (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  image_url text,
+  sort_order integer not null default 0,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+alter table public.repair_works enable row level security;
+
+-- Lectura: público solo ve activos; el admin ve todos.
+create policy "repair_works_read" on public.repair_works
+  for select using (active = true or public.is_admin());
+-- Escritura: solo admin.
+create policy "repair_works_admin_insert" on public.repair_works
+  for insert with check (public.is_admin());
+create policy "repair_works_admin_update" on public.repair_works
+  for update using (public.is_admin()) with check (public.is_admin());
+create policy "repair_works_admin_delete" on public.repair_works
+  for delete using (public.is_admin());
+
 -- ---------- Storage: imágenes de productos ----------
 insert into storage.buckets (id, name, public)
 values ('products', 'products', true)

@@ -92,6 +92,21 @@ export async function getProductById(id) {
   return normalize(data)
 }
 
+/* ------------------- Trabajos del servicio técnico ------------------- */
+
+// Galería "Trabajos recientes" de /reparaciones (contenido editable por el admin).
+export async function getRepairWorks() {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('repair_works')
+    .select('*')
+    .eq('active', true)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
 /* ------------------------- Pedidos ------------------------- */
 
 // Crea un pedido con sus items. Devuelve el pedido creado.
