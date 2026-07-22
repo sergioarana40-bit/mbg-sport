@@ -1,5 +1,6 @@
 import { supabase, isSupabaseConfigured } from './supabase'
 import { DEMO_CATEGORIES, DEMO_PRODUCTS, withCategoryNames } from '../data/demo'
+import { norm } from './csv'
 
 // Error uniforme cuando se intenta mutar sin backend configurado.
 function needBackend() {
@@ -65,6 +66,78 @@ export async function uploadProductImage(file) {
   if (error) throw error
   const { data } = supabase.storage.from('products').getPublicUrl(path)
   return data.publicUrl
+}
+
+// Importa productos desde CSV: si el nombre ya existe se ACTUALIZA (precio,
+// stock, etc.); si no, se crea. Las categorías que no existan se crean solas.
+// En actualizaciones, la imagen solo se toca si el CSV trae una URL.
+export async function importProducts(items) {
+  if (!isSupabaseConfigured) return needBackend()
+
+  // Mapa de categorías por nombre/slug normalizados; crea las faltantes.
+  const { data: cats, error: catErr } = await supabase.from('categories').select('*')
+  if (catErr) throw catErr
+  const catMap = new Map()
+  cats.forEach((c) => {
+    catMap.set(norm(c.name), c)
+    catMap.set(norm(c.slug), c)
+  })
+  const missing = [
+    ...new Set(
+      items.map((i) => i.categoryName).filter((n) => n && !catMap.has(norm(n)))
+    ),
+  ]
+  let nextOrder = cats.length + 1
+  for (const catName of missing) {
+    const slug = norm(catName)
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '')
+    const { data: created, error } = await supabase
+      .from('categories')
+      .insert({ name: catName, slug, sort_order: nextOrder++ })
+      .select()
+      .single()
+    if (error) throw error
+    catMap.set(norm(catName), created)
+    catMap.set(norm(slug), created)
+  }
+
+  // Productos existentes por nombre normalizado (para actualizar en vez de duplicar).
+  const { data: prods, error: prodErr } = await supabase.from('products').select('id, name')
+  if (prodErr) throw prodErr
+  const prodMap = new Map(prods.map((p) => [norm(p.name), p.id]))
+
+  let created = 0
+  let updated = 0
+  const inserts = []
+  for (const item of items) {
+    const payload = {
+      name: item.name,
+      description: item.description || null,
+      price: item.price,
+      stock: item.stock,
+      featured: item.featured,
+      active: item.active,
+      category_id: item.categoryName ? (catMap.get(norm(item.categoryName))?.id ?? null) : null,
+    }
+    if (item.image_url) payload.image_url = item.image_url
+
+    const existingId = prodMap.get(norm(item.name))
+    if (existingId) {
+      const { error } = await supabase.from('products').update(payload).eq('id', existingId)
+      if (error) throw error
+      updated++
+    } else {
+      inserts.push({ ...payload, image_url: item.image_url || null })
+      created++
+    }
+  }
+  if (inserts.length > 0) {
+    const { error } = await supabase.from('products').insert(inserts)
+    if (error) throw error
+  }
+
+  return { created, updated, newCategories: missing.length }
 }
 
 /* ------------------- Trabajos del servicio técnico ------------------- */

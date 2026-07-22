@@ -1,5 +1,17 @@
-import { useEffect, useState } from 'react'
-import { Plus, Pencil, Trash2, Search, Upload, AlertCircle, Star } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Search,
+  Upload,
+  AlertCircle,
+  Star,
+  FileSpreadsheet,
+  HelpCircle,
+  Download,
+  CheckCircle2,
+} from 'lucide-react'
 import Modal from '../../components/Modal'
 import Spinner from '../../components/Spinner'
 import ProductImage from '../../components/ProductImage'
@@ -11,7 +23,9 @@ import {
   saveProduct,
   deleteProduct,
   uploadProductImage,
+  importProducts,
 } from '../../lib/admin'
+import { productsFromCsv, downloadCsvTemplate, norm } from '../../lib/csv'
 
 const EMPTY = {
   name: '',
@@ -37,6 +51,13 @@ export default function AdminProducts() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [confirmDelete, setConfirmDelete] = useState(null)
+
+  // Importación por CSV
+  const csvInputRef = useRef(null)
+  const [helpOpen, setHelpOpen] = useState(false)
+  const [csvPreview, setCsvPreview] = useState(null) // { items, errors, fileName }
+  const [importing, setImporting] = useState(false)
+  const [importResult, setImportResult] = useState(null) // { created, updated, newCategories }
 
   async function load() {
     setLoading(true)
@@ -121,6 +142,49 @@ export default function AdminProducts() {
     }
   }
 
+  // Al elegir archivo CSV: parsear y abrir vista previa (no guarda todavía).
+  async function onPickCsv(e) {
+    const file = e.target.files?.[0]
+    e.target.value = '' // permite re-elegir el mismo archivo
+    if (!file) return
+    setImportResult(null)
+    try {
+      const text = await file.text()
+      const parsed = productsFromCsv(text)
+      setCsvPreview({ ...parsed, fileName: file.name })
+    } catch {
+      setCsvPreview({
+        items: [],
+        errors: [{ line: 1, message: 'No se pudo leer el archivo.' }],
+        fileName: file.name,
+      })
+    }
+  }
+
+  async function confirmImport() {
+    if (!csvPreview || csvPreview.items.length === 0) return
+    setImporting(true)
+    try {
+      const result = await importProducts(csvPreview.items)
+      setCsvPreview(null)
+      setImportResult(result)
+      await load()
+    } catch (err) {
+      setCsvPreview((p) => ({
+        ...p,
+        errors: [...(p?.errors ?? []), { line: '—', message: err.message }],
+      }))
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  // Cuántos del CSV actualizarían un producto existente (por nombre).
+  const existingNames = new Set(products.map((p) => norm(p.name)))
+  const csvUpdates = csvPreview
+    ? csvPreview.items.filter((i) => existingNames.has(norm(i.name))).length
+    : 0
+
   const filtered = products.filter((p) =>
     p.name.toLowerCase().includes(query.toLowerCase())
   )
@@ -134,14 +198,59 @@ export default function AdminProducts() {
           </h1>
           <p className="mt-2 text-xs font-medium text-fg-subtle">{products.length} en total</p>
         </div>
-        <button
-          onClick={openNew}
-          className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 px-4 py-2.5 font-display text-[11.5px] font-extrabold uppercase text-white shadow-hard-sm transition hover:bg-brand-700 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
-        >
-          <Plus className="h-3.5 w-3.5" strokeWidth={3} />
-          Nuevo producto
-        </button>
+        <div className="flex items-center gap-2.5">
+          {/* Importar CSV + ayuda del formato */}
+          <input
+            ref={csvInputRef}
+            type="file"
+            accept=".csv,text/csv"
+            onChange={onPickCsv}
+            className="hidden"
+          />
+          <button
+            onClick={() => csvInputRef.current?.click()}
+            className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-white px-4 py-2.5 font-display text-[11.5px] font-extrabold uppercase text-fg transition hover:bg-surface-2"
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5" strokeWidth={2.5} />
+            Importar CSV
+          </button>
+          <button
+            onClick={() => setHelpOpen(true)}
+            aria-label="Cómo preparar el CSV"
+            title="Cómo preparar el CSV"
+            className="grid h-10 w-10 place-items-center rounded-lg border-2 border-ink bg-accent-400 text-fg transition hover:bg-accent-300"
+          >
+            <HelpCircle className="h-[18px] w-[18px]" strokeWidth={2.2} />
+          </button>
+          <button
+            onClick={openNew}
+            className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 px-4 py-2.5 font-display text-[11.5px] font-extrabold uppercase text-white shadow-hard-sm transition hover:bg-brand-700 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+          >
+            <Plus className="h-3.5 w-3.5" strokeWidth={3} />
+            Nuevo producto
+          </button>
+        </div>
       </div>
+
+      {/* Resultado de la última importación */}
+      {importResult && (
+        <div className="flex items-start gap-2 rounded-[10px] border-2 border-ink bg-state-paid/15 p-4 text-sm font-medium text-fg">
+          <CheckCircle2 className="h-5 w-5 shrink-0 text-state-paid" />
+          <p>
+            Importación completada: <b>{importResult.created}</b> producto
+            {importResult.created === 1 ? '' : 's'} nuevo{importResult.created === 1 ? '' : 's'} y{' '}
+            <b>{importResult.updated}</b> actualizado{importResult.updated === 1 ? '' : 's'}
+            {importResult.newCategories > 0 && (
+              <>
+                {' '}
+                · se crearon <b>{importResult.newCategories}</b> categoría
+                {importResult.newCategories === 1 ? '' : 's'}
+              </>
+            )}
+            .
+          </p>
+        </div>
+      )}
 
       {!isSupabaseConfigured && (
         <div className="flex items-start gap-2 rounded-[10px] border-2 border-ink bg-accent-400/50 p-4 text-sm font-medium text-fg">
@@ -390,6 +499,210 @@ export default function AdminProducts() {
             Eliminar
           </button>
         </div>
+      </Modal>
+
+      {/* Ayuda: cómo preparar el CSV */}
+      <Modal
+        open={helpOpen}
+        onClose={() => setHelpOpen(false)}
+        title="Cómo preparar tu CSV"
+        maxWidth="max-w-2xl"
+      >
+        <div className="space-y-4 text-sm">
+          <p className="font-medium text-[#4a4a4a]">
+            Guarda tu inventario como <b className="text-fg">CSV</b> desde Excel o Google Sheets
+            (Archivo → Descargar → CSV). La primera fila debe traer los encabezados; el orden de
+            las columnas no importa y sirve tanto con comas como con punto y coma.
+          </p>
+
+          <div className="overflow-x-auto rounded-[10px] border-2 border-ink">
+            <table className="w-full text-[12.5px]">
+              <thead>
+                <tr className="bg-ink text-left text-[10px] uppercase tracking-[.08em] text-white">
+                  <th className="px-3 py-2 font-bold">Columna</th>
+                  <th className="px-3 py-2 font-bold">Obligatoria</th>
+                  <th className="px-3 py-2 font-bold">Ejemplo</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-[#e5e5e5]">
+                <tr>
+                  <td className="px-3 py-2 font-mono font-bold text-fg">nombre</td>
+                  <td className="px-3 py-2 font-bold text-brand-600">Sí</td>
+                  <td className="px-3 py-2 font-medium text-[#4a4a4a]">Mancuerna hexagonal 15 kg</td>
+                </tr>
+                <tr>
+                  <td className="px-3 py-2 font-mono font-bold text-fg">precio</td>
+                  <td className="px-3 py-2 font-bold text-brand-600">Sí</td>
+                  <td className="px-3 py-2 font-medium text-[#4a4a4a]">850 · $1,299.50</td>
+                </tr>
+                <tr>
+                  <td className="px-3 py-2 font-mono font-bold text-fg">stock</td>
+                  <td className="px-3 py-2 font-medium text-fg-subtle">No (0 si falta)</td>
+                  <td className="px-3 py-2 font-medium text-[#4a4a4a]">10</td>
+                </tr>
+                <tr>
+                  <td className="px-3 py-2 font-mono font-bold text-fg">categoria</td>
+                  <td className="px-3 py-2 font-medium text-fg-subtle">No</td>
+                  <td className="px-3 py-2 font-medium text-[#4a4a4a]">
+                    Refacciones (si no existe, se crea sola)
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-3 py-2 font-mono font-bold text-fg">descripcion</td>
+                  <td className="px-3 py-2 font-medium text-fg-subtle">No</td>
+                  <td className="px-3 py-2 font-medium text-[#4a4a4a]">
+                    Recubrimiento de hule, mango antideslizante
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-3 py-2 font-mono font-bold text-fg">destacado</td>
+                  <td className="px-3 py-2 font-medium text-fg-subtle">No</td>
+                  <td className="px-3 py-2 font-medium text-[#4a4a4a]">si / no</td>
+                </tr>
+                <tr>
+                  <td className="px-3 py-2 font-mono font-bold text-fg">activo</td>
+                  <td className="px-3 py-2 font-medium text-fg-subtle">No (si si falta)</td>
+                  <td className="px-3 py-2 font-medium text-[#4a4a4a]">si / no</td>
+                </tr>
+                <tr>
+                  <td className="px-3 py-2 font-mono font-bold text-fg">imagen</td>
+                  <td className="px-3 py-2 font-medium text-fg-subtle">No</td>
+                  <td className="px-3 py-2 font-medium text-[#4a4a4a]">
+                    https://… (enlace público a la foto)
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <ul className="space-y-1.5 text-[13px] font-medium text-[#4a4a4a]">
+            <li>
+              · Si el <b className="text-fg">nombre ya existe</b>, el producto se{' '}
+              <b className="text-fg">actualiza</b> (precio, stock, etc.) en lugar de duplicarse —
+              ideal para subir tu inventario cada semana.
+            </li>
+            <li>
+              · La columna <b className="text-fg">imagen</b> acepta un enlace a la foto; si la
+              dejas vacía, la foto de los productos existentes <b className="text-fg">no se toca</b>{' '}
+              y a los nuevos se la puedes subir después con el botón de editar.
+            </li>
+            <li>· Antes de guardar verás una vista previa con lo que se va a crear y actualizar.</li>
+          </ul>
+
+          <div className="flex justify-between gap-3 pt-1">
+            <button
+              onClick={downloadCsvTemplate}
+              className="inline-flex items-center gap-2 rounded-lg border-2 border-ink bg-accent-400 px-4 py-2.5 font-display text-[11px] font-extrabold uppercase text-fg transition hover:bg-accent-300"
+            >
+              <Download className="h-3.5 w-3.5" strokeWidth={2.5} />
+              Descargar plantilla
+            </button>
+            <button
+              onClick={() => {
+                setHelpOpen(false)
+                csvInputRef.current?.click()
+              }}
+              className="btn-primary px-5 py-2.5 text-xs"
+            >
+              <FileSpreadsheet className="h-3.5 w-3.5" />
+              Elegir archivo
+            </button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Vista previa de la importación */}
+      <Modal
+        open={!!csvPreview}
+        onClose={() => setCsvPreview(null)}
+        title="Vista previa de la importación"
+        maxWidth="max-w-2xl"
+      >
+        {csvPreview && (
+          <div className="space-y-4">
+            <p className="text-[13px] font-medium text-[#4a4a4a]">
+              Archivo <b className="font-mono text-fg">{csvPreview.fileName}</b> ·{' '}
+              <b className="text-fg">{csvPreview.items.length - csvUpdates}</b> producto
+              {csvPreview.items.length - csvUpdates === 1 ? '' : 's'} nuevo
+              {csvPreview.items.length - csvUpdates === 1 ? '' : 's'} ·{' '}
+              <b className="text-fg">{csvUpdates}</b> a actualizar
+              {csvPreview.errors.length > 0 && (
+                <>
+                  {' '}
+                  · <b className="text-brand-600">{csvPreview.errors.length} con error</b> (se
+                  omiten)
+                </>
+              )}
+            </p>
+
+            {csvPreview.errors.length > 0 && (
+              <div className="max-h-28 space-y-1 overflow-y-auto rounded-[10px] border-2 border-ink bg-brand-600/10 p-3 text-xs font-semibold text-brand-600">
+                {csvPreview.errors.map((e, i) => (
+                  <p key={i}>
+                    Fila {e.line}: {e.message}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {csvPreview.items.length > 0 && (
+              <div className="max-h-64 overflow-y-auto rounded-[10px] border-2 border-ink">
+                <table className="w-full text-[12.5px]">
+                  <thead className="sticky top-0">
+                    <tr className="bg-ink text-left text-[10px] uppercase tracking-[.08em] text-white">
+                      <th className="px-3 py-2 font-bold">Producto</th>
+                      <th className="px-3 py-2 font-bold">Precio</th>
+                      <th className="px-3 py-2 font-bold">Stock</th>
+                      <th className="px-3 py-2 font-bold">Categoría</th>
+                      <th className="px-3 py-2 font-bold">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[#e5e5e5]">
+                    {csvPreview.items.map((it, i) => (
+                      <tr key={i}>
+                        <td className="px-3 py-2 font-semibold text-fg">{it.name}</td>
+                        <td className="px-3 py-2 font-bold text-fg">{formatPrice(it.price)}</td>
+                        <td className="px-3 py-2 font-medium text-[#4a4a4a]">{it.stock}</td>
+                        <td className="px-3 py-2 font-medium text-[#4a4a4a]">
+                          {it.categoryName || '—'}
+                        </td>
+                        <td className="px-3 py-2">
+                          {existingNames.has(norm(it.name)) ? (
+                            <span className="rounded-[5px] border-2 border-ink bg-accent-400 px-1.5 font-display text-[9px] font-extrabold uppercase text-fg">
+                              Actualiza
+                            </span>
+                          ) : (
+                            <span className="rounded-[5px] border-2 border-ink bg-state-paid px-1.5 font-display text-[9px] font-extrabold uppercase text-white">
+                              Nuevo
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setCsvPreview(null)}
+                className="rounded-lg px-4 py-2 text-sm font-bold text-fg-muted hover:bg-surface-2"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmImport}
+                disabled={importing || csvPreview.items.length === 0}
+                className="btn-sticker px-5 py-2 text-xs disabled:opacity-50"
+              >
+                {importing && <Spinner size={4} className="border-white/40 border-t-white" />}
+                Importar {csvPreview.items.length} producto
+                {csvPreview.items.length === 1 ? '' : 's'}
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   )
