@@ -1,0 +1,44 @@
+# Compila la app en cada push a main y publica el resultado en la rama
+# `hostinger-deploy`, que es la que Hostinger clona en public_html.
+# Si el deploy automático (webhook) está activado en hPanel, el sitio
+# se actualiza solo; si no, basta con pulsar "Deploy" en hPanel > GIT.
+name: Build para Hostinger
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Build
+        env:
+          # Valores públicos: la URL y la publishable key viajan de todas
+          # formas dentro del bundle del frontend (la seguridad la da RLS).
+          VITE_SUPABASE_URL: https://cwffhlvjstmxgpmiafqn.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_D7hrDMA30mCQFqy_3uUeiA_kDq-8-fX
+        run: npm run build
+
+      - name: Publicar en la rama hostinger-deploy
+        run: |
+          cd dist
+          git init -b hostinger-deploy
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Deploy ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" hostinger-deploy

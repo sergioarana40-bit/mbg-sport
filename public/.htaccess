@@ -1,0 +1,22 @@
+# MBG Sport — configuración para Hostinger (Apache/LiteSpeed)
+
+# SPA con React Router: cualquier ruta que no sea un archivo real
+# se sirve con index.html (el router decide qué mostrar).
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+# Assets con hash en el nombre: caché larga.
+<FilesMatch "\.(js|css|woff2|png|jpg|jpeg|webp|svg|ico)$">
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+
+# El HTML, el service worker y el manifest siempre frescos
+# (si se cachean, los usuarios no reciben las actualizaciones de la PWA).
+<FilesMatch "(^index\.html|sw\.js|registerSW\.js|manifest\.webmanifest)$">
+  Header set Cache-Control "no-cache, must-revalidate"
+</FilesMatch>
