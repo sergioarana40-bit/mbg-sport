@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import Layout from './components/Layout'
+import Landing from './pages/Landing'
 import Home from './pages/Home'
 import Catalog from './pages/Catalog'
 import ProductDetail from './pages/ProductDetail'
@@ -22,6 +23,7 @@ import AdminLayout from './pages/admin/AdminLayout'
 import AdminLogin from './pages/admin/Login'
 import Dashboard from './pages/admin/Dashboard'
 import AdminProducts from './pages/admin/AdminProducts'
+import AdminBanners from './pages/admin/AdminBanners'
 import AdminCategories from './pages/admin/AdminCategories'
 import AdminCoupons from './pages/admin/AdminCoupons'
 import AdminOrders from './pages/admin/AdminOrders'
@@ -30,9 +32,12 @@ import AdminRepairs from './pages/admin/AdminRepairs'
 export default function App() {
   return (
     <Routes>
+      {/* Landing corporativa (cabecera propia, antecede a la tienda) */}
+      <Route path="/" element={<Landing />} />
+
       {/* Tienda (cliente) */}
       <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
+        <Route path="/tienda" element={<Home />} />
         <Route path="/catalogo" element={<Catalog />} />
         <Route path="/catalogo/:slug" element={<Catalog />} />
         <Route path="/producto/:id" element={<ProductDetail />} />
@@ -61,6 +66,7 @@ export default function App() {
       >
         <Route index element={<Dashboard />} />
         <Route path="productos" element={<AdminProducts />} />
+        <Route path="banner" element={<AdminBanners />} />
         <Route path="categorias" element={<AdminCategories />} />
         <Route path="cupones" element={<AdminCoupons />} />
         <Route path="pedidos" element={<AdminOrders />} />

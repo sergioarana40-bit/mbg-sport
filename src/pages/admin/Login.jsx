@@ -103,7 +103,7 @@ export default function Login() {
         </div>
 
         <Link
-          to="/"
+          to="/tienda"
           className="mt-5 flex items-center justify-center gap-2 text-[12.5px] font-semibold text-[#9a9aa0] transition hover:text-white"
         >
           <ArrowLeft className="h-3.5 w-3.5" strokeWidth={2.5} />

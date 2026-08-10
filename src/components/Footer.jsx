@@ -4,7 +4,8 @@ import Logo from './Logo'
 import { STORE } from '../config'
 
 // lucide-react removió los logos de marca; usamos SVGs propios para las redes.
-function InstagramIcon({ className = 'h-5 w-5' }) {
+// Se exportan para reutilizarlos en la landing (sección "Visítanos").
+export function InstagramIcon({ className = 'h-5 w-5' }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <rect x="2" y="2" width="20" height="20" rx="5" />
@@ -13,21 +14,21 @@ function InstagramIcon({ className = 'h-5 w-5' }) {
     </svg>
   )
 }
-function FacebookIcon({ className = 'h-5 w-5' }) {
+export function FacebookIcon({ className = 'h-5 w-5' }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
     </svg>
   )
 }
-function TikTokIcon({ className = 'h-5 w-5' }) {
+export function TikTokIcon({ className = 'h-5 w-5' }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <path d="M21 7.917v4.034a9.948 9.948 0 0 1-5-1.951v4.5a6.5 6.5 0 1 1-8-6.326v4.326a2.5 2.5 0 1 0 4 2V2h4.083A6.005 6.005 0 0 0 21 7.917z" />
     </svg>
   )
 }
-function YouTubeIcon({ className = 'h-5 w-5' }) {
+export function YouTubeIcon({ className = 'h-5 w-5' }) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden="true">
       <rect x="2" y="5" width="20" height="14" rx="4" />
@@ -63,9 +64,11 @@ function SocialRow({ className = '' }) {
   )
 }
 
-export default function Footer() {
+// `bottomNavSpace`: deja aire para la barra inferior móvil de la tienda;
+// la landing no la tiene, así que lo desactiva.
+export default function Footer({ bottomNavSpace = true }) {
   return (
-    <footer className="mt-16 bg-ink pb-20 text-[#a3a3a8] md:pb-0">
+    <footer className={`mt-16 bg-ink text-[#a3a3a8] ${bottomNavSpace ? 'pb-20 md:pb-0' : ''}`}>
       {/* Franja de marca amarillo → rojo (diseño 1b) */}
       <div className="h-[3px] bg-gradient-to-r from-accent-400 to-brand-600" />
 
@@ -90,13 +93,13 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <Link to="/reparaciones" className="transition hover:text-white">
-                Servicio técnico
+              <Link to="/catalogo/refacciones" className="transition hover:text-white">
+                Refacciones
               </Link>
             </li>
             <li>
-              <Link to="/carrito" className="transition hover:text-white">
-                Mi carrito
+              <Link to="/reparaciones" className="transition hover:text-white">
+                Servicio técnico
               </Link>
             </li>
             <li>

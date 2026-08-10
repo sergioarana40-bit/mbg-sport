@@ -92,6 +92,22 @@ export async function getProductById(id) {
   return normalize(data)
 }
 
+/* ------------------- Banner comercial de la home ------------------- */
+
+// Banners activos del carrusel de la portada de la tienda, en orden.
+// Incluye el producto ligado (precio, foto y categoría) para armar el slide.
+export async function getBanners() {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('banners')
+    .select('*, products(id, name, price, image_url, categories(name, slug))')
+    .eq('active', true)
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
 /* ------------------- Trabajos del servicio técnico ------------------- */
 
 // Galería "Trabajos recientes" de /reparaciones (contenido editable por el admin).

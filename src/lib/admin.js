@@ -163,6 +163,65 @@ export async function importProducts(items) {
   return { created, updated, newCategories: missing.length }
 }
 
+/* ------------------- Banner comercial de la home ------------------- */
+
+export async function getAllBanners() {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('banners')
+    .select('*, products(id, name)')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return data
+}
+
+export async function saveBanner(banner) {
+  if (!isSupabaseConfigured) return needBackend()
+  const payload = {
+    title: banner.title,
+    description: banner.description || null,
+    product_id: banner.product_id || null,
+    image_url: banner.image_url || null,
+    cta_label: banner.cta_label || null,
+    sort_order: Number(banner.sort_order) || 0,
+    active: banner.active !== false,
+  }
+  if (banner.id) {
+    const { data, error } = await supabase
+      .from('banners')
+      .update(payload)
+      .eq('id', banner.id)
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  }
+  const { data, error } = await supabase.from('banners').insert(payload).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteBanner(id) {
+  if (!isSupabaseConfigured) return needBackend()
+  const { error } = await supabase.from('banners').delete().eq('id', id)
+  if (error) throw error
+}
+
+// Sube la foto de un banner al bucket 'products' (carpeta banners/) y devuelve su URL.
+export async function uploadBannerImage(file) {
+  if (!isSupabaseConfigured) return needBackend()
+  const ext = file.name.split('.').pop()
+  const path = `banners/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const { error } = await supabase.storage.from('products').upload(path, file, {
+    cacheControl: '3600',
+    upsert: false,
+  })
+  if (error) throw error
+  const { data } = supabase.storage.from('products').getPublicUrl(path)
+  return data.publicUrl
+}
+
 /* ------------------- Trabajos del servicio técnico ------------------- */
 
 export async function getAllRepairWorks() {

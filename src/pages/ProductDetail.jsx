@@ -66,7 +66,7 @@ export default function ProductDetail() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Breadcrumb */}
       <nav className="mb-6 flex items-center gap-1.5 text-[12.5px] font-medium text-fg-subtle">
-        <Link to="/" className="hover:text-brand-600">
+        <Link to="/tienda" className="hover:text-brand-600">
           Inicio
         </Link>
         <ChevronRight className="h-[13px] w-[13px]" />

@@ -123,7 +123,7 @@ export default function Catalog() {
 
   function goBack() {
     if (window.history.length > 1) navigate(-1)
-    else navigate('/')
+    else navigate('/tienda')
   }
 
   function toggleCategory(catSlug) {

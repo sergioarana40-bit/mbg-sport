@@ -112,7 +112,7 @@ export default function Account() {
 
   async function handleLogout() {
     await signOut()
-    navigate('/')
+    navigate('/tienda')
   }
 
   // "Volver a comprar": re-agrega los artículos del pedido al carrito.

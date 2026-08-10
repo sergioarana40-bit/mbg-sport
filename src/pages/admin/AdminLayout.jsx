@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useNavigate, Link, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
+  Megaphone,
   Package,
   Tags,
   Ticket,
@@ -20,6 +21,7 @@ const NAV = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/pedidos', label: 'Pedidos', icon: ShoppingBag },
   { to: '/admin/productos', label: 'Productos', icon: Package },
+  { to: '/admin/banner', label: 'Banner', icon: Megaphone },
   { to: '/admin/categorias', label: 'Categorías', icon: Tags },
   { to: '/admin/cupones', label: 'Cupones', icon: Ticket },
   { to: '/admin/reparaciones', label: 'Servicio', icon: Wrench },
@@ -103,7 +105,7 @@ export default function AdminLayout() {
         ))}
       </nav>
       <div className="border-t border-ink-line p-3">
-        <Link to="/" className={footerLink}>
+        <Link to="/tienda" className={footerLink}>
           <Store className="h-4 w-4" strokeWidth={2} />
           Ver tienda
         </Link>

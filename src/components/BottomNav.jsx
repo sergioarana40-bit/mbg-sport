@@ -24,7 +24,7 @@ export default function BottomNav() {
   return (
     <>
       <nav className="bottom-nav fixed inset-x-0 bottom-0 z-40 md:hidden">
-        <NavLink to="/" end className={itemClass}>
+        <NavLink to="/tienda" end className={itemClass}>
           <Home className="h-5.5 w-5.5" />
           <span>Inicio</span>
         </NavLink>

@@ -20,7 +20,7 @@ export default function UserMenu() {
   async function handleLogout() {
     setOpen(false)
     await signOut()
-    navigate('/')
+    navigate('/tienda')
   }
 
   const itemClass =
