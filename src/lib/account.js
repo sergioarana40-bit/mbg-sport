@@ -23,7 +23,21 @@ export async function updateProfile(userId, { full_name, phone }) {
 }
 
 // Cambia la contraseña del usuario con sesión activa (cliente o admin).
-export async function changePassword(newPassword) {
+// Reautentica con la contraseña ACTUAL antes de cambiarla: así, si alguien
+// encuentra una sesión abierta (equipo compartido, token robado), no puede
+// apropiarse de la cuenta sin conocer la contraseña vigente.
+export async function changePassword(currentPassword, newPassword) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user?.email) throw new Error('No hay una sesión activa.')
+
+  const { error: reauthError } = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: currentPassword,
+  })
+  if (reauthError) throw new Error('La contraseña actual no es correcta.')
+
   const { error } = await supabase.auth.updateUser({ password: newPassword })
   if (error) throw error
 }

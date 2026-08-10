@@ -142,9 +142,13 @@ export function productsFromCsv(text) {
   return { items, errors }
 }
 
-// Escapa un valor para CSV (comillas cuando hace falta).
+// Escapa un valor para CSV (comillas cuando hace falta) y neutraliza la
+// inyección de fórmulas: una celda que empieza por = + - @ (o TAB/CR) podría
+// ejecutarse como fórmula en Excel/LibreOffice, así que se le antepone un
+// apóstrofo. Los datos vienen del checkout (nombre, notas…) sin autenticar.
 function cell(v) {
-  const s = v === null || v === undefined ? '' : String(v)
+  let s = v === null || v === undefined ? '' : String(v)
+  if (/^[=+\-@\t\r]/.test(s)) s = `'${s}`
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
 }
 

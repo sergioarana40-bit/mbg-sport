@@ -60,7 +60,7 @@ export default function Account() {
 
   // Cambio de contraseña
   const [pwOpen, setPwOpen] = useState(false)
-  const [pwForm, setPwForm] = useState({ password: '', confirm: '' })
+  const [pwForm, setPwForm] = useState({ current: '', password: '', confirm: '' })
   const [pwSaving, setPwSaving] = useState(false)
   const [pwSaved, setPwSaved] = useState(false)
   const [pwError, setPwError] = useState('')
@@ -127,8 +127,12 @@ export default function Account() {
   async function handleChangePassword(e) {
     e.preventDefault()
     setPwError('')
+    if (!pwForm.current) {
+      setPwError('Escribe tu contraseña actual.')
+      return
+    }
     if (pwForm.password.length < 8) {
-      setPwError('La contraseña debe tener al menos 8 caracteres.')
+      setPwError('La nueva contraseña debe tener al menos 8 caracteres.')
       return
     }
     if (pwForm.password !== pwForm.confirm) {
@@ -137,8 +141,8 @@ export default function Account() {
     }
     setPwSaving(true)
     try {
-      await changePassword(pwForm.password)
-      setPwForm({ password: '', confirm: '' })
+      await changePassword(pwForm.current, pwForm.password)
+      setPwForm({ current: '', password: '', confirm: '' })
       setPwSaved(true)
       setTimeout(() => {
         setPwSaved(false)
@@ -324,7 +328,7 @@ export default function Account() {
                 onClick={() => {
                   setPwOpen((v) => !v)
                   setPwError('')
-                  setPwForm({ password: '', confirm: '' })
+                  setPwForm({ current: '', password: '', confirm: '' })
                 }}
                 className="text-[12.5px] font-bold text-brand-600 transition hover:text-brand-700"
               >
@@ -334,6 +338,19 @@ export default function Account() {
 
             {pwOpen && (
               <form onSubmit={handleChangePassword} className="mt-4 space-y-3 border-t-2 border-ink pt-4">
+                <div>
+                  <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
+                    Contraseña actual
+                  </label>
+                  <input
+                    type="password"
+                    autoComplete="current-password"
+                    className="field"
+                    value={pwForm.current}
+                    onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
+                    placeholder="Tu contraseña de ahora"
+                  />
+                </div>
                 <div>
                   <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
                     Nueva contraseña

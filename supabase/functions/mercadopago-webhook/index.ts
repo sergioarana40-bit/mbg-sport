@@ -8,13 +8,9 @@ const SERVICE_ROLE = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 // se valida la firma HMAC de cada notificación. Si no, se omite la validación
 // (comportamiento anterior) y se confía solo en la re-consulta a la API de MP.
 const WEBHOOK_SECRET = Deno.env.get('MERCADOPAGO_WEBHOOK_SECRET')
-
-function mapOrderStatus(paymentStatus: string) {
-  if (paymentStatus === 'approved') return 'paid'
-  if (['rejected', 'cancelled', 'refunded', 'charged_back'].includes(paymentStatus))
-    return 'cancelled'
-  return 'pending'
-}
+// En producción real conviene exigir pagos live_mode. Se deja apagado por
+// defecto para no romper pruebas en sandbox. Pon MP_REQUIRE_LIVE_MODE=true al lanzar.
+const REQUIRE_LIVE_MODE = Deno.env.get('MP_REQUIRE_LIVE_MODE') === 'true'
 
 // Comparación en tiempo constante para no filtrar la firma por timing.
 function timingSafeEqual(a: string, b: string) {
@@ -69,7 +65,8 @@ Deno.serve(async (req) => {
     }
     if (!paymentId) return new Response('no payment id', { status: 200 })
 
-    // Validación de firma (si hay secreto configurado). Rechaza notificaciones falsas.
+    // Validación de firma (si hay secreto configurado). Rechaza notificaciones
+    // falsas ANTES de gastar una llamada a la API de MP.
     if (WEBHOOK_SECRET) {
       const ok = await validSignature(req, String(paymentId), WEBHOOK_SECRET)
       if (!ok) return new Response('invalid signature', { status: 401 })
@@ -84,27 +81,54 @@ Deno.serve(async (req) => {
 
     const payment = await payRes.json()
     const orderId = payment.external_reference
-    const paymentStatus = payment.status
-    const newStatus = mapOrderStatus(paymentStatus)
+    const paymentStatus = String(payment.status || '')
 
-    if (orderId && SUPABASE_URL && SERVICE_ROLE) {
-      const supabase = createClient(SUPABASE_URL, SERVICE_ROLE)
-      // Idempotencia: si el pedido ya está en ese estado, no se reescribe.
-      const { data: current } = await supabase
-        .from('orders')
-        .select('status')
-        .eq('id', orderId)
-        .maybeSingle()
-      if (!current || current.status !== newStatus) {
+    if (!orderId || !SUPABASE_URL || !SERVICE_ROLE) return new Response('ok', { status: 200 })
+    const supabase = createClient(SUPABASE_URL, SERVICE_ROLE)
+
+    const { data: order } = await supabase
+      .from('orders')
+      .select('status, total')
+      .eq('id', orderId)
+      .maybeSingle()
+    if (!order) return new Response('order not found', { status: 200 })
+
+    // Solo se actúa sobre pedidos que siguen 'pending'. Un pedido ya avanzado
+    // por el admin (processing/shipped/delivered) o cancelado NO se reescribe
+    // desde el webhook: evita que un replay del pago revierta el estado.
+    if (order.status !== 'pending') return new Response('ok', { status: 200 })
+
+    if (paymentStatus === 'approved') {
+      // Verifica que el monto pagado cubra el total del pedido y la moneda.
+      const paid = Number(
+        payment.transaction_amount ?? payment.transaction_details?.total_paid_amount ?? 0
+      )
+      const okAmount = paid + 0.01 >= Number(order.total)   // tolerancia de 1 centavo por redondeo
+      const okCurrency = (payment.currency_id ?? 'MXN') === 'MXN'
+      const okLive = !REQUIRE_LIVE_MODE || payment.live_mode === true
+
+      if (okAmount && okCurrency && okLive) {
         await supabase
           .from('orders')
-          .update({
-            payment_status: paymentStatus,
-            status: newStatus,
-            payment_id: String(paymentId),
-          })
+          .update({ payment_status: paymentStatus, status: 'paid', payment_id: String(paymentId) })
+          .eq('id', orderId)
+      } else {
+        // Pago aprobado PERO con discrepancia (monto/moneda/entorno): NO se marca
+        // pagado. Se registra el pago para que el admin lo revise; el pedido sigue
+        // 'pending' (un pago 'approved' sobre un pedido 'pending' es la señal).
+        await supabase
+          .from('orders')
+          .update({ payment_status: paymentStatus, payment_id: String(paymentId) })
           .eq('id', orderId)
       }
+      return new Response('ok', { status: 200 })
+    }
+
+    if (['rejected', 'cancelled', 'refunded', 'charged_back'].includes(paymentStatus)) {
+      await supabase
+        .from('orders')
+        .update({ payment_status: paymentStatus, status: 'cancelled', payment_id: String(paymentId) })
+        .eq('id', orderId)
     }
 
     return new Response('ok', { status: 200 })

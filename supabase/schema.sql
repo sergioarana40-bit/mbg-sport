@@ -258,8 +258,17 @@ create policy "orders_admin_update" on public.orders
 create policy "orders_admin_delete" on public.orders
   for delete to authenticated using (public.is_admin());
 
+-- El artículo solo puede insertarse en un pedido propio (o de invitado) que
+-- siga 'pending'. Impide añadir productos a pedidos ya pagados o ajenos.
 create policy "order_items_insert" on public.order_items
-  for insert to anon, authenticated with check (true);
+  for insert to anon, authenticated with check (
+    exists (
+      select 1 from public.orders o
+      where o.id = order_items.order_id
+        and (o.user_id = auth.uid() or o.user_id is null)
+        and o.status = 'pending'
+    )
+  );
 create policy "order_items_read" on public.order_items
   for select to authenticated using (
     public.is_admin()

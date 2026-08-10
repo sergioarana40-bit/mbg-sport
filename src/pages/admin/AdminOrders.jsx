@@ -87,12 +87,14 @@ function printOrder(o) {
   <p class="foot">${escapeHtml(STORE.address)}<br>${escapeHtml(
     STORE.hours
   )}<br>¡Gracias por su preferencia!</p>
-</div><script>window.onload=function(){window.print()}</script></body></html>`
+</div></body></html>`
   const w = window.open('', '_blank', 'width=460,height=700')
   if (!w) return
   w.document.write(html)
   w.document.close()
   w.focus()
+  // Se imprime desde el opener (sin <script> inline) para respetar la CSP estricta.
+  w.print()
 }
 
 // Enlace de WhatsApp al cliente con el resumen del pedido.
