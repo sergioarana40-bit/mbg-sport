@@ -22,6 +22,12 @@ export async function updateProfile(userId, { full_name, phone }) {
   if (error) throw error
 }
 
+// Cambia la contraseña del usuario con sesión activa (cliente o admin).
+export async function changePassword(newPassword) {
+  const { error } = await supabase.auth.updateUser({ password: newPassword })
+  if (error) throw error
+}
+
 // Preferencia de notificaciones.
 export async function setNotifications(userId, enabled) {
   const { error } = await supabase

@@ -8,9 +8,11 @@ import {
   ChevronRight,
   Bell,
   Heart,
+  KeyRound,
   MapPin,
   ShoppingBag,
   ArrowRight,
+  AlertCircle,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { useCart } from '../../context/CartContext'
@@ -18,7 +20,7 @@ import Spinner from '../../components/Spinner'
 import StatusBadge from '../../components/StatusBadge'
 import AddressManager from '../../components/AddressManager'
 import { formatPrice } from '../../config'
-import { getMyOrders, updateProfile, setNotifications } from '../../lib/account'
+import { getMyOrders, updateProfile, setNotifications, changePassword } from '../../lib/account'
 import { getProductsByIds } from '../../lib/api'
 
 function fmtDate(iso) {
@@ -55,6 +57,13 @@ export default function Account() {
   const [saved, setSaved] = useState(false)
   const [notifOn, setNotifOn] = useState(true)
   const [rebuying, setRebuying] = useState(null)
+
+  // Cambio de contraseña
+  const [pwOpen, setPwOpen] = useState(false)
+  const [pwForm, setPwForm] = useState({ password: '', confirm: '' })
+  const [pwSaving, setPwSaving] = useState(false)
+  const [pwSaved, setPwSaved] = useState(false)
+  const [pwError, setPwError] = useState('')
 
   useEffect(() => {
     if (!user) return
@@ -113,6 +122,33 @@ export default function Account() {
   async function handleLogout() {
     await signOut()
     navigate('/tienda')
+  }
+
+  async function handleChangePassword(e) {
+    e.preventDefault()
+    setPwError('')
+    if (pwForm.password.length < 8) {
+      setPwError('La contraseña debe tener al menos 8 caracteres.')
+      return
+    }
+    if (pwForm.password !== pwForm.confirm) {
+      setPwError('Las contraseñas no coinciden.')
+      return
+    }
+    setPwSaving(true)
+    try {
+      await changePassword(pwForm.password)
+      setPwForm({ password: '', confirm: '' })
+      setPwSaved(true)
+      setTimeout(() => {
+        setPwSaved(false)
+        setPwOpen(false)
+      }, 1500)
+    } catch (err) {
+      setPwError(err.message || 'No se pudo cambiar la contraseña.')
+    } finally {
+      setPwSaving(false)
+    }
   }
 
   // "Volver a comprar": re-agrega los artículos del pedido al carrito.
@@ -275,6 +311,82 @@ export default function Account() {
                 />
               </button>
             </div>
+          </div>
+
+          {/* Cambiar contraseña */}
+          <div className="sticker p-[18px]">
+            <div className="flex items-center gap-3">
+              <span className={menuIcon}>
+                <KeyRound className="h-[18px] w-[18px]" strokeWidth={1.7} />
+              </span>
+              <span className="flex-1 text-[13.5px] font-bold text-fg">Cambiar contraseña</span>
+              <button
+                onClick={() => {
+                  setPwOpen((v) => !v)
+                  setPwError('')
+                  setPwForm({ password: '', confirm: '' })
+                }}
+                className="text-[12.5px] font-bold text-brand-600 transition hover:text-brand-700"
+              >
+                {pwOpen ? 'Cerrar' : 'Cambiar'}
+              </button>
+            </div>
+
+            {pwOpen && (
+              <form onSubmit={handleChangePassword} className="mt-4 space-y-3 border-t-2 border-ink pt-4">
+                <div>
+                  <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
+                    Nueva contraseña
+                  </label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    className="field"
+                    value={pwForm.password}
+                    onChange={(e) => setPwForm({ ...pwForm, password: e.target.value })}
+                    placeholder="Mínimo 8 caracteres"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
+                    Confirmar contraseña
+                  </label>
+                  <input
+                    type="password"
+                    autoComplete="new-password"
+                    className="field"
+                    value={pwForm.confirm}
+                    onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+                    placeholder="Repite la nueva contraseña"
+                  />
+                </div>
+
+                {pwError && (
+                  <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-2.5 text-[12.5px] font-semibold text-white">
+                    <AlertCircle className="h-4 w-4 shrink-0" />
+                    {pwError}
+                  </p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={pwSaving}
+                  className={`w-full rounded-[10px] py-2.5 font-display text-xs font-extrabold uppercase tracking-[.06em] text-white transition ${
+                    pwSaved ? 'bg-state-paid' : 'bg-ink hover:bg-ink-2'
+                  }`}
+                >
+                  {pwSaving ? (
+                    <Spinner size={5} className="mx-auto border-white/40 border-t-white" />
+                  ) : pwSaved ? (
+                    <span className="inline-flex items-center gap-2">
+                      <Check className="h-4 w-4" /> Contraseña actualizada
+                    </span>
+                  ) : (
+                    'Guardar contraseña'
+                  )}
+                </button>
+              </form>
+            )}
           </div>
 
           {/* Cerrar sesión (contorno rojo, diseño 1b) */}
