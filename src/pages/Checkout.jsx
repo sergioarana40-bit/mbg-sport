@@ -102,14 +102,7 @@ export default function Checkout() {
         userId: user?.id,
       })
       const { init_point } = await createMercadoPagoPreference({
-        order: {
-          id: order.id,
-          shipping,
-          discount,
-          customer_name: customer.name,
-          customer_email: customer.email,
-        },
-        items,
+        order: { id: order.id },
       })
       window.location.href = init_point
     } catch (err) {

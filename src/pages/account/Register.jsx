@@ -22,7 +22,7 @@ export default function Register() {
     e.preventDefault()
     if (!form.name.trim()) return setError('Escribe tu nombre.')
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return setError('Correo no válido.')
-    if (form.password.length < 6) return setError('La contraseña debe tener al menos 6 caracteres.')
+    if (form.password.length < 8) return setError('La contraseña debe tener al menos 8 caracteres.')
 
     setLoading(true)
     setError('')
@@ -112,7 +112,7 @@ export default function Register() {
                 type="password"
                 value={form.password}
                 onChange={(e) => update('password', e.target.value)}
-                placeholder="Contraseña (mín. 6 caracteres)"
+                placeholder="Contraseña (mín. 8 caracteres)"
                 className="field pl-10"
                 autoComplete="new-password"
               />
