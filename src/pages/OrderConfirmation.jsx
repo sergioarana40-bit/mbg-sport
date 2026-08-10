@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, useSearchParams, Link } from 'react-router-dom'
-import { CheckCircle2, Clock, XCircle, ArrowRight, Truck, Store, Download } from 'lucide-react'
+import { CheckCircle2, ArrowRight, Truck, Store, Download } from 'lucide-react'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
@@ -9,48 +9,29 @@ import { formatPrice, STORE } from '../config'
 import { isSupabaseConfigured } from '../lib/supabase'
 
 function resolveStatus(raw) {
-  if (raw === 'demo') return 'demo'
-  if (['approved', 'success'].includes(raw)) return 'success'
-  if (['pending', 'in_process'].includes(raw)) return 'pending'
-  if (['failure', 'rejected', 'cancelled', 'null'].includes(raw)) return 'failure'
-  return 'success'
+  return raw === 'demo' ? 'demo' : 'success'
 }
 
-// Círculo sticker del póster: amarillo para éxito/pendiente, rojo para fallo.
+// Círculo sticker del póster (amarillo con check).
 const VIEWS = {
   success: {
     icon: CheckCircle2,
     color: 'text-fg',
     bg: 'bg-accent-400',
-    title: '¡Gracias por tu compra!',
-    text: 'Recibimos tu pago. Te avisaremos cuando tu pedido esté listo para recoger.',
-  },
-  pending: {
-    icon: Clock,
-    color: 'text-fg',
-    bg: 'bg-accent-400',
-    title: 'Pago pendiente',
-    text: 'Tu pago está en proceso. Te avisaremos cuando se confirme.',
-  },
-  failure: {
-    icon: XCircle,
-    color: 'text-white',
-    bg: 'bg-brand-600',
-    title: 'El pago no se completó',
-    text: 'No se realizó ningún cargo. Puedes intentar de nuevo.',
+    title: '¡Pedido confirmado!',
+    text: 'Lo estamos preparando. Pagas al recogerlo en la tienda, en efectivo o con tarjeta.',
   },
   demo: {
     icon: CheckCircle2,
     color: 'text-fg',
     bg: 'bg-accent-400',
     title: '¡Pedido simulado con éxito!',
-    text: 'Esto es una demostración. Conecta Supabase y MercadoPago para pedidos reales.',
+    text: 'Esto es una demostración. Conecta Supabase para pedidos reales.',
   },
 }
 
 const STATUS_PILL = {
-  success: { label: 'Pagado' },
-  pending: { label: 'Pendiente' },
+  success: { label: 'Confirmado' },
   demo: { label: 'Demo' },
 }
 
@@ -70,9 +51,9 @@ export default function OrderConfirmation() {
   )
 
   useEffect(() => {
-    if (status !== 'failure') clearCart()
+    clearCart()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status])
+  }, [])
 
   useEffect(() => {
     if (id && id !== 'demo' && isSupabaseConfigured) {
@@ -106,7 +87,7 @@ export default function OrderConfirmation() {
       )}
 
       {/* Tarjeta del pedido (sticker, diseño 1b) */}
-      {id && id !== 'demo' && status !== 'failure' && (
+      {id && id !== 'demo' && (
         <div className="sticker mt-6 p-[18px] text-left">
           <div className="flex items-center justify-between">
             <div>
@@ -168,7 +149,7 @@ export default function OrderConfirmation() {
       )}
 
       {/* Banner instalar PWA */}
-      {!standalone && status !== 'failure' && (
+      {!standalone && (
         <div className="mt-4 flex items-center gap-3 rounded-[10px] border-2 border-ink bg-accent-400 px-3.5 py-3 text-left">
           <Download className="h-[19px] w-[19px] shrink-0 text-fg" strokeWidth={2} />
           <span className="text-xs font-bold text-fg">
@@ -178,26 +159,18 @@ export default function OrderConfirmation() {
       )}
 
       <div className="mt-8 flex flex-col gap-3">
-        {status === 'failure' ? (
-          <Link to="/checkout" className="btn-sticker h-[50px] w-full">
-            Intentar de nuevo
+        {id && id !== 'demo' && (
+          <Link
+            to={user ? `/cuenta/pedidos/${id}` : '/cuenta/login'}
+            className="btn-sticker h-[50px] w-full"
+          >
+            Ver mi pedido
           </Link>
-        ) : (
-          <>
-            {id && id !== 'demo' && (
-              <Link
-                to={user ? `/cuenta/pedidos/${id}` : '/cuenta/login'}
-                className="btn-sticker h-[50px] w-full"
-              >
-                Ver mi pedido
-              </Link>
-            )}
-            <Link to="/catalogo" className="btn-secondary h-12 w-full">
-              Seguir comprando
-              <ArrowRight className="h-[15px] w-[15px]" strokeWidth={2.5} />
-            </Link>
-          </>
         )}
+        <Link to="/catalogo" className="btn-secondary h-12 w-full">
+          Seguir comprando
+          <ArrowRight className="h-[15px] w-[15px]" strokeWidth={2.5} />
+        </Link>
         <p className="mt-2 text-xs font-medium text-fg-subtle">
           ¿Dudas? Visítanos en {STORE.city} o escríbenos por WhatsApp.
         </p>

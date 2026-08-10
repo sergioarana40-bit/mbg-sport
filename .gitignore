@@ -18,6 +18,10 @@ dev-dist
 .env.*
 !.env.example
 
+# Manual del administrador — contiene credenciales, no subir al repo
+Manual-Administrador-MBGSPORT.pdf
+design/manual-admin.html
+
 # Editor directories and files
 .claude/
 .vscode/*

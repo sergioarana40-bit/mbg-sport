@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useParams, Link, Navigate } from 'react-router-dom'
-import { ChevronLeft, Check, Package, Truck, Home, CreditCard, XCircle } from 'lucide-react'
+import { ChevronLeft, Check, Package, Truck, Home, Store as StoreIcon, XCircle } from 'lucide-react'
 import Spinner from '../../components/Spinner'
 import StatusBadge from '../../components/StatusBadge'
 import { useAuth } from '../../context/AuthContext'
@@ -25,19 +25,19 @@ function fmtDateTime(iso) {
   }).format(new Date(iso))
 }
 
-// Pasos del pedido; con recogida en tienda el 4º paso es "Listo para recoger".
+// Pasos del pedido; se paga en la tienda al recoger (sin pago en línea).
 function stepsFor(deliveryMethod) {
   return [
     { label: 'Pedido confirmado', icon: Check, note: 'Recibimos tu pedido' },
-    { label: 'Pago aprobado', icon: CreditCard, note: 'MercadoPago' },
     { label: 'En preparación', icon: Package, note: 'Armando tu pedido' },
     deliveryMethod === 'pickup'
-      ? { label: 'Listo para recoger', icon: Package, note: 'Te esperamos en tienda' }
+      ? { label: 'Listo para recoger', icon: StoreIcon, note: 'Te esperamos en tienda · pagas al recoger' }
       : { label: 'Enviado', icon: Truck, note: 'En camino' },
     { label: 'Entregado', icon: Home, note: 'Recibido' },
   ]
 }
-const STATUS_STEP = { pending: 0, paid: 1, processing: 2, shipped: 3, delivered: 4 }
+// 'paid' se cobra en mostrador al recoger, así que equivale a "listo para recoger".
+const STATUS_STEP = { pending: 0, paid: 2, processing: 1, shipped: 2, delivered: 3 }
 
 export default function OrderTracking() {
   const { id } = useParams()

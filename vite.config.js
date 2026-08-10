@@ -53,6 +53,7 @@ export default defineConfig({
     }),
   ],
   server: {
-    port: 5173,
+    // Respeta PORT si el entorno lo define (p. ej. previews); 5173 por defecto.
+    port: Number(process.env.PORT) || 5173,
   },
 })

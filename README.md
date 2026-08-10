@@ -1,11 +1,12 @@
 # MBG Sport · Tienda en línea
 
 Tienda de artículos deportivos (gimnasio, pesas, barras, ropa y refacciones) con
-catálogo, carrito, checkout con **MercadoPago** y panel de administración.
+catálogo, carrito, pedidos para **recoger y pagar en tienda** y panel de administración.
 
-- **Cliente:** catálogo, filtros por categoría, buscador, detalle de producto, carrito y checkout.
+- **Cliente:** catálogo, filtros por categoría, buscador, detalle de producto, carrito y checkout
+  (el pedido se confirma en línea y se paga al recogerlo en la tienda).
 - **Admin:** dashboard con estadísticas, gestión de productos (con imágenes), categorías y pedidos.
-- **Stack:** Vite + React + React Router + Tailwind CSS v4 + Supabase (base de datos, auth, storage y edge functions) + MercadoPago.
+- **Stack:** Vite + React + React Router + Tailwind CSS v4 + Supabase (base de datos, auth y storage).
 
 > Mientras no configures Supabase, la app funciona en **modo demostración** con datos de ejemplo,
 > para que puedas ver y navegar la tienda.
@@ -45,31 +46,12 @@ Abre http://localhost:5173 (o el puerto que indique Vite).
 
 ---
 
-## 3. Configurar MercadoPago
+## 3. Pagos
 
-1. Crea una aplicación en el [panel de desarrolladores de MercadoPago](https://www.mercadopago.com.mx/developers)
-   y copia tu **Access Token** (para pruebas usa las credenciales de *TEST*).
-2. Guarda el Access Token como secret y despliega las edge functions:
-
-   ```bash
-   # Requiere la CLI de Supabase y haber hecho: supabase link --project-ref TU-REF
-   supabase secrets set MERCADOPAGO_ACCESS_TOKEN=APP_USR-tu-access-token
-
-   supabase functions deploy create-preference
-   supabase functions deploy mercadopago-webhook --no-verify-jwt
-   ```
-
-3. En el panel de MercadoPago, configura la **URL de notificaciones (webhook)** apuntando a:
-
-   ```
-   https://TU-PROYECTO.supabase.co/functions/v1/mercadopago-webhook
-   ```
-
-Con esto, al finalizar la compra el cliente es redirigido al checkout de MercadoPago y,
-tras pagar, el webhook actualiza el estado del pedido automáticamente.
-
-> **Nota de seguridad:** el `create-preference` usa el Access Token solo en el servidor.
-> Para producción se recomienda validar la firma `x-signature` en el webhook.
+No hay pasarela de pago en línea: los pedidos se confirman en la tienda en línea y
+**se pagan presencialmente al recogerlos** (efectivo o tarjeta en mostrador). El admin
+gestiona el ciclo del pedido desde el panel: Pendiente → En preparación → Listo para
+recoger → Entregado (y "Pagado" al cobrar en mostrador).
 
 ---
 
@@ -88,7 +70,7 @@ tras pagar, el webhook actualiza el estado del pedido automáticamente.
 src/
   components/     Header, Footer, ProductCard, Modal, etc.
   context/        CartContext (carrito) y AuthContext (admin)
-  lib/            supabase, api (tienda), admin (panel), mercadopago
+  lib/            supabase, api (tienda), admin (panel), account, csv
   pages/          Home, Catalog, ProductDetail, Cart, Checkout, ...
   pages/admin/    Login, Dashboard, AdminProducts, AdminCategories, AdminOrders
   config.js       Datos del negocio (dirección, envío, etc.) — edítalo aquí
@@ -96,7 +78,6 @@ src/
 supabase/
   schema.sql      Tablas + RLS + storage
   seed.sql        Datos iniciales
-  functions/      Edge functions de MercadoPago
 ```
 
 Los datos del negocio (dirección, teléfono, WhatsApp, costo de envío, etc.) se editan

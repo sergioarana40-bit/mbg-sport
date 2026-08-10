@@ -115,9 +115,6 @@ create table if not exists public.orders (
   delivery_method text not null default 'shipping',  -- 'shipping' | 'pickup'
   total numeric(10,2) not null default 0,
   status text not null default 'pending',            -- pending|paid|processing|shipped|delivered|cancelled
-  payment_status text not null default 'pending',    -- pending|approved|rejected|in_process
-  payment_id text,
-  preference_id text,
   created_at timestamptz not null default now()
 );
 

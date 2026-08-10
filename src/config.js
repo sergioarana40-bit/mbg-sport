@@ -50,11 +50,13 @@ export function formatPrice(value) {
 }
 
 // Estados posibles de un pedido, con etiqueta y color para la UI.
+// El pago es presencial (al recoger en tienda): "Pagado" lo marca el admin al cobrar.
+// Si algún día se reactivan los envíos, regresa la etiqueta de `shipped` a 'Enviado'.
 export const ORDER_STATUS = {
   pending: { label: 'Pendiente', color: 'amber' },
   paid: { label: 'Pagado', color: 'emerald' },
   processing: { label: 'En preparación', color: 'blue' },
-  shipped: { label: 'Enviado', color: 'indigo' },
+  shipped: { label: 'Listo para recoger', color: 'indigo' },
   delivered: { label: 'Entregado', color: 'green' },
   cancelled: { label: 'Cancelado', color: 'red' },
 }

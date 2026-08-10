@@ -53,7 +53,7 @@ const NAV_LINKS = [
 ]
 
 const BENEFITS = [
-  { icon: CreditCard, title: 'Pago seguro', text: 'MercadoPago', short: 'MercadoPago' },
+  { icon: CreditCard, title: 'Paga al recoger', text: 'Efectivo o tarjeta en tienda', short: 'En tienda' },
   { icon: PackageCheck, title: 'Recoge en tienda', text: 'Tu pedido listo hoy', short: 'Listo hoy' },
   { icon: Store, title: 'Tienda física', text: 'Visítanos en Toluca', short: 'Toluca' },
   { icon: ShieldCheck, title: 'Garantía', text: 'Productos originales', short: 'Originales' },
@@ -63,7 +63,7 @@ const WHAT_WE_DO = [
   {
     icon: ShoppingCart,
     title: 'Tienda en línea',
-    text: 'Pesas, barras, máquinas, accesorios, suplementación y ropa deportiva. Compra con MercadoPago y recoge en tienda el mismo día.',
+    text: 'Pesas, barras, máquinas, accesorios, suplementación y ropa deportiva. Aparta en línea, recoge en tienda el mismo día y paga al recoger.',
     short: 'Pesas, máquinas, accesorios y ropa. Recoge en tienda el mismo día.',
     linkLabel: 'Ver catálogo',
     to: '/catalogo',

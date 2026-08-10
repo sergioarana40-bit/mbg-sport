@@ -162,7 +162,6 @@ export async function createOrder({
     delivery_method: deliveryMethod || 'shipping',
     total,
     status: 'pending',
-    payment_status: 'pending',
   }
 
   const { error } = await supabase.from('orders').insert(order)

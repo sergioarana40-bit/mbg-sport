@@ -203,9 +203,9 @@ export default function Promotions() {
                 <CreditCard className="h-5 w-5" strokeWidth={1.8} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-[13.5px] font-bold text-fg">Meses sin intereses</p>
+                <p className="text-[13.5px] font-bold text-fg">Paga al recoger</p>
                 <p className="mt-0.5 text-[11.5px] font-medium text-fg-subtle">
-                  Paga a meses con MercadoPago
+                  Efectivo o tarjeta en la tienda
                 </p>
               </div>
             </div>

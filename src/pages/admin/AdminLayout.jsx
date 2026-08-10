@@ -12,10 +12,16 @@ import {
   Menu,
   Wrench,
   X,
+  KeyRound,
+  AlertCircle,
+  Check,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import Logo from '../../components/Logo'
+import Modal from '../../components/Modal'
+import Spinner from '../../components/Spinner'
 import { getPendingOrdersCount, subscribeOrders } from '../../lib/admin'
+import { changePassword } from '../../lib/account'
 
 const NAV = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -34,6 +40,49 @@ export default function AdminLayout() {
   const [open, setOpen] = useState(false)
   // Pedidos por atender (pendientes o pagados sin preparar) para el aviso del menú.
   const [pendingCount, setPendingCount] = useState(0)
+
+  // Cambio de contraseña del administrador (desde el propio panel).
+  const EMPTY_PW = { current: '', password: '', confirm: '' }
+  const [pwOpen, setPwOpen] = useState(false)
+  const [pwForm, setPwForm] = useState(EMPTY_PW)
+  const [pwSaving, setPwSaving] = useState(false)
+  const [pwError, setPwError] = useState('')
+  const [pwDone, setPwDone] = useState(false)
+
+  function openPasswordModal() {
+    setPwForm(EMPTY_PW)
+    setPwError('')
+    setPwDone(false)
+    setPwOpen(true)
+    setOpen(false)
+  }
+
+  async function handleChangePassword(e) {
+    e.preventDefault()
+    if (!pwForm.current) {
+      setPwError('Escribe tu contraseña actual.')
+      return
+    }
+    if (pwForm.password.length < 8) {
+      setPwError('La nueva contraseña debe tener al menos 8 caracteres.')
+      return
+    }
+    if (pwForm.password !== pwForm.confirm) {
+      setPwError('Las contraseñas no coinciden.')
+      return
+    }
+    setPwSaving(true)
+    setPwError('')
+    try {
+      await changePassword(pwForm.current, pwForm.password)
+      setPwForm(EMPTY_PW)
+      setPwDone(true)
+    } catch (err) {
+      setPwError(err.message || 'No se pudo cambiar la contraseña.')
+    } finally {
+      setPwSaving(false)
+    }
+  }
 
   // Suscripción única al montar: Realtime + refresco periódico de respaldo.
   useEffect(() => {
@@ -109,6 +158,10 @@ export default function AdminLayout() {
           <Store className="h-4 w-4" strokeWidth={2} />
           Ver tienda
         </Link>
+        <button onClick={openPasswordModal} className={footerLink}>
+          <KeyRound className="h-4 w-4" strokeWidth={2} />
+          Cambiar contraseña
+        </button>
         <button onClick={handleLogout} className={footerLink}>
           <LogOut className="h-4 w-4" strokeWidth={2} />
           Cerrar sesión
@@ -154,6 +207,94 @@ export default function AdminLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* Modal: cambiar contraseña del administrador */}
+      <Modal
+        open={pwOpen}
+        onClose={() => setPwOpen(false)}
+        title="Cambiar contraseña"
+        maxWidth="max-w-md"
+      >
+        {pwDone ? (
+          <div className="space-y-4">
+            <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-state-paid/15 p-3 text-sm font-semibold text-fg">
+              <Check className="h-4 w-4 shrink-0 text-state-paid" />
+              Contraseña actualizada. Úsala en tu próximo inicio de sesión.
+            </p>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setPwOpen(false)}
+                className="btn-primary px-5 py-2 text-sm"
+              >
+                Listo
+              </button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleChangePassword} className="space-y-4">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-fg-muted">
+                Contraseña actual
+              </label>
+              <input
+                type="password"
+                autoComplete="current-password"
+                className="field"
+                value={pwForm.current}
+                onChange={(e) => setPwForm({ ...pwForm, current: e.target.value })}
+                placeholder="Tu contraseña de ahora"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-fg-muted">
+                Nueva contraseña
+              </label>
+              <input
+                type="password"
+                autoComplete="new-password"
+                className="field"
+                value={pwForm.password}
+                onChange={(e) => setPwForm({ ...pwForm, password: e.target.value })}
+                placeholder="Mínimo 8 caracteres"
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-fg-muted">
+                Confirmar contraseña
+              </label>
+              <input
+                type="password"
+                autoComplete="new-password"
+                className="field"
+                value={pwForm.confirm}
+                onChange={(e) => setPwForm({ ...pwForm, confirm: e.target.value })}
+                placeholder="Repite la nueva contraseña"
+              />
+            </div>
+
+            {pwError && (
+              <p className="flex items-center gap-2 rounded-lg border-2 border-ink bg-brand-600 p-3 text-sm font-semibold text-white">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                {pwError}
+              </p>
+            )}
+
+            <div className="flex justify-end gap-3 pt-1">
+              <button
+                type="button"
+                onClick={() => setPwOpen(false)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-fg-muted hover:bg-surface-2"
+              >
+                Cancelar
+              </button>
+              <button type="submit" disabled={pwSaving} className="btn-primary px-5 py-2 text-sm">
+                {pwSaving && <Spinner size={4} className="border-white/40 border-t-white" />}
+                Guardar contraseña
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
   )
 }

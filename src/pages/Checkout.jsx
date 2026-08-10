@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate, Navigate } from 'react-router-dom'
-import { AlertCircle, CreditCard } from 'lucide-react'
+import { AlertCircle, Store as StoreIcon } from 'lucide-react'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
 import { formatPrice, STORE } from '../config'
 import { computeTotals } from '../lib/coupons'
 import { createOrder } from '../lib/api'
-import { createMercadoPagoPreference } from '../lib/mercadopago'
 import { isSupabaseConfigured } from '../lib/supabase'
 
 const EMPTY = { name: '', email: '', phone: '', address: '', notes: '' }
@@ -65,7 +64,7 @@ export default function Checkout() {
     return ''
   }
 
-  async function handlePay(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
     const problem = validate()
     if (problem) {
@@ -101,12 +100,10 @@ export default function Checkout() {
         notes: form.notes.trim(),
         userId: user?.id,
       })
-      const { init_point } = await createMercadoPagoPreference({
-        order: { id: order.id },
-      })
-      window.location.href = init_point
+      // Sin pasarela en línea: el pedido queda confirmado y se paga al recogerlo.
+      navigate(`/pedido/${order.id}`)
     } catch (err) {
-      setError(err.message || 'Ocurrió un error al procesar el pago.')
+      setError(err.message || 'Ocurrió un error al crear el pedido.')
       setLoading(false)
     }
   }
@@ -131,7 +128,7 @@ export default function Checkout() {
           </Link>
           <span className="text-fg-subtle">→</span>
           <span className="rounded-full border-2 border-ink bg-accent-400 px-2.5 py-1 text-fg">
-            2 · Datos y pago
+            2 · Datos y entrega
           </span>
           <span className="text-fg-subtle">→</span>
           <span className="text-fg-subtle">3 · Confirmación</span>
@@ -142,12 +139,12 @@ export default function Checkout() {
         <div className="mt-6 flex items-start gap-3 rounded-[10px] border-2 border-ink bg-accent-400/40 p-4 text-sm font-medium text-fg">
           <AlertCircle className="h-5 w-5 shrink-0" />
           <p>
-            <b>Modo demostración.</b> Conecta Supabase y MercadoPago para procesar pagos reales.
+            <b>Modo demostración.</b> Conecta Supabase para recibir pedidos reales.
           </p>
         </div>
       )}
 
-      <form onSubmit={handlePay} className="mt-6 grid items-start gap-8 lg:grid-cols-[1fr_360px]">
+      <form onSubmit={handleSubmit} className="mt-6 grid items-start gap-8 lg:grid-cols-[1fr_360px]">
         <div className="space-y-6">
           {/* Datos de contacto */}
           <div className="rounded-[10px] border-2 border-ink bg-white p-5 sm:p-6">
@@ -283,15 +280,16 @@ export default function Checkout() {
           <div className="rounded-[10px] border-2 border-ink bg-white p-5 sm:p-6">
             <h2 className="font-display text-[15px] font-extrabold uppercase text-fg">Pago</h2>
             <div className="mt-4 flex items-center gap-3.5 rounded-[10px] border-2 border-ink p-4">
-              <CreditCard className="h-6 w-6 shrink-0 text-fg" strokeWidth={1.8} />
+              <StoreIcon className="h-6 w-6 shrink-0 text-fg" strokeWidth={1.8} />
               <span className="min-w-0 flex-1">
-                <span className="block text-[13.5px] font-bold text-fg">MercadoPago</span>
+                <span className="block text-[13.5px] font-bold text-fg">Pagas al recoger</span>
                 <span className="mt-0.5 block text-xs font-medium text-[#4a4a4a]">
-                  Tarjetas, transferencia y meses sin intereses. Serás redirigido para pagar.
+                  Confirma tu pedido y págalo en la tienda al recogerlo, en efectivo o con
+                  tarjeta.
                 </span>
               </span>
               <span className="hidden shrink-0 rounded-md border-2 border-ink bg-accent-400 px-2 py-1 font-display text-[10px] font-extrabold uppercase text-fg sm:inline-block">
-                Pago seguro
+                Sin anticipos
               </span>
             </div>
           </div>
@@ -360,15 +358,15 @@ export default function Checkout() {
               {loading ? (
                 <Spinner size={5} className="border-white/40 border-t-white" />
               ) : (
-                'Pagar con MercadoPago'
+                'Confirmar pedido'
               )}
             </button>
 
             <p className="mt-3 text-center text-[11px] font-medium text-fg-subtle">
-              Pago procesado por MercadoPago · datos protegidos
+              Pagas al recoger en tienda · sin cargos en línea
             </p>
             <p className="mt-1.5 text-center text-[11px] font-medium leading-relaxed text-fg-subtle">
-              Al pagar aceptas nuestros{' '}
+              Al confirmar aceptas nuestros{' '}
               <Link to="/terminos" className="underline underline-offset-2 transition hover:text-fg">
                 términos y condiciones
               </Link>
