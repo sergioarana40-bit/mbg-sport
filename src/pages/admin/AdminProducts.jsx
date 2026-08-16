@@ -178,8 +178,8 @@ export default function AdminProducts() {
 
   async function handleSave(e) {
     e.preventDefault()
-    if (!form.name.trim() || !form.price) {
-      setError('Nombre y precio son obligatorios.')
+    if (!form.name.trim()) {
+      setError('El nombre es obligatorio.')
       return
     }
     setSaving(true)
@@ -530,7 +530,7 @@ export default function AdminProducts() {
                         value={p.price}
                         min={0}
                         step={0.5}
-                        format={formatPrice}
+                        format={(v) => (Number(v) > 0 ? formatPrice(v) : 'Por confirmar')}
                         onSave={(n) => saveInline(p, { price: n })}
                       />
                     </td>
@@ -636,7 +636,7 @@ export default function AdminProducts() {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="mb-1 block text-sm font-medium text-fg-muted">
-                Precio (MXN)
+                Precio (MXN) — opcional
               </label>
               <input
                 type="number"
@@ -645,7 +645,12 @@ export default function AdminProducts() {
                 className="field"
                 value={form.price}
                 onChange={(e) => setForm({ ...form, price: e.target.value })}
+                placeholder="Vacío = por confirmar"
               />
+              <p className="mt-1 text-[11px] font-medium text-fg-subtle">
+                Sin precio, la tienda muestra "Precio por confirmar" y el cliente lo consulta
+                por WhatsApp (no se puede agregar al carrito).
+              </p>
             </div>
             <div>
               <label className="mb-1 block text-sm font-medium text-fg-muted">Stock</label>
@@ -812,7 +817,7 @@ export default function AdminProducts() {
                 </tr>
                 <tr>
                   <td className="px-3 py-2 font-mono font-bold text-fg">precio</td>
-                  <td className="px-3 py-2 font-bold text-brand-600">Sí</td>
+                  <td className="px-3 py-2 font-medium text-fg-subtle">No (vacío = por confirmar)</td>
                   <td className="px-3 py-2 font-medium text-[#4a4a4a]">850 · $1,299.50</td>
                 </tr>
                 <tr>
@@ -860,6 +865,11 @@ export default function AdminProducts() {
               · Si el <b className="text-fg">nombre ya existe</b>, el producto se{' '}
               <b className="text-fg">actualiza</b> (precio, stock, etc.) en lugar de duplicarse —
               ideal para subir tu inventario cada semana.
+            </li>
+            <li>
+              · Sin <b className="text-fg">precio</b> (columna vacía o en 0), el producto se
+              publica como <b className="text-fg">"Precio por confirmar"</b>: se ve en la tienda
+              pero no se puede comprar hasta que le pongas precio.
             </li>
             <li>
               · La columna <b className="text-fg">imagen</b> acepta un enlace a la foto; si la
@@ -941,7 +951,9 @@ export default function AdminProducts() {
                     {csvPreview.items.map((it, i) => (
                       <tr key={i}>
                         <td className="px-3 py-2 font-semibold text-fg">{it.name}</td>
-                        <td className="px-3 py-2 font-bold text-fg">{formatPrice(it.price)}</td>
+                        <td className="px-3 py-2 font-bold text-fg">
+                          {it.price > 0 ? formatPrice(it.price) : 'Por confirmar'}
+                        </td>
                         <td className="px-3 py-2 font-medium text-[#4a4a4a]">{it.stock}</td>
                         <td className="px-3 py-2 font-medium text-[#4a4a4a]">
                           {it.categoryName || '—'}

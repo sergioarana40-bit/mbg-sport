@@ -7,17 +7,18 @@ import Spinner from '../components/Spinner'
 import { useFavorites } from '../context/FavoritesContext'
 import { useCart } from '../context/CartContext'
 import { getProductsByIds } from '../lib/api'
-import { formatPrice } from '../config'
+import { formatPrice, hasPrice } from '../config'
 
 // Tarjeta de favorito (diseño 08): corazón arriba-derecha + botón "Agregar" oscuro.
 function FavoriteCard({ product }) {
   const { addItem } = useCart()
   const [added, setAdded] = useState(false)
+  const noPrice = !hasPrice(product.price)
   const outOfStock = product.stock === 0
 
   function handleAdd(e) {
     e.preventDefault()
-    if (outOfStock) return
+    if (outOfStock || noPrice) return
     addItem(product, 1)
     setAdded(true)
     setTimeout(() => setAdded(false), 1200)
@@ -39,7 +40,9 @@ function FavoriteCard({ product }) {
           size={4}
           className="absolute right-2 top-2 h-[34px] w-[34px] rounded-lg border-2 border-ink bg-white text-fg"
         />
-        {outOfStock && <span className="badge-out absolute bottom-2 left-2">Agotado</span>}
+        {outOfStock && !noPrice && (
+          <span className="badge-out absolute bottom-2 left-2">Agotado</span>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-3.5">
         {product.category_name && (
@@ -50,12 +53,20 @@ function FavoriteCard({ product }) {
         <h3 className="mt-1 line-clamp-2 text-[13.5px] font-semibold leading-snug text-fg">
           {product.name}
         </h3>
-        <span className="price-tag mt-2 self-start text-base">{formatPrice(product.price)}</span>
+        {noPrice ? (
+          <span className="mt-2 self-start rounded-md border-2 border-ink bg-accent-400 px-2 py-1 font-display text-[9.5px] font-extrabold uppercase leading-none text-fg">
+            Precio por confirmar
+          </span>
+        ) : (
+          <span className="price-tag mt-2 self-start text-base">
+            {formatPrice(product.price)}
+          </span>
+        )}
         <button
           onClick={handleAdd}
-          disabled={outOfStock}
+          disabled={outOfStock || noPrice}
           className={`mt-3 flex h-[38px] items-center justify-center gap-2 rounded-lg font-display text-[11.5px] font-extrabold uppercase transition ${
-            outOfStock
+            outOfStock || noPrice
               ? 'cursor-not-allowed border-2 border-[#d9d9d9] bg-white text-fg-subtle'
               : added
                 ? 'bg-state-paid text-white'
@@ -66,6 +77,8 @@ function FavoriteCard({ product }) {
             <>
               <Check className="h-3.5 w-3.5" /> Agregado
             </>
+          ) : noPrice ? (
+            'Ver producto'
           ) : outOfStock ? (
             'Agotado'
           ) : (

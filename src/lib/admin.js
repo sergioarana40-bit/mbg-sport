@@ -78,17 +78,54 @@ export async function bulkDeleteProducts(ids) {
 }
 
 // Sube una imagen al bucket 'products' y devuelve su URL pública.
-export async function uploadProductImage(file) {
+/* ------------------- Subida de imágenes (WebP automático) ------------------- */
+
+// Toda imagen subida desde el panel se convierte a WebP y se redimensiona
+// (máx. 1600 px por lado) antes de ir al storage: archivos mucho más ligeros
+// sin que el admin haga nada. Si el navegador no puede decodificar el archivo
+// (formatos raros) o el WebP no sale más ligero, se sube el original tal cual.
+const MAX_IMAGE_SIDE = 1600
+const WEBP_QUALITY = 0.82
+
+async function toWebp(file) {
+  try {
+    const bitmap = await createImageBitmap(file)
+    const scale = Math.min(1, MAX_IMAGE_SIDE / Math.max(bitmap.width, bitmap.height))
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale))
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale))
+    canvas.getContext('2d').drawImage(bitmap, 0, 0, canvas.width, canvas.height)
+    bitmap.close?.()
+    const blob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, 'image/webp', WEBP_QUALITY)
+    )
+    // Navegador sin soporte para exportar WebP, o resultado más pesado que el
+    // original sin haberlo reducido: mejor conservar el archivo original.
+    if (!blob || blob.type !== 'image/webp') return file
+    if (blob.size >= file.size && scale === 1) return file
+    return blob
+  } catch {
+    return file
+  }
+}
+
+async function uploadImage(folder, file) {
   if (!isSupabaseConfigured) return needBackend()
-  const ext = file.name.split('.').pop()
-  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
-  const { error } = await supabase.storage.from('products').upload(path, file, {
+  const image = await toWebp(file)
+  const ext = image === file ? (file.name.split('.').pop() || 'jpg').toLowerCase() : 'webp'
+  const path = `${folder}${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
+  const { error } = await supabase.storage.from('products').upload(path, image, {
     cacheControl: '3600',
     upsert: false,
+    contentType: image.type || undefined,
   })
   if (error) throw error
   const { data } = supabase.storage.from('products').getPublicUrl(path)
   return data.publicUrl
+}
+
+export function uploadProductImage(file) {
+  return uploadImage('', file)
 }
 
 // Importa productos desde CSV: si el nombre ya existe se ACTUALIZA (precio,
@@ -209,17 +246,8 @@ export async function deleteBanner(id) {
 }
 
 // Sube la foto de un banner al bucket 'products' (carpeta banners/) y devuelve su URL.
-export async function uploadBannerImage(file) {
-  if (!isSupabaseConfigured) return needBackend()
-  const ext = file.name.split('.').pop()
-  const path = `banners/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
-  const { error } = await supabase.storage.from('products').upload(path, file, {
-    cacheControl: '3600',
-    upsert: false,
-  })
-  if (error) throw error
-  const { data } = supabase.storage.from('products').getPublicUrl(path)
-  return data.publicUrl
+export function uploadBannerImage(file) {
+  return uploadImage('banners/', file)
 }
 
 /* ------------------- Trabajos del servicio técnico ------------------- */
@@ -266,17 +294,8 @@ export async function deleteRepairWork(id) {
 }
 
 // Sube la foto de un trabajo al bucket 'products' (carpeta repairs/) y devuelve su URL.
-export async function uploadRepairImage(file) {
-  if (!isSupabaseConfigured) return needBackend()
-  const ext = file.name.split('.').pop()
-  const path = `repairs/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`
-  const { error } = await supabase.storage.from('products').upload(path, file, {
-    cacheControl: '3600',
-    upsert: false,
-  })
-  if (error) throw error
-  const { data } = supabase.storage.from('products').getPublicUrl(path)
-  return data.publicUrl
+export function uploadRepairImage(file) {
+  return uploadImage('repairs/', file)
 }
 
 /* ------------------------- Categorías ------------------------- */

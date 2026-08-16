@@ -95,12 +95,10 @@ export function productsFromCsv(text) {
   }
 
   const headers = rows[0].map((h) => HEADER_MAP[norm(h)] || null)
-  if (!headers.includes('name') || !headers.includes('price')) {
+  if (!headers.includes('name')) {
     return {
       items: [],
-      errors: [
-        { line: 1, message: 'Faltan las columnas obligatorias "nombre" y/o "precio".' },
-      ],
+      errors: [{ line: 1, message: 'Falta la columna obligatoria "nombre".' }],
     }
   }
 
@@ -117,12 +115,13 @@ export function productsFromCsv(text) {
       errors.push({ line, message: 'Falta el nombre del producto.' })
       return
     }
-    // Precio: admite "$1,299.50" y "1299,50".
+    // Precio: admite "$1,299.50" y "1299,50". Es opcional: vacío = 0 = "por
+    // confirmar" (el producto se publica pero no se puede comprar todavía).
     let raw = (obj.price || '').replace(/[$\s]/g, '')
     if (/,\d{1,2}$/.test(raw) && !raw.includes('.')) raw = raw.replace(',', '.')
     else raw = raw.replace(/,/g, '')
-    const price = Number(raw)
-    if (!raw || Number.isNaN(price) || price < 0) {
+    const price = raw === '' ? 0 : Number(raw)
+    if (Number.isNaN(price) || price < 0) {
       errors.push({ line, message: `Precio no válido para "${obj.name}".` })
       return
     }

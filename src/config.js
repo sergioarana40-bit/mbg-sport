@@ -39,6 +39,12 @@ export function calcShipping(subtotal) {
   return STORE.shippingCost
 }
 
+// Un producto puede publicarse sin precio (price 0 o vacío): la tienda muestra
+// "Precio por confirmar", no se puede agregar al carrito y se consulta por WhatsApp.
+export function hasPrice(value) {
+  return Number(value) > 0
+}
+
 // Formatea un número como precio en pesos mexicanos.
 export function formatPrice(value) {
   const n = Number(value) || 0
