@@ -37,12 +37,15 @@ export default function Header() {
     <header className="sticky top-0 z-40">
       {/* Barra superior roja */}
       <div className="bg-brand-600 text-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-1.5 text-xs font-bold">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-1.5 text-xs font-bold">
           <span className="flex min-w-0 items-center gap-1.5">
             <Store className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">Recoge tu pedido en tienda · Listo hoy</span>
+            <span className="truncate">
+              <span className="sm:hidden">Recoge en tienda · Listo hoy</span>
+              <span className="hidden sm:inline">Recoge tu pedido en tienda · Listo hoy</span>
+            </span>
           </span>
-          <span className="hidden items-center gap-1.5 sm:flex">
+          <span className="flex shrink-0 items-center gap-1.5">
             <MapPin className="h-3.5 w-3.5" />
             {STORE.branch}
           </span>
@@ -104,9 +107,9 @@ export default function Header() {
           />
         </form>
 
-        {/* Navegación de categorías (escritorio) */}
-        <nav className="hidden border-t border-ink-line md:block">
-          <div className="no-scrollbar mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-4 py-3">
+        {/* Navegación de categorías (en móvil se desliza horizontal) */}
+        <nav className="border-t border-ink-line">
+          <div className="no-scrollbar mx-auto flex max-w-7xl items-center gap-5 overflow-x-auto px-4 py-2.5 md:gap-6 md:py-3">
             <NavLink to="/catalogo" end className={linkClass}>
               Todo el catálogo
             </NavLink>

@@ -48,6 +48,7 @@ const DOTS_STYLE = {
 const NAV_LINKS = [
   { label: 'Tienda en línea', to: '/tienda' },
   { label: 'Refacciones', to: '/catalogo/refacciones' },
+  { label: 'Arma tu cable', to: '/cables' },
   { label: 'Servicio técnico', to: '/reparaciones' },
   { label: 'Contacto', href: '#visitanos' },
 ]
@@ -55,7 +56,7 @@ const NAV_LINKS = [
 const BENEFITS = [
   { icon: CreditCard, title: 'Paga al recoger', text: 'Efectivo o tarjeta en tienda', short: 'En tienda' },
   { icon: PackageCheck, title: 'Recoge en tienda', text: 'Tu pedido listo hoy', short: 'Listo hoy' },
-  { icon: Store, title: 'Tienda física', text: 'Visítanos en Toluca', short: 'Toluca' },
+  { icon: Store, title: 'Tienda física', text: 'Visítanos en Patio Zamarrero', short: 'Patio Zamarrero' },
   { icon: ShieldCheck, title: 'Garantía', text: 'Productos originales', short: 'Originales' },
 ]
 
@@ -163,7 +164,7 @@ function LandingHeader() {
         <div className="flex items-center justify-center gap-[7px] px-4 py-[7px] text-[11px] font-bold lg:hidden">
           <Clock className="h-[13px] w-[13px] shrink-0" />
           <span className="truncate">
-            {STORE.hours} · Toluca, Edo. Méx.
+            {STORE.hours} · Patio Zamarrero
           </span>
         </div>
       </div>
@@ -391,7 +392,7 @@ export default function Landing() {
                   </p>
                   <Link
                     to={item.to}
-                    className="mt-auto hidden items-center gap-2 pt-3 text-[13px] font-bold text-fg underline underline-offset-4 transition hover:text-brand-600 lg:inline-flex"
+                    className="mt-2 inline-flex items-center gap-2 text-[12.5px] font-bold text-fg underline underline-offset-4 transition hover:text-brand-600 lg:mt-auto lg:pt-3 lg:text-[13px]"
                   >
                     {item.linkLabel}
                     <ArrowRight className="h-3.5 w-3.5 text-brand-600" strokeWidth={2.5} />
@@ -481,9 +482,9 @@ export default function Landing() {
                 </a>
                 <Link
                   to="/reparaciones"
-                  className="hidden text-[12.5px] font-bold text-white underline underline-offset-4 transition hover:text-accent-300 lg:inline"
+                  className="text-center text-[12.5px] font-bold text-white underline underline-offset-4 transition hover:text-accent-300"
                 >
-                  Ver refacciones
+                  Conocer el servicio completo
                 </Link>
               </div>
             </div>
@@ -510,7 +511,45 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* Refacciones: banda amarilla (solo escritorio, según diseño) */}
+        {/* Refacciones: versión compacta (móvil), pegada a la banda roja como en escritorio */}
+        <section className="border-y-2 border-ink bg-accent-400 lg:hidden" style={DOTS_STYLE}>
+          <div className="px-5 py-8">
+            <h2 className="font-display text-[22px] font-black uppercase leading-tight text-fg">
+              Refacciones para todo tu equipo
+            </h2>
+            <p className="mt-2 text-[12.5px] font-semibold leading-relaxed text-fg">
+              Piezas de alta precisión, en stock o sobre pedido para tu equipo.
+            </p>
+            <div className="mt-3.5 flex flex-wrap gap-2">
+              {PART_CHIPS.map((c) => (
+                <span
+                  key={c.label}
+                  className="inline-flex items-center gap-1.5 rounded-full border-2 border-ink bg-white px-3 py-1.5 text-[10.5px] font-bold uppercase text-fg"
+                >
+                  <c.icon className="h-3.5 w-3.5" strokeWidth={2} />
+                  {c.label}
+                </span>
+              ))}
+            </div>
+            <div className="mt-5 flex flex-col gap-3">
+              <Link to="/catalogo/refacciones" className="btn-primary w-full py-3.5 text-xs">
+                Ver refacciones en la tienda
+                <ArrowRight className="h-4 w-4 text-accent-400" strokeWidth={2.5} />
+              </Link>
+              <a
+                href={waParts}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex w-full items-center justify-center gap-[9px] rounded-[10px] border-[3px] border-ink bg-white px-4 py-[11px] font-display text-xs font-extrabold uppercase tracking-[.06em] text-fg shadow-hard-sm transition hover:bg-surface-2 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none"
+              >
+                <MessageCircle className="h-4 w-4" />
+                ¿No la encuentras? Cotízala
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* Refacciones: banda amarilla (escritorio) */}
         <section
           className="hidden border-y-2 border-ink bg-accent-400 lg:block"
           style={DOTS_STYLE}
@@ -656,6 +695,10 @@ export default function Landing() {
                 <li className="flex gap-2.5">
                   <Phone className="h-[15px] w-[15px] shrink-0 text-brand-600" strokeWidth={2} />
                   {STORE.phone}
+                </li>
+                <li className="flex gap-2.5">
+                  <Mail className="h-[15px] w-[15px] shrink-0 text-brand-600" strokeWidth={2} />
+                  {STORE.email}
                 </li>
               </ul>
               <a
