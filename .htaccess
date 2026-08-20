@@ -1,0 +1,45 @@
+# MBG Sport - configuracion para Hostinger (Apache/LiteSpeed)
+
+# SPA con React Router: cualquier ruta que no sea un archivo real
+# se sirve con index.html (el router decide que mostrar).
+Options -MultiViews
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.html$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.html [L]
+
+# Assets con hash en el nombre: cache larga.
+<FilesMatch "\.(js|css|woff2|png|jpg|jpeg|webp|svg|ico)$">
+  Header set Cache-Control "public, max-age=31536000, immutable"
+</FilesMatch>
+
+# El HTML, el service worker y el manifest siempre frescos
+# (si se cachean, los usuarios no reciben las actualizaciones de la PWA).
+<FilesMatch "(^index\.html|sw\.js|registerSW\.js|manifest\.webmanifest)$">
+  Header set Cache-Control "no-cache, must-revalidate"
+</FilesMatch>
+
+# ---------------------------------------------------------------------------
+# Cabeceras de seguridad
+# ---------------------------------------------------------------------------
+<IfModule mod_headers.c>
+  # Fuerza HTTPS durante 2 anios (incluye subdominios).
+  Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+  # Evita que el navegador "adivine" el tipo de contenido.
+  Header always set X-Content-Type-Options "nosniff"
+  # No permite que el sitio se cargue dentro de un iframe (clickjacking).
+  Header always set X-Frame-Options "DENY"
+  # Limita la informacion de referrer que se envia a terceros.
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  # Desactiva APIs sensibles del navegador que la tienda no usa.
+  Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), payment=()"
+
+  # Content-Security-Policy: defensa en profundidad contra XSS y robo de sesion.
+  # - script-src 'self': solo scripts propios (el build no usa scripts inline).
+  # - style-src 'unsafe-inline': la UI usa atributos style= y Google Fonts.
+  # - connect/img: Supabase (REST + Realtime WSS + Storage) y data/blob.
+  # - frame-src: el mapa de la landing (Google Maps embed).
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://www.google.com https://maps.google.com; worker-src 'self'; manifest-src 'self'; form-action 'self'; upgrade-insecure-requests"
+</IfModule>
