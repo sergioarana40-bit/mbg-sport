@@ -12,7 +12,9 @@ import {
   Bike,
   ArrowRight,
   MapPin,
+  Phone,
   Clock,
+  Cable,
 } from 'lucide-react'
 import ProductImage from '../components/ProductImage'
 import { STORE } from '../config'
@@ -72,7 +74,8 @@ export default function Repairs() {
       .catch(() => setWorks([]))
   }, [])
 
-  const waLink = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
+  // Línea exclusiva del servicio técnico (distinta al WhatsApp de la tienda).
+  const waLink = `https://wa.me/${STORE.repairWhatsapp}?text=${encodeURIComponent(
     'Hola, quiero cotizar la reparación / mantenimiento de mi equipo de gimnasio.'
   )}`
 
@@ -159,6 +162,30 @@ export default function Repairs() {
         </div>
       </section>
 
+      {/* CTA: armador de cables a la medida */}
+      <section className="mx-auto max-w-7xl px-4 pt-10 lg:pt-14">
+        <div className="sticker flex flex-col items-start gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-start gap-3.5">
+            <span className="grid h-[52px] w-[52px] shrink-0 place-items-center rounded-lg border-2 border-ink bg-accent-400 text-fg">
+              <Cable className="h-6 w-6" strokeWidth={1.75} />
+            </span>
+            <div>
+              <p className="font-display text-[15px] font-extrabold uppercase text-fg">
+                ¿Se reventó el cable de tu máquina?
+              </p>
+              <p className="mt-1 max-w-[560px] text-[13px] font-medium leading-relaxed text-[#4a4a4a]">
+                Lo fabricamos o duplicamos a la medida: elige el tipo de cable, las terminales
+                y el largo, y cotízalo en línea.
+              </p>
+            </div>
+          </div>
+          <Link to="/cables" className="btn-primary shrink-0">
+            Arma tu cable
+            <ArrowRight className="h-4 w-4 text-accent-400" strokeWidth={2.5} />
+          </Link>
+        </div>
+      </section>
+
       {/* Trabajos recientes (contenido que el admin actualiza con fotos) */}
       {works.length > 0 && (
         <section className="mx-auto max-w-7xl px-4 pt-10 lg:pt-14">
@@ -220,6 +247,12 @@ export default function Repairs() {
               <li className="flex gap-2.5">
                 <MapPin className="h-4 w-4 shrink-0 text-brand-600" strokeWidth={2} />
                 {STORE.address}
+              </li>
+              <li className="flex gap-2.5">
+                <Phone className="h-4 w-4 shrink-0 text-brand-600" strokeWidth={2} />
+                <a href={`tel:+52${STORE.repairPhone.replace(/\D/g, '')}`} className="transition hover:text-fg">
+                  {STORE.repairPhone} · servicio técnico
+                </a>
               </li>
               <li className="flex gap-2.5">
                 <Clock className="h-4 w-4 shrink-0 text-brand-600" strokeWidth={2} />

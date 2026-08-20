@@ -194,7 +194,7 @@ export default function Promotions() {
                   {STORE.pickupOnly ? 'Recoge en tienda sin costo' : 'Recoge en tienda'}
                 </p>
                 <p className="mt-0.5 text-[11.5px] font-medium text-fg-subtle">
-                  Tu pedido listo hoy · {STORE.city.split(',')[0]}
+                  Tu pedido listo hoy · {STORE.branch}
                 </p>
               </div>
             </div>

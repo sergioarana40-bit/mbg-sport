@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react'
 import Spinner from '../../components/Spinner'
 import StatusBadge from '../../components/StatusBadge'
 import { getStats } from '../../lib/admin'
-import { formatPrice } from '../../config'
+import { formatPrice, orderNumber } from '../../config'
 
 const DAY_LETTER = ['D', 'L', 'M', 'M', 'J', 'V', 'S']
 
@@ -215,7 +215,7 @@ export default function Dashboard() {
                   }`}
                 >
                   <span className="font-mono font-bold text-fg">
-                    #{o.id.slice(0, 8).toUpperCase()}
+                    {orderNumber(o)}
                   </span>
                   <span className="truncate font-semibold text-fg">
                     {o.customer_name || 'Cliente'}

@@ -21,15 +21,28 @@ function loadInitial() {
   }
 }
 
+// Identidad de una línea del carrito: el mismo producto con distinta variante
+// (color, talla…) ocupa líneas separadas. Carritos guardados antes de las
+// variantes no traen `key`, por eso los lectores caen a `i.key ?? i.id`.
+function lineKey(productId, variant) {
+  if (!variant) return productId
+  const sig = Object.entries(variant)
+    .map(([name, value]) => `${name}=${value}`)
+    .sort()
+    .join('|')
+  return `${productId}::${sig}`
+}
+
 function reducer(state, action) {
   switch (action.type) {
     case 'ADD': {
-      const { product, quantity = 1 } = action
-      const existing = state.find((i) => i.id === product.id)
+      const { product, quantity = 1, variant = null } = action
+      const key = lineKey(product.id, variant)
+      const existing = state.find((i) => (i.key ?? i.id) === key)
       const maxStock = product.stock ?? 99
       if (existing) {
         return state.map((i) =>
-          i.id === product.id
+          (i.key ?? i.id) === key
             ? { ...i, quantity: Math.min(i.quantity + quantity, maxStock) }
             : i
         )
@@ -37,21 +50,23 @@ function reducer(state, action) {
       return [
         ...state,
         {
+          key,
           id: product.id,
           name: product.name,
           price: Number(product.price),
           image_url: product.image_url,
           stock: maxStock,
           quantity: Math.min(quantity, maxStock),
+          variant,
         },
       ]
     }
     case 'REMOVE':
-      return state.filter((i) => i.id !== action.id)
+      return state.filter((i) => (i.key ?? i.id) !== action.key)
     case 'SET_QTY': {
       const qty = Math.max(1, Math.min(action.quantity, 99))
       return state.map((i) =>
-        i.id === action.id
+        (i.key ?? i.id) === action.key
           ? { ...i, quantity: Math.min(qty, i.stock ?? 99) }
           : i
       )
@@ -94,9 +109,10 @@ export function CartProvider({ children }) {
       appliedCoupon: coupon,
       applyCoupon: setCoupon,
       removeCoupon: () => setCoupon(null),
-      addItem: (product, quantity = 1) => dispatch({ type: 'ADD', product, quantity }),
-      removeItem: (id) => dispatch({ type: 'REMOVE', id }),
-      setQuantity: (id, quantity) => dispatch({ type: 'SET_QTY', id, quantity }),
+      addItem: (product, quantity = 1, variant = null) =>
+        dispatch({ type: 'ADD', product, quantity, variant }),
+      removeItem: (key) => dispatch({ type: 'REMOVE', key }),
+      setQuantity: (key, quantity) => dispatch({ type: 'SET_QTY', key, quantity }),
       clearCart: () => {
         dispatch({ type: 'CLEAR' })
         setCoupon(null)

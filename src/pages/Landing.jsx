@@ -124,7 +124,8 @@ const SOCIALS = [
   { name: 'YouTube', href: STORE.youtube, Icon: YouTubeIcon },
 ].filter((s) => s.href)
 
-const waService = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
+// El servicio técnico se cotiza por su línea propia; la tienda conserva la suya.
+const waService = `https://wa.me/${STORE.repairWhatsapp}?text=${encodeURIComponent(
   'Hola, quiero cotizar el servicio técnico / mantenimiento de mi equipo.'
 )}`
 const waParts = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
@@ -618,7 +619,7 @@ export default function Landing() {
               />
               <div className="flex items-center justify-between gap-3.5 border-t-2 border-ink px-[18px] py-3.5">
                 <span className="text-[12.5px] font-semibold text-[#4a4a4a]">
-                  Plaza Zamarrero · estacionamiento disponible
+                  Patio Zamarrero · estacionamiento disponible
                 </span>
                 <a
                   href={STORE.maps}

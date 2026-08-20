@@ -10,6 +10,7 @@ import Promotions from './pages/Promotions'
 import OrderConfirmation from './pages/OrderConfirmation'
 import Terms from './pages/Terms'
 import Repairs from './pages/Repairs'
+import CableBuilder from './pages/CableBuilder'
 import NotFound from './pages/NotFound'
 
 import Favorites from './pages/Favorites'
@@ -28,6 +29,7 @@ import AdminCategories from './pages/admin/AdminCategories'
 import AdminCoupons from './pages/admin/AdminCoupons'
 import AdminOrders from './pages/admin/AdminOrders'
 import AdminRepairs from './pages/admin/AdminRepairs'
+import AdminCables from './pages/admin/AdminCables'
 
 export default function App() {
   return (
@@ -48,6 +50,7 @@ export default function App() {
         <Route path="/pedido/:id" element={<OrderConfirmation />} />
         <Route path="/terminos" element={<Terms />} />
         <Route path="/reparaciones" element={<Repairs />} />
+        <Route path="/cables" element={<CableBuilder />} />
         <Route path="/cuenta" element={<Account />} />
         <Route path="/cuenta/pedidos/:id" element={<OrderTracking />} />
         <Route path="/cuenta/login" element={<CustomerLogin />} />
@@ -71,6 +74,7 @@ export default function App() {
         <Route path="cupones" element={<AdminCoupons />} />
         <Route path="pedidos" element={<AdminOrders />} />
         <Route path="reparaciones" element={<AdminRepairs />} />
+        <Route path="cables" element={<AdminCables />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />

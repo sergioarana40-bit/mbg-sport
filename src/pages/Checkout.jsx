@@ -4,7 +4,7 @@ import { AlertCircle, Store as StoreIcon } from 'lucide-react'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
-import { formatPrice, STORE } from '../config'
+import { formatPrice, variantLabel, STORE } from '../config'
 import { computeTotals } from '../lib/coupons'
 import { createOrder } from '../lib/api'
 import { isSupabaseConfigured } from '../lib/supabase'
@@ -302,9 +302,14 @@ export default function Checkout() {
 
             <ul className="mt-3.5 space-y-2.5 text-[13px]">
               {items.map((i) => (
-                <li key={i.id} className="flex justify-between gap-3">
+                <li key={i.key ?? i.id} className="flex justify-between gap-3">
                   <span className="font-semibold text-fg">
                     {i.quantity}× {i.name}
+                    {i.variant && (
+                      <span className="block text-[11.5px] font-medium text-fg-subtle">
+                        {variantLabel(i.variant)}
+                      </span>
+                    )}
                   </span>
                   <span className="shrink-0 whitespace-nowrap font-bold text-fg">
                     {formatPrice(i.price * i.quantity)}

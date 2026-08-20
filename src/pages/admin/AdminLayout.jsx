@@ -11,6 +11,7 @@ import {
   Store,
   Menu,
   Wrench,
+  Cable,
   X,
   KeyRound,
   AlertCircle,
@@ -31,6 +32,7 @@ const NAV = [
   { to: '/admin/categorias', label: 'Categorías', icon: Tags },
   { to: '/admin/cupones', label: 'Cupones', icon: Ticket },
   { to: '/admin/reparaciones', label: 'Servicio', icon: Wrench },
+  { to: '/admin/cables', label: 'Cables', icon: Cable },
 ]
 
 export default function AdminLayout() {

@@ -4,8 +4,8 @@ import { CheckCircle2, ArrowRight, Truck, Store, Download } from 'lucide-react'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
 import { useAuth } from '../context/AuthContext'
-import { getOrderById } from '../lib/api'
-import { formatPrice, STORE } from '../config'
+import { getOrderById, getOrderFolio } from '../lib/api'
+import { formatPrice, orderNumber, STORE } from '../config'
 import { isSupabaseConfigured } from '../lib/supabase'
 
 function resolveStatus(raw) {
@@ -42,6 +42,8 @@ export default function OrderConfirmation() {
   const { user } = useAuth()
   const status = resolveStatus(searchParams.get('status'))
   const [order, setOrder] = useState(null)
+  // Folio corto vía RPC: el invitado no puede releer su pedido, pero sí su folio.
+  const [folio, setFolio] = useState(null)
   const [loading, setLoading] = useState(false)
   const [standalone] = useState(
     () =>
@@ -62,6 +64,9 @@ export default function OrderConfirmation() {
         .then(setOrder)
         .catch(() => {})
         .finally(() => setLoading(false))
+      getOrderFolio(id)
+        .then(setFolio)
+        .catch(() => {})
     }
   }, [id])
 
@@ -95,7 +100,7 @@ export default function OrderConfirmation() {
                 Pedido
               </p>
               <p className="mt-0.5 font-mono text-lg font-bold text-fg">
-                #{id.slice(0, 8).toUpperCase()}
+                {orderNumber({ id, folio: order?.folio ?? folio })}
               </p>
             </div>
             {STATUS_PILL[status] && (
@@ -120,7 +125,7 @@ export default function OrderConfirmation() {
                   <>
                     <Store className="h-[15px] w-[15px] shrink-0 text-brand-600" strokeWidth={2} />
                     <span>
-                      Recoge en tienda · {STORE.city.split(',')[0]} · Listo hoy
+                      Recoge en tienda · {STORE.branch} · Listo hoy
                       {STORE.maps && (
                         <>
                           {' · '}
@@ -172,7 +177,7 @@ export default function OrderConfirmation() {
           <ArrowRight className="h-[15px] w-[15px]" strokeWidth={2.5} />
         </Link>
         <p className="mt-2 text-xs font-medium text-fg-subtle">
-          ¿Dudas? Visítanos en {STORE.city} o escríbenos por WhatsApp.
+          ¿Dudas? Visítanos en la {STORE.branch} o escríbenos por WhatsApp.
         </p>
       </div>
     </div>

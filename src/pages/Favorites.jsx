@@ -7,7 +7,7 @@ import Spinner from '../components/Spinner'
 import { useFavorites } from '../context/FavoritesContext'
 import { useCart } from '../context/CartContext'
 import { getProductsByIds } from '../lib/api'
-import { formatPrice, hasPrice } from '../config'
+import { formatPrice, hasPrice, productVariants } from '../config'
 
 // Tarjeta de favorito (diseño 08): corazón arriba-derecha + botón "Agregar" oscuro.
 function FavoriteCard({ product }) {
@@ -15,8 +15,11 @@ function FavoriteCard({ product }) {
   const [added, setAdded] = useState(false)
   const noPrice = !hasPrice(product.price)
   const outOfStock = product.stock === 0
+  // Con variantes, el botón lleva al detalle a elegir color/talla.
+  const needsVariant = productVariants(product).length > 0
 
   function handleAdd(e) {
+    if (needsVariant) return
     e.preventDefault()
     if (outOfStock || noPrice) return
     addItem(product, 1)
@@ -81,6 +84,8 @@ function FavoriteCard({ product }) {
             'Ver producto'
           ) : outOfStock ? (
             'Agotado'
+          ) : needsVariant ? (
+            'Elegir opciones'
           ) : (
             <>
               <ShoppingCart className="h-3.5 w-3.5" strokeWidth={2} />
@@ -113,7 +118,10 @@ export default function Favorites() {
   const inStock = products.filter((p) => (p.stock ?? 0) > 0)
 
   function addAll() {
-    inStock.forEach((p) => addItem(p, 1))
+    // Solo entra lo que puede comprarse directo: con precio y sin variantes por elegir.
+    inStock
+      .filter((p) => hasPrice(p.price) && productVariants(p).length === 0)
+      .forEach((p) => addItem(p, 1))
     setAddedAll(true)
     setTimeout(() => setAddedAll(false), 1400)
   }

@@ -19,7 +19,7 @@ import { useCart } from '../../context/CartContext'
 import Spinner from '../../components/Spinner'
 import StatusBadge from '../../components/StatusBadge'
 import AddressManager from '../../components/AddressManager'
-import { formatPrice } from '../../config'
+import { formatPrice, orderNumber } from '../../config'
 import { getMyOrders, updateProfile, setNotifications, changePassword } from '../../lib/account'
 import { getProductsByIds } from '../../lib/api'
 
@@ -455,7 +455,7 @@ export default function Account() {
                     <div className="flex items-center justify-between gap-3">
                       <Link to={`/cuenta/pedidos/${o.id}`} className="min-w-0 transition hover:opacity-80">
                         <p className="font-mono text-base font-bold text-fg">
-                          #{o.id.slice(0, 8).toUpperCase()}
+                          {orderNumber(o)}
                         </p>
                         <p className="mt-0.5 text-[11.5px] font-medium text-fg-subtle">
                           {fmtDate(o.created_at)} · {itemCount} artículo{itemCount === 1 ? '' : 's'}

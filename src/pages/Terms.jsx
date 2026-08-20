@@ -22,7 +22,7 @@ const SECTIONS = [
     title: '3. Refacciones',
     paragraphs: [
       'El tiempo estimado de entrega de las refacciones es el que se especifique en la cotización una vez realizado el pago, y está sujeto a disponibilidad del proveedor e incidentes que puedan afectar al envío de las mismas.',
-      'En caso de necesitar únicamente las refacciones, estas se entregarán en alguna de nuestras sucursales (Toluca, Zinacantepec) dentro del horario comercial.',
+      'En caso de necesitar únicamente las refacciones, estas se entregarán en nuestra sucursal Patio Zamarrero (Zinacantepec) dentro del horario comercial.',
       'No se aceptan cambios ni devoluciones en refacciones, ya que se solicitan específicamente para cada equipo y cliente.',
     ],
   },
@@ -92,7 +92,7 @@ export default function Terms() {
         <ul className="mx-auto mt-4 inline-flex flex-col items-center gap-2 text-sm text-fg-muted">
           <li className="flex items-center gap-2">
             <MapPin className="h-4 w-4 shrink-0 text-brand-600" />
-            Aztecas #203, Plaza Zamarrero, Zinacantepec
+            Aztecas #203, Patio Zamarrero, Zinacantepec
           </li>
           <li className="flex items-center gap-2">
             <Mail className="h-4 w-4 shrink-0 text-brand-600" />
@@ -106,7 +106,7 @@ export default function Terms() {
           <li className="flex items-center gap-2">
             <Phone className="h-4 w-4 shrink-0 text-brand-600" />
             <a href="tel:7227910584" className="transition hover:text-fg">
-              722 791 0584
+              722 791 05 84 (servicio técnico)
             </a>
           </li>
         </ul>

@@ -1,6 +1,7 @@
 // Importación de productos por CSV (panel admin).
 // Tolerante a Excel en español: separador , o ; · BOM · encabezados con
 // acentos y mayúsculas · precios con "$" y coma decimal.
+import { orderNumber } from '../config'
 
 // Parser CSV con soporte de comillas dobles y detección de separador.
 export function parseCsv(text) {
@@ -228,7 +229,7 @@ export function exportOrdersCsv(orders, statusLabels = {}) {
       'entrega',
     ],
     ...orders.map((o) => [
-      `#${o.id.slice(0, 8).toUpperCase()}`,
+      orderNumber(o),
       o.created_at ? new Date(o.created_at).toLocaleString('es-MX') : '',
       o.customer_name || '',
       o.customer_email || '',

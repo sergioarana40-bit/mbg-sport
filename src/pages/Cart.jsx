@@ -15,7 +15,7 @@ import {
 import ProductImage from '../components/ProductImage'
 import Spinner from '../components/Spinner'
 import { useCart } from '../context/CartContext'
-import { formatPrice, STORE } from '../config'
+import { formatPrice, variantLabel, STORE } from '../config'
 import { findCoupon, evaluateCoupon, computeTotals, couponLabel } from '../lib/coupons'
 
 export default function Cart() {
@@ -119,7 +119,7 @@ export default function Cart() {
         <div className="overflow-hidden rounded-[10px] border-2 border-ink bg-white">
           {items.map((item, idx) => (
             <div
-              key={item.id}
+              key={item.key ?? item.id}
               className={`flex gap-4 p-4 ${idx > 0 ? 'border-t-2 border-ink' : ''}`}
             >
               <Link to={`/producto/${item.id}`} className="shrink-0">
@@ -137,13 +137,18 @@ export default function Cart() {
                 >
                   {item.name}
                 </Link>
+                {item.variant && (
+                  <p className="mt-0.5 text-[11.5px] font-semibold text-[#4a4a4a]">
+                    {variantLabel(item.variant)}
+                  </p>
+                )}
                 <p className="mt-0.5 text-xs font-medium text-fg-subtle">
                   {formatPrice(item.price)} c/u
                 </p>
 
                 <div className="mt-auto inline-flex items-center self-start overflow-hidden rounded-lg border-2 border-ink pt-0">
                   <button
-                    onClick={() => setQuantity(item.id, item.quantity - 1)}
+                    onClick={() => setQuantity(item.key ?? item.id, item.quantity - 1)}
                     className="grid h-8 w-8 place-items-center text-fg hover:bg-surface-2 disabled:opacity-40"
                     disabled={item.quantity <= 1}
                     aria-label="Quitar uno"
@@ -154,7 +159,7 @@ export default function Cart() {
                     {item.quantity}
                   </span>
                   <button
-                    onClick={() => setQuantity(item.id, item.quantity + 1)}
+                    onClick={() => setQuantity(item.key ?? item.id, item.quantity + 1)}
                     className="grid h-8 w-8 place-items-center text-fg hover:bg-surface-2 disabled:opacity-40"
                     disabled={item.quantity >= (item.stock ?? 99)}
                     aria-label="Agregar uno"
@@ -166,7 +171,7 @@ export default function Cart() {
 
               <div className="flex shrink-0 flex-col items-end justify-between">
                 <button
-                  onClick={() => removeItem(item.id)}
+                  onClick={() => removeItem(item.key ?? item.id)}
                   className="grid h-8 w-8 place-items-center rounded-lg border-2 border-ink text-fg transition hover:bg-brand-600 hover:text-white"
                   aria-label="Quitar producto"
                 >

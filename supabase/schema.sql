@@ -2,8 +2,10 @@
 -- MBG Sport · Esquema completo (Supabase / PostgreSQL)
 -- ============================================================
 -- Refleja el estado REAL de producción (proyecto cwffhlvjstmxgpmiafqn) a
--- 2026-08-10. Reproduce toda la base: tablas, funciones, triggers, RLS y
+-- 2026-08-20. Reproduce toda la base: tablas, funciones, triggers, RLS y
 -- Storage. Ejecutar una vez en un proyecto nuevo (SQL Editor).
+-- Los datos iniciales del armador de cables están en
+-- migrations/2026-08-20-folio-variantes-cables.sql.
 --
 -- Regla de oro de seguridad: el rol "admin" se decide en la BASE DE DATOS
 -- (profiles.role + is_admin()), nunca en el frontend. Toda escritura de
@@ -87,6 +89,8 @@ create table if not exists public.products (
   featured boolean not null default false,
   active boolean not null default true,
   image_url text,
+  -- Variantes a elegir (sin cambio de precio): [{"name":"Color","options":["Rojo"]}]
+  variants jsonb,
   created_at timestamptz not null default now()
 );
 
@@ -100,8 +104,12 @@ create table if not exists public.profiles (
   created_at timestamptz not null default now()
 );
 
+-- Folio corto consecutivo de pedidos (#0001, #0002, …).
+create sequence if not exists public.orders_folio_seq;
+
 create table if not exists public.orders (
   id uuid primary key default gen_random_uuid(),
+  folio integer default nextval('public.orders_folio_seq'),
   user_id uuid references auth.users(id) on delete set null,  -- null = invitado
   customer_name text not null,
   customer_email text not null,
@@ -117,6 +125,22 @@ create table if not exists public.orders (
   status text not null default 'pending',            -- pending|paid|processing|shipped|delivered|cancelled
   created_at timestamptz not null default now()
 );
+
+alter sequence public.orders_folio_seq owned by public.orders.folio;
+
+-- El checkout de invitado no puede releer su pedido (sin SELECT por privacidad);
+-- devuelve SOLO el folio a quien conozca el UUID completo (secreto e inadivinable).
+create or replace function public.get_order_folio(p_order_id uuid)
+returns integer
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select folio from public.orders where id = p_order_id;
+$$;
+
+grant execute on function public.get_order_folio(uuid) to anon, authenticated;
 
 create table if not exists public.order_items (
   id uuid primary key default gen_random_uuid(),
@@ -190,6 +214,29 @@ create table if not exists public.repair_works (
   created_at timestamptz not null default now()
 );
 
+-- Armador de cables a la medida (/cables): tipos de cable y terminales.
+create table if not exists public.cable_types (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  thickness text not null,                    -- etiqueta de grosor: 'delgado' | 'grueso'
+  image_url text,
+  sort_order integer not null default 0,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table if not exists public.cable_ends (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  description text,
+  compatible text[] not null default '{}',    -- grosores compatibles; vacío = todos
+  image_url text,
+  sort_order integer not null default 0,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
 -- ---------------------------------------------------------------
 -- Índices
 -- ---------------------------------------------------------------
@@ -199,6 +246,7 @@ create index if not exists idx_order_items_order on public.order_items(order_id)
 create index if not exists idx_orders_created on public.orders(created_at desc);
 create index if not exists idx_orders_user on public.orders(user_id);
 create index if not exists idx_reviews_product on public.reviews(product_id);
+create unique index if not exists idx_orders_folio on public.orders(folio);
 
 -- ---------------------------------------------------------------
 -- Triggers
@@ -227,6 +275,8 @@ alter table public.reviews      enable row level security;
 alter table public.coupons      enable row level security;
 alter table public.banners      enable row level security;
 alter table public.repair_works enable row level security;
+alter table public.cable_types  enable row level security;
+alter table public.cable_ends   enable row level security;
 
 -- Catálogo: lectura pública, escritura solo admin.
 create policy "categories_public_read" on public.categories for select using (true);
@@ -310,6 +360,24 @@ create policy "repair_works_admin_insert" on public.repair_works
 create policy "repair_works_admin_update" on public.repair_works
   for update using (public.is_admin()) with check (public.is_admin());
 create policy "repair_works_admin_delete" on public.repair_works
+  for delete using (public.is_admin());
+
+create policy "cable_types_read" on public.cable_types
+  for select using (active = true or public.is_admin());
+create policy "cable_types_admin_insert" on public.cable_types
+  for insert with check (public.is_admin());
+create policy "cable_types_admin_update" on public.cable_types
+  for update using (public.is_admin()) with check (public.is_admin());
+create policy "cable_types_admin_delete" on public.cable_types
+  for delete using (public.is_admin());
+
+create policy "cable_ends_read" on public.cable_ends
+  for select using (active = true or public.is_admin());
+create policy "cable_ends_admin_insert" on public.cable_ends
+  for insert with check (public.is_admin());
+create policy "cable_ends_admin_update" on public.cable_ends
+  for update using (public.is_admin()) with check (public.is_admin());
+create policy "cable_ends_admin_delete" on public.cable_ends
   for delete using (public.is_admin());
 
 -- ---------------------------------------------------------------

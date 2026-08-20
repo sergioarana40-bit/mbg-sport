@@ -14,7 +14,7 @@ import {
 import Modal from '../../components/Modal'
 import Spinner from '../../components/Spinner'
 import StatusBadge from '../../components/StatusBadge'
-import { formatPrice, ORDER_STATUS, STORE } from '../../config'
+import { formatPrice, orderNumber, ORDER_STATUS, STORE } from '../../config'
 import { isSupabaseConfigured } from '../../lib/supabase'
 import { getAllOrders, updateOrderStatus, subscribeOrders } from '../../lib/admin'
 import { exportOrdersCsv } from '../../lib/csv'
@@ -37,9 +37,7 @@ function printOrder(o) {
     )
     .join('')
   const discount = Number(o.discount) > 0
-  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Pedido #${o.id
-    .slice(0, 8)
-    .toUpperCase()}</title>
+  const html = `<!doctype html><html><head><meta charset="utf-8"><title>Pedido ${orderNumber(o)}</title>
 <style>
   body{font-family:'Segoe UI',Arial,sans-serif;color:#000;margin:0;padding:20px;display:flex;justify-content:center}
   .ticket{width:320px}
@@ -58,7 +56,7 @@ function printOrder(o) {
   <h1>${escapeHtml(STORE.name)}</h1>
   <p class="sub">Nota de pedido · ${escapeHtml(STORE.city)}</p>
   <div class="box">
-    <div class="row"><b>#${o.id.slice(0, 8).toUpperCase()}</b><span class="badge">${escapeHtml(
+    <div class="row"><b>${orderNumber(o)}</b><span class="badge">${escapeHtml(
       ORDER_STATUS[o.status]?.label || o.status
     )}</span></div>
     <div class="row"><span>${new Date(o.created_at).toLocaleString('es-MX')}</span></div>
@@ -97,20 +95,26 @@ function printOrder(o) {
   w.print()
 }
 
-// Enlace de WhatsApp al cliente con el resumen del pedido.
+// Enlace de WhatsApp al cliente con el resumen del pedido. Si el pedido ya está
+// pagado o listo para recoger, el mensaje anuncia "¡Está listo!"; si sigue en
+// proceso, confirma la recepción.
 function waCustomerLink(o) {
   const digits = (o.customer_phone || '').replace(/\D/g, '')
   if (digits.length < 10) return null
   const phone = digits.length === 10 ? `521${digits}` : digits
   const firstName = (o.customer_name || '').trim().split(/\s+/)[0]
+  const ready = ['paid', 'shipped'].includes(o.status)
   const lines = [
     `Hola${firstName ? ` ${firstName}` : ''}, te escribimos de ${STORE.name}.`,
-    `Tu pedido #${o.id.slice(0, 8).toUpperCase()}:`,
+    ready
+      ? `Tu pedido ${orderNumber(o)} ¡Está listo! 🎉`
+      : `Recibimos tu pedido ${orderNumber(o)}:`,
     ...(o.order_items ?? []).map((i) => `• ${i.quantity}× ${i.product_name}`),
     `Total: ${formatPrice(o.total)}`,
     o.delivery_method === 'pickup'
-      ? `Puedes recogerlo en tienda: ${STORE.address} (${STORE.hours}).`
+      ? `Puedes recogerlo en nuestra ${STORE.branch}: ${STORE.address} (${STORE.hours}).`
       : 'Te avisamos en cuanto salga el envío.',
+    'Te esperamos 💪',
   ]
   return `https://wa.me/${phone}?text=${encodeURIComponent(lines.join('\n'))}`
 }
@@ -190,13 +194,16 @@ export default function AdminOrders() {
   const filtered = orders
     .filter((o) => (filter === 'all' ? true : o.status === filter))
     .filter(inDateRange)
-    .filter(
-      (o) =>
-        !q ||
+    .filter((o) => {
+      if (!q) return true
+      const code = q.replace(/^#/, '')
+      return (
         (o.customer_name || '').toLowerCase().includes(q) ||
         (o.customer_email || '').toLowerCase().includes(q) ||
-        o.id.toLowerCase().startsWith(q.replace(/^#/, ''))
-    )
+        o.id.toLowerCase().startsWith(code) ||
+        orderNumber(o).slice(1).toLowerCase().startsWith(code)
+      )
+    })
 
   const controlClass =
     'cursor-pointer rounded-lg border-2 border-ink bg-white px-3 py-2 text-[12.5px] font-semibold text-fg outline-none focus:border-brand-600'
@@ -290,7 +297,7 @@ export default function AdminOrders() {
                 {filtered.map((o) => (
                   <tr key={o.id} className="transition hover:bg-surface-2">
                     <td className="px-4 py-3 font-mono text-xs font-bold text-fg">
-                      #{o.id.slice(0, 8).toUpperCase()}
+                      {orderNumber(o)}
                     </td>
                     <td className="px-4 py-3 font-semibold text-fg">{o.customer_name}</td>
                     <td className="px-4 py-3 font-medium text-[#4a4a4a]">
@@ -338,7 +345,7 @@ export default function AdminOrders() {
       <Modal
         open={!!selected}
         onClose={() => setSelected(null)}
-        title={selected ? `Pedido #${selected.id.slice(0, 8).toUpperCase()}` : ''}
+        title={selected ? `Pedido ${orderNumber(selected)}` : ''}
       >
         {selected && (
           <div className="space-y-5">

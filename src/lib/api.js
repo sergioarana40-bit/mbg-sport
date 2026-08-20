@@ -1,4 +1,5 @@
 import { supabase, isSupabaseConfigured } from './supabase'
+import { variantLabel } from '../config'
 import {
   DEMO_CATEGORIES,
   DEMO_PRODUCTS,
@@ -170,7 +171,8 @@ export async function createOrder({
   const orderItems = items.map((i) => ({
     order_id: orderId,
     product_id: i.id,
-    product_name: i.name,
+    // La variante elegida viaja en el nombre para verse en admin, nota y WhatsApp.
+    product_name: i.variant ? `${i.name} (${variantLabel(i.variant)})` : i.name,
     price: i.price,
     quantity: i.quantity,
   }))
@@ -189,4 +191,38 @@ export async function getOrderById(id) {
     .single()
   if (error) throw error
   return data
+}
+
+// Folio corto de un pedido. RPC security definer: conocer el UUID completo
+// funciona como comprobante, así el invitado ve su folio aunque no tenga
+// permiso de SELECT sobre orders.
+export async function getOrderFolio(id) {
+  if (!isSupabaseConfigured) return null
+  const { data, error } = await supabase.rpc('get_order_folio', { p_order_id: id })
+  if (error) throw error
+  return data
+}
+
+/* ------------------- Armador de cables a la medida ------------------- */
+
+// Tipos de cable y terminales activos, en orden, para el armador (/cables).
+export async function getCableOptions() {
+  if (!isSupabaseConfigured) return { types: [], ends: [] }
+  const [types, ends] = await Promise.all([
+    supabase
+      .from('cable_types')
+      .select('*')
+      .eq('active', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('cable_ends')
+      .select('*')
+      .eq('active', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: true }),
+  ])
+  if (types.error) throw types.error
+  if (ends.error) throw ends.error
+  return { types: types.data, ends: ends.data }
 }

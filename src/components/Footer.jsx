@@ -98,6 +98,11 @@ export default function Footer({ bottomNavSpace = true }) {
               </Link>
             </li>
             <li>
+              <Link to="/cables" className="transition hover:text-white">
+                Arma tu cable
+              </Link>
+            </li>
+            <li>
               <Link to="/reparaciones" className="transition hover:text-white">
                 Servicio técnico
               </Link>
@@ -134,11 +139,18 @@ export default function Footer({ bottomNavSpace = true }) {
             </li>
             <li className="flex gap-2.5">
               <Phone className="h-4 w-4 shrink-0 text-brand-600" />
-              <span>{STORE.phone}</span>
+              <a
+                href={`tel:+52${STORE.phone.replace(/\D/g, '')}`}
+                className="transition hover:text-white"
+              >
+                {STORE.phone}
+              </a>
             </li>
             <li className="flex gap-2.5">
               <Mail className="h-4 w-4 shrink-0 text-brand-600" />
-              <span>{STORE.email}</span>
+              <a href={`mailto:${STORE.email}`} className="transition hover:text-white">
+                {STORE.email}
+              </a>
             </li>
           </ul>
         </div>
@@ -148,10 +160,12 @@ export default function Footer({ bottomNavSpace = true }) {
             Horario
           </h4>
           <ul className="mt-4 space-y-3 text-[13px]">
-            <li className="flex gap-2.5">
-              <Clock className="h-4 w-4 shrink-0 text-brand-600" />
-              <span>{STORE.hours}</span>
-            </li>
+            {STORE.hoursLines.map((line) => (
+              <li key={line} className="flex gap-2.5">
+                <Clock className="h-4 w-4 shrink-0 text-brand-600" />
+                <span>{line}</span>
+              </li>
+            ))}
           </ul>
         </div>
       </div>
@@ -174,16 +188,21 @@ export default function Footer({ bottomNavSpace = true }) {
             Cómo llegar <ExternalLink className="h-3 w-3" />
           </span>
         </a>
-        <p className="flex items-center gap-3 text-xs">
-          <span className="flex items-center gap-1.5">
-            <Phone className="h-3.5 w-3.5 text-brand-600" />
-            {STORE.phone}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-brand-600" />
-            {STORE.hours}
-          </span>
+        <p className="flex items-center gap-1.5 text-xs">
+          <Phone className="h-3.5 w-3.5 text-brand-600" />
+          <a href={`tel:+52${STORE.phone.replace(/\D/g, '')}`}>{STORE.phone}</a>
+          <span className="px-1 text-fg-subtle">·</span>
+          <Mail className="h-3.5 w-3.5 text-brand-600" />
+          <a href={`mailto:${STORE.email}`}>{STORE.email}</a>
         </p>
+        <div className="flex flex-col items-center gap-1 text-xs">
+          {STORE.hoursLines.map((line) => (
+            <span key={line} className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5 text-brand-600" />
+              {line}
+            </span>
+          ))}
+        </div>
       </div>
 
       <div className="border-t border-[#222]">

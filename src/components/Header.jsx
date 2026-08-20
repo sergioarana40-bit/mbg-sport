@@ -44,7 +44,7 @@ export default function Header() {
           </span>
           <span className="hidden items-center gap-1.5 sm:flex">
             <MapPin className="h-3.5 w-3.5" />
-            {STORE.city}
+            {STORE.branch}
           </span>
         </div>
       </div>
@@ -115,6 +115,9 @@ export default function Header() {
                 {c.name}
               </NavLink>
             ))}
+            <NavLink to="/cables" className={linkClass}>
+              Arma tu cable
+            </NavLink>
             <NavLink
               to="/promociones"
               className={({ isActive }) =>

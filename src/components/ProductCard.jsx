@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { Plus, Check } from 'lucide-react'
 import ProductImage from './ProductImage'
 import FavoriteButton from './FavoriteButton'
-import { formatPrice, hasPrice } from '../config'
+import { formatPrice, hasPrice, productVariants } from '../config'
 import { useCart } from '../context/CartContext'
 
 // Tarjeta de producto estilo sticker (borde negro + sombra dura, diseño 1b).
@@ -12,8 +12,11 @@ export default function ProductCard({ product }) {
   const [added, setAdded] = useState(false)
   const noPrice = !hasPrice(product.price)
   const outOfStock = product.stock === 0
+  // Con variantes no hay agregado rápido: el clic navega al detalle a elegirlas.
+  const needsVariant = productVariants(product).length > 0
 
   function handleAdd(e) {
+    if (needsVariant) return
     e.preventDefault()
     if (outOfStock || noPrice) return
     addItem(product, 1)

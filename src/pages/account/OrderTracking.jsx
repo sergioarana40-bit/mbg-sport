@@ -5,7 +5,7 @@ import Spinner from '../../components/Spinner'
 import StatusBadge from '../../components/StatusBadge'
 import { useAuth } from '../../context/AuthContext'
 import { getOrderById } from '../../lib/api'
-import { formatPrice, STORE } from '../../config'
+import { formatPrice, orderNumber, STORE } from '../../config'
 
 function WhatsAppIcon({ className = 'h-5 w-5' }) {
   return (
@@ -86,7 +86,7 @@ export default function OrderTracking() {
   const cancelled = order.status === 'cancelled'
   const current = STATUS_STEP[order.status] ?? 0
   const waLink = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
-    `Hola, quiero consultar mi pedido #${order.id.slice(0, 8).toUpperCase()}`
+    `Hola, quiero consultar mi pedido ${orderNumber(order)}`
   )}`
 
   return (
@@ -104,7 +104,7 @@ export default function OrderTracking() {
           <span>Seguimiento</span>
         </h1>
         <span className="font-mono text-[13px] font-bold text-fg-subtle">
-          #{order.id.slice(0, 8).toUpperCase()}
+          {orderNumber(order)}
         </span>
       </div>
 
@@ -122,7 +122,7 @@ export default function OrderTracking() {
             {order.delivery_method === 'pickup' ? 'Recoge en tienda' : 'Entrega estimada'}
           </p>
           <p className="text-xs font-medium text-fg-subtle">
-            {order.delivery_method === 'pickup' ? STORE.city : '2–4 días hábiles'}
+            {order.delivery_method === 'pickup' ? STORE.branch : '2–4 días hábiles'}
           </p>
         </div>
         <StatusBadge status={order.status} />

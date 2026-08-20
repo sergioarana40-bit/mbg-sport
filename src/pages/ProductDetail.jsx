@@ -7,7 +7,7 @@ import ProductReviews from '../components/ProductReviews'
 import StarRating from '../components/StarRating'
 import Spinner from '../components/Spinner'
 import { getProductById } from '../lib/api'
-import { formatPrice, hasPrice, STORE } from '../config'
+import { formatPrice, hasPrice, productVariants, STORE } from '../config'
 import { useCart } from '../context/CartContext'
 
 function WhatsAppIcon({ className = 'h-4 w-4' }) {
@@ -27,10 +27,13 @@ export default function ProductDetail() {
   const [qty, setQty] = useState(1)
   const [added, setAdded] = useState(false)
   const [reviewSummary, setReviewSummary] = useState(null)
+  // Opciones elegidas de las variantes del producto ({ Color: 'Rojo', … }).
+  const [selection, setSelection] = useState({})
 
   useEffect(() => {
     setLoading(true)
     setQty(1)
+    setSelection({})
     getProductById(id)
       .then(setProduct)
       .catch(() => setProduct(null))
@@ -64,16 +67,25 @@ export default function ProductDetail() {
     `Hola, quiero consultar el precio de: ${product.name}`
   )}`
 
+  // Variantes: todas las opciones deben elegirse antes de agregar al carrito.
+  const variantGroups = productVariants(product)
+  const missingGroups = variantGroups.filter((g) => !selection[g.name])
+  const variantComplete = missingGroups.length === 0
+  const variant =
+    variantGroups.length > 0 && variantComplete
+      ? Object.fromEntries(variantGroups.map((g) => [g.name, selection[g.name]]))
+      : null
+
   function handleAdd() {
-    if (noPrice) return
-    addItem(product, qty)
+    if (noPrice || !variantComplete) return
+    addItem(product, qty, variant)
     setAdded(true)
     setTimeout(() => setAdded(false), 1400)
   }
 
   function buyNow() {
-    if (noPrice) return
-    addItem(product, qty)
+    if (noPrice || !variantComplete) return
+    addItem(product, qty, variant)
     navigate('/carrito')
   }
 
@@ -178,6 +190,35 @@ export default function ProductDetail() {
             </div>
           )}
 
+          {/* Variantes del producto (color, talla, grosor…) */}
+          {!noPrice && !outOfStock && variantGroups.length > 0 && (
+            <div className="mt-6 grid max-w-[430px] gap-3.5 sm:grid-cols-2">
+              {variantGroups.map((g) => (
+                <label key={g.name} className="block">
+                  <span className="mb-1.5 block text-[11px] font-bold uppercase tracking-[.06em] text-[#4a4a4a]">
+                    {g.name}
+                  </span>
+                  <select
+                    value={selection[g.name] || ''}
+                    onChange={(e) =>
+                      setSelection((s) => ({ ...s, [g.name]: e.target.value }))
+                    }
+                    className="w-full cursor-pointer rounded-[10px] border-2 border-ink bg-white px-3 py-2.5 text-[13.5px] font-semibold text-fg outline-none transition focus:border-brand-600"
+                  >
+                    <option value="" disabled>
+                      Elige {g.name.toLowerCase()}…
+                    </option>
+                    {g.options.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ))}
+            </div>
+          )}
+
           {/* Cantidad + acciones (póster 1b) */}
           {!outOfStock && !noPrice && (
             <div className="mt-6 flex flex-wrap items-center gap-3.5">
@@ -205,7 +246,8 @@ export default function ProductDetail() {
 
               <button
                 onClick={handleAdd}
-                className={`inline-flex h-12 items-center gap-2.5 rounded-[10px] px-6 font-display text-[13px] font-extrabold uppercase tracking-[.08em] text-white transition ${
+                disabled={!variantComplete}
+                className={`inline-flex h-12 items-center gap-2.5 rounded-[10px] px-6 font-display text-[13px] font-extrabold uppercase tracking-[.08em] text-white transition disabled:cursor-not-allowed disabled:opacity-50 ${
                   added ? 'bg-state-paid' : 'bg-ink hover:bg-ink-2'
                 }`}
               >
@@ -220,9 +262,20 @@ export default function ProductDetail() {
                 )}
               </button>
 
-              <button onClick={buyNow} className="btn-sticker h-12">
+              <button
+                onClick={buyNow}
+                disabled={!variantComplete}
+                className="btn-sticker h-12 disabled:cursor-not-allowed disabled:opacity-50"
+              >
                 Comprar ahora
               </button>
+
+              {!variantComplete && (
+                <p className="w-full text-[12px] font-semibold text-brand-600">
+                  Elige {missingGroups.map((g) => g.name.toLowerCase()).join(' y ')} para
+                  agregar al carrito.
+                </p>
+              )}
             </div>
           )}
 
@@ -230,7 +283,7 @@ export default function ProductDetail() {
           <div className="mt-5 flex max-w-[430px] items-center gap-2.5 rounded-[10px] border-2 border-ink bg-accent-400 px-4 py-3">
             <Store className="h-[18px] w-[18px] shrink-0 text-fg" strokeWidth={2} />
             <span className="text-[12.5px] font-semibold text-fg">
-              Recoge tu pedido en tienda · {STORE.city.split(',')[0]} · Listo hoy
+              Recoge tu pedido en tienda · {STORE.branch} · Listo hoy
             </span>
           </div>
           {!STORE.pickupOnly && (

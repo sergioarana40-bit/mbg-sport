@@ -32,6 +32,8 @@ export async function saveProduct(product) {
     featured: !!product.featured,
     active: product.active !== false,
     image_url: product.image_url || null,
+    // Grupos de opciones a elegir ([{name, options:[…]}]) o null si no aplica.
+    variants: product.variants ?? null,
   }
   if (product.id) {
     const { data, error } = await supabase
@@ -298,6 +300,98 @@ export function uploadRepairImage(file) {
   return uploadImage('repairs/', file)
 }
 
+/* ------------------- Armador de cables (tipos y terminales) ------------------- */
+
+export async function getAllCableTypes() {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('cable_types')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data
+}
+
+export async function saveCableType(item) {
+  if (!isSupabaseConfigured) return needBackend()
+  const payload = {
+    name: item.name,
+    description: item.description || null,
+    thickness: (item.thickness || '').trim().toLowerCase(),
+    image_url: item.image_url || null,
+    sort_order: Number(item.sort_order) || 0,
+    active: item.active !== false,
+  }
+  if (item.id) {
+    const { data, error } = await supabase
+      .from('cable_types')
+      .update(payload)
+      .eq('id', item.id)
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  }
+  const { data, error } = await supabase.from('cable_types').insert(payload).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteCableType(id) {
+  if (!isSupabaseConfigured) return needBackend()
+  const { error } = await supabase.from('cable_types').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function getAllCableEnds() {
+  if (!isSupabaseConfigured) return []
+  const { data, error } = await supabase
+    .from('cable_ends')
+    .select('*')
+    .order('sort_order', { ascending: true })
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data
+}
+
+export async function saveCableEnd(item) {
+  if (!isSupabaseConfigured) return needBackend()
+  const payload = {
+    name: item.name,
+    description: item.description || null,
+    // Grosores compatibles; lista vacía = compatible con todos los cables.
+    compatible: Array.isArray(item.compatible) ? item.compatible : [],
+    image_url: item.image_url || null,
+    sort_order: Number(item.sort_order) || 0,
+    active: item.active !== false,
+  }
+  if (item.id) {
+    const { data, error } = await supabase
+      .from('cable_ends')
+      .update(payload)
+      .eq('id', item.id)
+      .select()
+      .single()
+    if (error) throw error
+    return data
+  }
+  const { data, error } = await supabase.from('cable_ends').insert(payload).select().single()
+  if (error) throw error
+  return data
+}
+
+export async function deleteCableEnd(id) {
+  if (!isSupabaseConfigured) return needBackend()
+  const { error } = await supabase.from('cable_ends').delete().eq('id', id)
+  if (error) throw error
+}
+
+// Sube la foto de un cable/terminal al bucket 'products' (carpeta cables/).
+export function uploadCableImage(file) {
+  return uploadImage('cables/', file)
+}
+
 /* ------------------------- Categorías ------------------------- */
 
 export async function getAllCategories() {
@@ -452,7 +546,7 @@ export async function getStats() {
     }
   }
   const [{ data: orders, error }, { data: products, error: prodError }] = await Promise.all([
-    supabase.from('orders').select('id, total, status, created_at, customer_name, customer_email'),
+    supabase.from('orders').select('id, folio, total, status, created_at, customer_name, customer_email'),
     supabase.from('products').select('id, name, stock, active').eq('active', true),
   ])
   if (error) throw error

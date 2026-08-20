@@ -31,7 +31,8 @@ export default function Home() {
       .finally(() => setLoading(false))
   }, [])
 
-  const waLink = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(
+  // El CTA de servicio técnico usa la línea de reparaciones.
+  const waLink = `https://wa.me/${STORE.repairWhatsapp}?text=${encodeURIComponent(
     'Hola, quiero cotizar el servicio técnico / mantenimiento de mi equipo.'
   )}`
 

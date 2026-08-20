@@ -48,6 +48,29 @@ const EMPTY = {
   featured: false,
   active: true,
   image_url: '',
+  variants: [],
+}
+
+// El editor maneja las opciones como texto separado por comas; en la base se
+// guardan como [{name, options: […]}] (o null si no hay variantes válidas).
+function toEditorVariants(list) {
+  if (!Array.isArray(list)) return []
+  return list.map((g) => ({
+    name: g?.name || '',
+    optionsText: Array.isArray(g?.options) ? g.options.join(', ') : '',
+  }))
+}
+function fromEditorVariants(list) {
+  const groups = (list || [])
+    .map((g) => ({
+      name: g.name.trim(),
+      options: g.optionsText
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    }))
+    .filter((g) => g.name && g.options.length > 0)
+  return groups.length > 0 ? groups : null
 }
 
 // Celda editable al clic (precio/stock): Enter o clic fuera guarda, Esc cancela.
@@ -162,6 +185,7 @@ export default function AdminProducts() {
       featured: !!p.featured,
       active: p.active !== false,
       image_url: p.image_url || '',
+      variants: toEditorVariants(p.variants),
     })
     setImageFile(null)
     setPreview(p.image_url || '')
@@ -187,7 +211,7 @@ export default function AdminProducts() {
     try {
       let image_url = form.image_url
       if (imageFile) image_url = await uploadProductImage(imageFile)
-      await saveProduct({ ...form, image_url })
+      await saveProduct({ ...form, image_url, variants: fromEditorVariants(form.variants) })
       setModalOpen(false)
       await load()
     } catch (err) {
@@ -278,6 +302,7 @@ export default function AdminProducts() {
       featured: !!p.featured,
       active: p.active !== false,
       image_url: p.image_url || '',
+      variants: toEditorVariants(p.variants),
     })
     setImageFile(null)
     setPreview(p.image_url || '')
@@ -678,6 +703,77 @@ export default function AdminProducts() {
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Variantes (color, talla, grosor…): el cliente elige una opción de
+              cada grupo antes de agregar al carrito. No cambian el precio. */}
+          <div>
+            <div className="flex items-center justify-between">
+              <label className="block text-sm font-medium text-fg-muted">
+                Variantes (opcional)
+              </label>
+              <button
+                type="button"
+                onClick={() =>
+                  setForm((f) => ({
+                    ...f,
+                    variants: [...(f.variants || []), { name: '', optionsText: '' }],
+                  }))
+                }
+                className="inline-flex items-center gap-1.5 rounded-lg border-2 border-ink bg-white px-2.5 py-1.5 font-display text-[10.5px] font-extrabold uppercase text-fg transition hover:bg-surface-2"
+              >
+                <Plus className="h-3 w-3" strokeWidth={3} />
+                Agregar
+              </button>
+            </div>
+            <p className="mt-1 text-[11px] font-medium text-fg-subtle">
+              Para productos con opciones a elegir (color, talla, grosor, tamaño…). Escribe las
+              opciones separadas por coma; la elección del cliente llega junto con el pedido.
+            </p>
+            {(form.variants || []).map((g, idx) => (
+              <div key={idx} className="mt-2 flex gap-2">
+                <input
+                  className="field w-32 shrink-0"
+                  placeholder="Ej. Color"
+                  value={g.name}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      variants: f.variants.map((v, i) =>
+                        i === idx ? { ...v, name: e.target.value } : v
+                      ),
+                    }))
+                  }
+                />
+                <input
+                  className="field flex-1"
+                  placeholder="Opciones separadas por coma (ej. Rojo, Negro, Azul)"
+                  value={g.optionsText}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      variants: f.variants.map((v, i) =>
+                        i === idx ? { ...v, optionsText: e.target.value } : v
+                      ),
+                    }))
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    setForm((f) => ({
+                      ...f,
+                      variants: f.variants.filter((_, i) => i !== idx),
+                    }))
+                  }
+                  aria-label="Quitar variante"
+                  title="Quitar variante"
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border-2 border-ink text-fg transition hover:bg-brand-600 hover:text-white"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+            ))}
           </div>
 
           <div className="flex gap-6">
